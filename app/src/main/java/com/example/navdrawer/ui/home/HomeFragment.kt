@@ -1,6 +1,7 @@
 package com.example.navdrawer.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentHomeBinding
+import java.io.InputStream
+import java.io.OutputStream
 
 class HomeFragment : Fragment() {
 
@@ -38,6 +41,9 @@ class HomeFragment : Fragment() {
 
         _binding?.textView2?.text = "Hi, good to see you."
 
+
+
+
         return root
     }
 
@@ -45,4 +51,5 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
 }

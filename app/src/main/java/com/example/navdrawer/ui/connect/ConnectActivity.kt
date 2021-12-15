@@ -2,16 +2,19 @@ package com.example.navdrawer.ui.connect
 
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.ListView
-import android.widget.SimpleAdapter
+import android.view.ViewGroup
+import android.widget.*
 import com.example.navdrawer.GlobalVariables
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.ActivityConnectBinding
+
+//import com.example.navdrawer.databinding.ActivityConnectBinding
 
 class ConnectActivity : AppCompatActivity() {
 
@@ -19,22 +22,62 @@ class ConnectActivity : AppCompatActivity() {
     private  val mmMacs = arrayListOf<String>()
     private  val mmDevices = arrayListOf<BluetoothDevice>()
 
+    private var mmBinding: ActivityConnectBinding? = null
+    private val binding get() = mmBinding!!
+
+//    val mmTvTitle = findViewById<TextView>(R.id.tvTitle)
 //    val mmBtnCancel = findViewById<Button>(R.id.btnCancel)
 //    val mmLvDevices = findViewById<ListView>(R.id.lvDevices)
+
+    private lateinit var mmInfalter:LayoutInflater
+    private var mmContainer:ViewGroup? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
+//
+//        //mmBinding = ActivityConnectBinding.inflate(layoutInflater)
+//        //mmBinding?.tvTitle?.text = "Clicked"
+//        mmTvTitle = findViewById<TextView>(R.id.tvTitle)
+//        mmTvTitle.text = "Entered"
+
+        //mmBinding = ActivityConnectBinding.inflate(inflater, container, false)
 
 //        //--------------------------------------------------------------------------//
 //        // Listener 등록
 //        //--------------------------------------------------------------------------//
-//        mmBtnCancel.setOnClickListener(listenerCancel)
-//        mmLvDevices.onItemClickListener = listenerItemClick
+        val btnCancel = findViewById<Button>(R.id.btnCancel)
+        btnCancel.setOnClickListener(listenerCancel)
+
+        val lvDevices = findViewById<ListView>(R.id.lvDevices)
+        lvDevices.onItemClickListener = listenerItemClick
 //        //--------------------------------------------------------------------------//
 //
-//        getPairedDevices()
+        getPairedDevices()
     }
+
+//    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+//
+////        mmInfalter = inflater
+////        mmContainer = container
+//       // val view = inflater.inflate(R.layout.my_fragment, null)
+//
+//
+//        mmBinding = ActivityConnectBinding.inflate(layoutInflater)
+//        val root: View? = mmBinding?.root
+//        //mmBinding = ActivityConnectBinding.inflate(inflater, container, false)
+//
+////        //--------------------------------------------------------------------------//
+////        // Listener 등록
+////        //--------------------------------------------------------------------------//
+//        mmBinding?.btnCancel?.setOnClickListener(listenerCancel)
+//    //    mmBinding?.lvDevices?.onItemClickListener = listenerItemClick
+////        //--------------------------------------------------------------------------//
+////
+//        //getPairedDevices()
+//
+//        return root
+//    }
 
     //--------------------------------------------------------------------------//
     // btnCancel 의 OnClick Listener
@@ -42,6 +85,10 @@ class ConnectActivity : AppCompatActivity() {
     private val listenerCancel = View.OnClickListener {
         setResult(Activity.RESULT_CANCELED, intent)
         finish()
+        //mmBinding?.tvTitle?.text = "Clicked"
+        //mmTvTitle.text= "Clicked"
+//        val tvTitle = findViewById<TextView>(R.id.tvTitle)
+//        tvTitle.text= "Clicked"
     }
 
     //--------------------------------------------------------------------------//
@@ -79,6 +126,6 @@ class ConnectActivity : AppCompatActivity() {
         var keys = arrayOf("name", "mac")
         val ids = intArrayOf(R.id.tvDeviceName, R.id.tvDeviceMac)
         val adapter1 = SimpleAdapter(this, dataList, R.layout.bt_devices_row, keys, ids)
-        //mmLvDevices.adapter = adapter1
+        mmBinding?.lvDevices?.adapter = adapter1
     }
 }

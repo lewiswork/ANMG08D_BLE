@@ -93,44 +93,44 @@ class ConnectFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == CONNECT_ACTIVYTY){
-            if (resultCode == RESULT_OK){
-                val device = GlobalVariables.Companion.selectedDevice
-
-                // Get Socket and Connect using UUID
-                mmSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                mmSocket.connect()
-
-                // Get Input/Output Stream using socket
-                mmInStream = mmSocket.inputStream
-                mmOutStream = mmSocket.outputStream
-
-                // Receive Thread 시작
-                try {
-                    mmIsRunningRxThread =true
-                    mmRxThread = ReceiveThread()
-                    mmRxThread.start()
-
-                    mmIsRunningDisplayThread = true
-                    mmDisplayThread = DisplayThread()
-                    mmDisplayThread.start()
-                } catch (ex: Exception) {
-//                    tvReceiveMsg.text = ex.message
-                }
-              //  tvStatus.text = "Receive thread started."
-                //btnSend.isEnabled = true
-                mmBinding?.btnConnect?.isEnabled = false
-                mmBinding?.btnDisconnect?.isEnabled = true
-                //tvReceiveMsg.text = ""
-
-                mmBinding?.tvDeviceName?.append(device.name)
-                mmBinding?.tvMac?.append(device.address)
-
-                //tvStatus.text = "Connected."
-            }else if (resultCode == RESULT_CANCELED) {
-                //tvStatus.text = "Connection canceled."
-            }
-        }
+//        if (requestCode == CONNECT_ACTIVYTY){
+//            if (resultCode == RESULT_OK){
+//                val device = GlobalVariables.Companion.selectedDevice
+//
+//                // Get Socket and Connect using UUID
+//                mmSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
+//                mmSocket.connect()
+//
+//                // Get Input/Output Stream using socket
+//                mmInStream = mmSocket.inputStream
+//                mmOutStream = mmSocket.outputStream
+//
+//                // Receive Thread 시작
+//                try {
+//                    mmIsRunningRxThread =true
+//                    mmRxThread = ReceiveThread()
+//                    mmRxThread.start()
+//
+//                    mmIsRunningDisplayThread = true
+//                    mmDisplayThread = DisplayThread()
+//                    mmDisplayThread.start()
+//                } catch (ex: Exception) {
+////                    tvReceiveMsg.text = ex.message
+//                }
+//              //  tvStatus.text = "Receive thread started."
+//                //btnSend.isEnabled = true
+//                mmBinding?.btnConnect?.isEnabled = false
+//                mmBinding?.btnDisconnect?.isEnabled = true
+//                //tvReceiveMsg.text = ""
+//
+//                mmBinding?.tvDeviceName?.append(device.name)
+//                mmBinding?.tvMac?.append(device.address)
+//
+//                //tvStatus.text = "Connected."
+//            }else if (resultCode == RESULT_CANCELED) {
+//                //tvStatus.text = "Connection canceled."
+//            }
+//        }
     }
 
     override fun onDestroyView() {

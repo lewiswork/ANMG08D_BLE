@@ -85,10 +85,6 @@ class ConnectActivity : AppCompatActivity() {
     private val listenerCancel = View.OnClickListener {
         setResult(Activity.RESULT_CANCELED, intent)
         finish()
-        //mmBinding?.tvTitle?.text = "Clicked"
-        //mmTvTitle.text= "Clicked"
-//        val tvTitle = findViewById<TextView>(R.id.tvTitle)
-//        tvTitle.text= "Clicked"
     }
 
     //--------------------------------------------------------------------------//
@@ -126,6 +122,8 @@ class ConnectActivity : AppCompatActivity() {
         var keys = arrayOf("name", "mac")
         val ids = intArrayOf(R.id.tvDeviceName, R.id.tvDeviceMac)
         val adapter1 = SimpleAdapter(this, dataList, R.layout.bt_devices_row, keys, ids)
-        mmBinding?.lvDevices?.adapter = adapter1
+
+        val lvDevices = findViewById<ListView>(R.id.lvDevices)
+        lvDevices.adapter = adapter1
     }
 }

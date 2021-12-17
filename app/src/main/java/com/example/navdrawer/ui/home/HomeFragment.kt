@@ -39,11 +39,6 @@ class HomeFragment : Fragment() {
             textView.text = it
         })
 
-        _binding?.textView2?.text = "Hi, good to see you."
-
-
-
-
         return root
     }
 

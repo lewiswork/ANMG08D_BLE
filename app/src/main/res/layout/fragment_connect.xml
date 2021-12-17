@@ -32,25 +32,28 @@
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Status : " />
+        android:text="Status : Disconnected"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
         android:id="@+id/tvDeviceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
+        android:paddingLeft="15dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Device Name : " />
+        android:text="Name : "
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <TextView
         android:id="@+id/tvMac"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
+        android:paddingLeft="15dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="MAC : " />
+        android:text="MAC : "
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <Space
         android:layout_width="match_parent"
@@ -69,7 +72,8 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:text="Connect" />
+            android:text="Connect"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <Button
             android:id="@+id/btnDisconnect"
@@ -78,7 +82,9 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:text="Disconnect" />
+            android:enabled="false"
+            android:text="Disconnect"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     </LinearLayout>
 

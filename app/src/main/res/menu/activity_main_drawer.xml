@@ -7,17 +7,23 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@android:drawable/ic_dialog_dialer"
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_connect"
             android:icon="@android:drawable/stat_sys_data_bluetooth"
             android:title="@string/menu_gallery" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="@string/menu_slideshow" />
-        <item android:title="Item" />
-        <item android:title="Item" />
+            android:id="@+id/nav_jig"
+            android:title="@string/menu_jig" />
+        <item
+            android:id="@+id/nav_register"
+            android:title="@string/menu_register" />
+        <item
+            android:id="@+id/nav_monitoring"
+            android:title="@string/menu_monitoring" />
+        <item
+            android:id="@+id/nav_help"
+            android:title="@string/menu_help" />
     </group>
 </menu>

@@ -17,7 +17,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.GlobalVariables
 import com.example.navdrawer.databinding.FragmentConnectBinding
-import kotlinx.coroutines.Dispatchers.Main
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -29,35 +28,28 @@ class ConnectFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    //private val binding get() = _binding!!
     private val binding get() = mmBinding!!
-
-    private lateinit var mmInStream: InputStream
-    private lateinit var mmOutStream: OutputStream
-    private lateinit var mmSocket: BluetoothSocket
-
-    private var mmTxBuffer: ByteArray = ByteArray(2048)
-    //private var mmRxBuffer: ByteArray = ByteArray(8192)
-    //private var mmRxBuffer: ByteArray = ByteArray(2048)
-    private var mmRxBuffer: ByteArray = ByteArray(8192)
-
-    private lateinit var mmRxThread: ReceiveThread
-    private lateinit var mmDisplayThread: DisplayThread
-
-    private var mmIsRunningRxThread = false
-    private var mmIsRunningDisplayThread = false
     private val CONNECT_ACTIVYTY = 0
 
-    private lateinit var mmInfalter:LayoutInflater
-    private var mmContainer:ViewGroup? = null
+    private  var mmInStream: InputStream? = null
+    private  var mmOutStream: OutputStream? = null
+    private  var mmSocket: BluetoothSocket? = null
+    private  var mmRxThread: ReceiveThread?  = null
+    private  var mmDisplayThread: DisplayThread? = null
+
+    private var mmTxBuffer: ByteArray = ByteArray(2048)
+    private var mmRxBuffer: ByteArray = ByteArray(8192)
+
+    private var mmRunRxThread = false
+    private var mmRunDisplayThread = false
+
+    private var mmBtConnected = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        mmInfalter = inflater
-        mmContainer = container
 
         connectViewModel =
             ViewModelProvider(this).get(ConnectViewModel::class.java)
@@ -73,8 +65,8 @@ class ConnectFragment : Fragment() {
         try {
             GlobalVariables.adapter = BluetoothAdapter.getDefaultAdapter()
         }catch (ex:Exception){
-//            Toast.makeText(applicationContext, "Error occurred when getting BT adapter", Toast.LENGTH_SHORT)
-//                .show()
+            Toast.makeText(this@ConnectFragment.context, "Error occurred while getting BT adapter", Toast.LENGTH_SHORT)
+                .show()
         }
 
         //------------------------------------------------------------------//
@@ -99,34 +91,37 @@ class ConnectFragment : Fragment() {
 
                 // Get Socket and Connect using UUID
                 mmSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                mmSocket.connect()
+                mmSocket!!.connect()
 
                 // Get Input/Output Stream using socket
-                mmInStream = mmSocket.inputStream
-                mmOutStream = mmSocket.outputStream
+                mmInStream = mmSocket!!.inputStream
+                mmOutStream = mmSocket!!.outputStream
 
                 // Receive Thread 시작
                 try {
-                    mmIsRunningRxThread =true
+                    mmRunRxThread =true
                     mmRxThread = ReceiveThread()
-                    mmRxThread.start()
+                    mmRxThread!!.start()
 
-                    mmIsRunningDisplayThread = true
+                    mmRunDisplayThread = true
                     mmDisplayThread = DisplayThread()
-                    mmDisplayThread.start()
+                    mmDisplayThread!!.start()
                 } catch (ex: Exception) {
-//                    tvReceiveMsg.text = ex.message
+                    Toast.makeText(this@ConnectFragment.context, "Error occurred while starting threads.", Toast.LENGTH_LONG)
+                    .show()
                 }
               //  tvStatus.text = "Receive thread started."
-                //btnSend.isEnabled = true
+
                 mmBinding?.btnConnect?.isEnabled = false
                 mmBinding?.btnDisconnect?.isEnabled = true
                 //tvReceiveMsg.text = ""
+                mmBinding?.tvStatus?.text = "Status : Connected"
 
                 mmBinding?.tvDeviceName?.append(device.name)
                 mmBinding?.tvMac?.append(device.address)
 
-                //tvStatus.text = "Connected."
+                Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
+                    .show()
             }else if (resultCode == RESULT_CANCELED) {
                 //tvStatus.text = "Connection canceled."
             }
@@ -144,14 +139,15 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     private fun DisconnectBt() {
 
-        mmInStream.close()
-        mmOutStream.close()
-        mmSocket.close()
+        if (mmInStream != null)        mmInStream!!.close()
+        if (mmOutStream != null) mmOutStream!!.close()
+        if (mmSocket != null) mmSocket!!.close()
 
-        mmIsRunningRxThread = false
-        mmIsRunningDisplayThread = false
+        mmRunRxThread = false
+        mmRunDisplayThread = false
+        mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        GlobalVariables.sampleQueue.clear()
+        GlobalVariables.rStringQueue.clear()
     }
 
     //---------------------------------------------------------------------------------------//
@@ -159,22 +155,12 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     private val listenerConnect = View.OnClickListener {
         if (GlobalVariables.adapter == null) {
-//            Toast.makeText(this, "Bluetooth Not Supported", Toast.LENGTH_SHORT)
-//                .show()
+            Toast.makeText(this@ConnectFragment.context, "Bluetooth Not Supported", Toast.LENGTH_SHORT)
+                .show()
         } else {
             if (GlobalVariables.adapter.isEnabled) {
                 //val intent = Intent(this, ConnectActivity::class.java)
                 val intent = Intent(this@ConnectFragment.context, ConnectActivity::class.java)
-
-//                activity?.let {
-//                    val intent = Intent(it, ConnectActivity::class.java)
-//                    try {
-//                        it.startActivity(intent)
-//                    } catch (ex: Exception) {
-//                        //tvReceiveMsg.text = ex.message
-//                        Log.d("Error", ex.message.toString())
-//                    }
-//                }
 
                 try {
                     startActivityForResult(intent, CONNECT_ACTIVYTY)
@@ -182,8 +168,12 @@ class ConnectFragment : Fragment() {
                     //tvReceiveMsg.text = ex.message
                 }
             } else {
-//                Toast.makeText(this, "Bluetooth is Disabled", Toast.LENGTH_SHORT)
-//                    .show()
+                /*---------------------------------------------------------------------------
+                // Bluetooth 가 Disable 되어 있는 경우 메시지 표시
+                // 향 후, 사용자에게 BT 연결 작업 요청 코드 추가 예정
+                //-------------------------------------------------------------------------*/
+                Toast.makeText(this@ConnectFragment.context, "Bluetooth is Disabled", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -195,7 +185,7 @@ class ConnectFragment : Fragment() {
 
         DisconnectBt()
 
-        GlobalVariables.sampleQueue.clear()
+        GlobalVariables.rStringQueue.clear()
 
         mmBinding?.tvDeviceName?.text = "Device : "
         mmBinding?.tvMac?.text = "MAC : "
@@ -219,19 +209,19 @@ class ConnectFragment : Fragment() {
             var readMessage : String
 
             Log.d("ME", "Receive thread started. ID : ${this.id}")
-            while (mmIsRunningRxThread) {
+            while (mmRunRxThread) {
                 try {
                     //Log.d("MEA", "Receive Thread")
-                    if (mmSocket.isConnected) {
+                    if (mmSocket!!.isConnected) {
                         // Receive
-                        bytes = mmInStream.read(mmRxBuffer)
+                        bytes = mmInStream!!.read(mmRxBuffer)
 
                         if (bytes > 0) {
 
                             readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
 
                             synchronized(this) {
-                                GlobalVariables.sampleQueue.add(readMessage)
+                                GlobalVariables.rStringQueue.add(readMessage)
                             }
                         }
                     }
@@ -254,11 +244,11 @@ class ConnectFragment : Fragment() {
             //var qCount: Int = -1
 
             Log.d("ME", "Display thread started. ID : ${this.id}")
-            while (mmIsRunningDisplayThread) {
+            while (mmRunDisplayThread) {
                 try {
                     //Log.d("MEA", "Display Thread")
                     synchronized(this) {
-                        qEmpty = GlobalVariables.sampleQueue.isEmpty()
+                        qEmpty = GlobalVariables.rStringQueue.isEmpty()
                         //qCount = GlobalVariables.sampleQueue.count()
                     }
 
@@ -266,11 +256,11 @@ class ConnectFragment : Fragment() {
                         //if (qCount > 0) {
                         try {
                             synchronized(this) {
-                                sb.append(GlobalVariables.sampleQueue.remove())
+                                sb.append(GlobalVariables.rStringQueue.remove())
                             }
 
                         } catch (ex: NoSuchElementException) {
-                            Log.d("MEX", GlobalVariables.sampleQueue.count().toString())
+                            Log.d("MEX", GlobalVariables.rStringQueue.count().toString())
                             ex.printStackTrace()
                             //continue
                             break

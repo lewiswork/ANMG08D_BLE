@@ -33,10 +33,16 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        //-------------------------------------------------------------------------------------//
+        // Fragment 추가 시 수정 필요
+        //-------------------------------------------------------------------------------------//
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home, R.id.nav_connect, R.id.nav_slideshow), drawerLayout)
+            R.id.nav_home, R.id.nav_connect, R.id.nav_jig, R.id.nav_monitoring), drawerLayout)
+        //-------------------------------------------------------------------------------------//
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }

@@ -9,6 +9,6 @@ class GlobalVariables {
     companion object {
         public lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         public lateinit var selectedDevice: BluetoothDevice
-        public  var sampleQueue: Queue<String> = LinkedList()
+        public  var rStringQueue: Queue<String> = LinkedList()
     }
 }

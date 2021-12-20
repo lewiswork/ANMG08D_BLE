@@ -6,9 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.lifecycle.Observer
-import com.example.navdrawer.R
+import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.RxThread
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 
 class MonitoringFragment : Fragment() {
@@ -26,10 +25,21 @@ class MonitoringFragment : Fragment() {
         _binding = FragmentMonitoringBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.tvMonitoring
-        monitoringViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
+//        val textView: TextView = binding.tvMonitoring
+//        monitoringViewModel.text.observe(viewLifecycleOwner, Observer {
+//            textView.text = it
+//        })
+
+        if (GlobalVariables.isBtConnected)
+            _binding?.tvMonitoring?.text = "BT Connected"
+        else
+            _binding?.tvMonitoring?.text = "BT Not Connected"
+
+
+//        val rTh = RxThread()
+//        rTh.start()
+
+
         return root
     }
 

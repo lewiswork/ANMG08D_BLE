@@ -1,6 +1,7 @@
 package com.example.navdrawer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -40,7 +41,11 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home, R.id.nav_connect, R.id.nav_jig, R.id.nav_monitoring), drawerLayout)
+            R.id.nav_home,      // 기본 생성(3개)
+            R.id.nav_connect,   // 기본 생성(3개) 후 명칭 변경
+            R.id.nav_jig,       // 기본 생성(3개) 후 명칭 변경
+            R.id.nav_monitoring // 추가
+        ), drawerLayout)
         //-------------------------------------------------------------------------------------//
 
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -56,5 +61,27 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        DisconnectBt()
+    }
+
+    //---------------------------------------------------------------------------------------//
+    // BT Disconnect 함수, Stream, Socket Close 및 Thread 종료
+    //---------------------------------------------------------------------------------------//
+    public fun DisconnectBt() {
+
+        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
+
+        GlobalVariables.rxThreadOn = false
+        GlobalVariables.displayThreadOn = false
+        //mmBinding?.tvStatus?.text = "Status : Disconnected"
+
+        GlobalVariables.rStringQueue.clear()
+        GlobalVariables.isBtConnected = false
     }
 }

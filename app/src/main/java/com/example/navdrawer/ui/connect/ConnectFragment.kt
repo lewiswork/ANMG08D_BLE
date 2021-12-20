@@ -16,7 +16,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
+
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -31,19 +33,19 @@ class ConnectFragment : Fragment() {
     private val binding get() = mmBinding!!
     private val CONNECT_ACTIVYTY = 0
 
-    private  var mmInStream: InputStream? = null
-    private  var mmOutStream: OutputStream? = null
-    private  var mmSocket: BluetoothSocket? = null
-    private  var mmRxThread: ReceiveThread?  = null
-    private  var mmDisplayThread: DisplayThread? = null
+//    private  var mmInStream: InputStream? = null
+//    private  var mmOutStream: OutputStream? = null
+//    private  var mmSocket: BluetoothSocket? = null
+
+//    private  var mmRxThread: ReceiveThread?  = null
+//    private  var mmDisplayThread: DisplayThread? = null
 
     private var mmTxBuffer: ByteArray = ByteArray(2048)
-    private var mmRxBuffer: ByteArray = ByteArray(8192)
+    //private var mmRxBuffer: ByteArray = ByteArray(8192)
+    private var mmRxBuffer: ByteArray = ByteArray(2048)
 
-    private var mmRunRxThread = false
-    private var mmRunDisplayThread = false
-
-    private var mmBtConnected = false
+//    private var mmRunRxThread = false
+//    private var mmRunDisplayThread = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,6 +81,8 @@ class ConnectFragment : Fragment() {
 //        btnClear.setOnClickListener { tvReceiveMsg.text = null }    // Clear(Received Message)
         //------------------------------------------------------------------//
 
+        DisplayBtStatus()
+
         return root
     }
 
@@ -87,38 +91,33 @@ class ConnectFragment : Fragment() {
 
         if (requestCode == CONNECT_ACTIVYTY){
             if (resultCode == RESULT_OK){
-                val device = GlobalVariables.Companion.selectedDevice
+                val device = GlobalVariables.selectedDevice
 
                 // Get Socket and Connect using UUID
-                mmSocket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                mmSocket!!.connect()
+                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
+                GlobalVariables.socket!!.connect()
 
                 // Get Input/Output Stream using socket
-                mmInStream = mmSocket!!.inputStream
-                mmOutStream = mmSocket!!.outputStream
+                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
+                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
 
                 // Receive Thread 시작
                 try {
-                    mmRunRxThread =true
-                    mmRxThread = ReceiveThread()
-                    mmRxThread!!.start()
+                    GlobalVariables.rxThreadOn =true
+                    //mmRxThread = ReceiveThread()
+                    GlobalVariables.mmRxThread = RxThread()
+                    GlobalVariables.mmRxThread!!.start()
 
-                    mmRunDisplayThread = true
-                    mmDisplayThread = DisplayThread()
-                    mmDisplayThread!!.start()
+//                    GlobalVariables.displayThreadOn = true
+//                    mmDisplayThread = DisplayThread()
+//                    mmDisplayThread!!.start()
                 } catch (ex: Exception) {
                     Toast.makeText(this@ConnectFragment.context, "Error occurred while starting threads.", Toast.LENGTH_LONG)
                     .show()
                 }
-              //  tvStatus.text = "Receive thread started."
 
-                mmBinding?.btnConnect?.isEnabled = false
-                mmBinding?.btnDisconnect?.isEnabled = true
-                //tvReceiveMsg.text = ""
-                mmBinding?.tvStatus?.text = "Status : Connected"
-
-                mmBinding?.tvDeviceName?.append(device.name)
-                mmBinding?.tvMac?.append(device.address)
+                GlobalVariables.isBtConnected = true
+                DisplayBtStatus()
 
                 Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
                     .show()
@@ -128,10 +127,26 @@ class ConnectFragment : Fragment() {
         }
     }
 
+    private fun DisplayBtStatus() {
+        if (GlobalVariables.isBtConnected) {
+            mmBinding?.btnConnect?.isEnabled = false
+            mmBinding?.btnDisconnect?.isEnabled = true
+            mmBinding?.tvStatus?.text = "Status : Connected"
+
+            mmBinding?.tvDeviceName?.append(GlobalVariables.selectedDevice.name)
+            mmBinding?.tvMac?.append(GlobalVariables.selectedDevice.address)
+        }
+        else
+        {
+            mmBinding?.btnConnect?.isEnabled = true
+            mmBinding?.btnDisconnect?.isEnabled = false
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         mmBinding = null
-        DisconnectBt()
+        //DisconnectBt()
     }
 
     //---------------------------------------------------------------------------------------//
@@ -139,15 +154,16 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     private fun DisconnectBt() {
 
-        if (mmInStream != null)        mmInStream!!.close()
-        if (mmOutStream != null) mmOutStream!!.close()
-        if (mmSocket != null) mmSocket!!.close()
+        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
-        mmRunRxThread = false
-        mmRunDisplayThread = false
+        GlobalVariables.rxThreadOn = false
+        GlobalVariables.displayThreadOn = false
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
         GlobalVariables.rStringQueue.clear()
+        GlobalVariables.isBtConnected = false
     }
 
     //---------------------------------------------------------------------------------------//
@@ -185,7 +201,7 @@ class ConnectFragment : Fragment() {
 
         DisconnectBt()
 
-        GlobalVariables.rStringQueue.clear()
+        //GlobalVariables.rStringQueue.clear()
 
         mmBinding?.tvDeviceName?.text = "Device : "
         mmBinding?.tvMac?.text = "MAC : "
@@ -209,20 +225,16 @@ class ConnectFragment : Fragment() {
             var readMessage : String
 
             Log.d("ME", "Receive thread started. ID : ${this.id}")
-            while (mmRunRxThread) {
+            while (GlobalVariables.rxThreadOn) {
                 try {
                     //Log.d("MEA", "Receive Thread")
-                    if (mmSocket!!.isConnected) {
+                    if (GlobalVariables.socket!!.isConnected) {
                         // Receive
-                        bytes = mmInStream!!.read(mmRxBuffer)
+                        bytes = GlobalVariables.inStream!!.read(mmRxBuffer)
 
                         if (bytes > 0) {
-
                             readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
-
-                            synchronized(this) {
-                                GlobalVariables.rStringQueue.add(readMessage)
-                            }
+                            synchronized(this) { GlobalVariables.rStringQueue.add(readMessage) }
                         }
                     }
                 } catch (e: java.io.IOException) {
@@ -244,7 +256,7 @@ class ConnectFragment : Fragment() {
             //var qCount: Int = -1
 
             Log.d("ME", "Display thread started. ID : ${this.id}")
-            while (mmRunDisplayThread) {
+            while (GlobalVariables.displayThreadOn) {
                 try {
                     //Log.d("MEA", "Display Thread")
                     synchronized(this) {

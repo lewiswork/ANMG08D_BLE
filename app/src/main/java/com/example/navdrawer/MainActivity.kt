@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
-        GlobalVariables.displayThreadOn = false
+        //GlobalVariables.displayThreadOn = false
         //mmBinding?.tvStatus?.text = "Status : Disconnected"
 
         GlobalVariables.rStringQueue.clear()

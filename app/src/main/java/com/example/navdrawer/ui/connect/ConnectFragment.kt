@@ -3,7 +3,6 @@ package com.example.navdrawer.ui.connect
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -16,12 +15,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.GlobalVariables
-import com.example.navdrawer.RxThread
+import com.example.navdrawer.thread.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
-
-
-import java.io.InputStream
-import java.io.OutputStream
 
 class ConnectFragment : Fragment() {
 
@@ -159,7 +154,7 @@ class ConnectFragment : Fragment() {
         if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
-        GlobalVariables.displayThreadOn = false
+        //GlobalVariables.displayThreadOn = false
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
         GlobalVariables.rStringQueue.clear()
@@ -211,106 +206,106 @@ class ConnectFragment : Fragment() {
     }
 
 
-    //---------------------------------------------------------------------------------------//
-    // Bluetooth Receive Thread 처리용 Inner Class
-    //---------------------------------------------------------------------------------------//
-    inner class ReceiveThread : Thread() {
-        override fun run() {
-
-            var sidx:Int=0
-            var eidx:Int=0
-            var str:String=""
-            var pk:String=""
-            var bytes : Int
-            var readMessage : String
-
-            Log.d("ME", "Receive thread started. ID : ${this.id}")
-            while (GlobalVariables.rxThreadOn) {
-                try {
-                    //Log.d("MEA", "Receive Thread")
-                    if (GlobalVariables.socket!!.isConnected) {
-                        // Receive
-                        bytes = GlobalVariables.inStream!!.read(mmRxBuffer)
-
-                        if (bytes > 0) {
-                            readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
-                            synchronized(this) { GlobalVariables.rStringQueue.add(readMessage) }
-                        }
-                    }
-                } catch (e: java.io.IOException) {
-                    e.printStackTrace()
-                    break
-                }
-            }
-            Log.d("ME", "Receive thread finished. ID : ${this.id}")
-        }
-    }
-
-    inner class DisplayThread : Thread() {
-        override fun run() {
-            var pk: String = ""
-            var sb: StringBuilder = StringBuilder()
-            var sidx: Int = 0
-            var eidx: Int = 0
-            var qEmpty: Boolean = true
-            //var qCount: Int = -1
-
-            Log.d("ME", "Display thread started. ID : ${this.id}")
-            while (GlobalVariables.displayThreadOn) {
-                try {
-                    //Log.d("MEA", "Display Thread")
-                    synchronized(this) {
-                        qEmpty = GlobalVariables.rStringQueue.isEmpty()
-                        //qCount = GlobalVariables.sampleQueue.count()
-                    }
-
-                    if (!qEmpty) {
-                        //if (qCount > 0) {
-                        try {
-                            synchronized(this) {
-                                sb.append(GlobalVariables.rStringQueue.remove())
-                            }
-
-                        } catch (ex: NoSuchElementException) {
-                            Log.d("MEX", GlobalVariables.rStringQueue.count().toString())
-                            ex.printStackTrace()
-                            //continue
-                            break
-                        }
-
-                        while (sb.isNotEmpty()) {
-                            if (sb.contains('S')) {
-                                sidx = sb.indexOf('S')
-                            }
-
-                            if (sb.contains('Z')) {
-                                eidx = sb.indexOf('Z')
-                                pk = sb.substring(sidx, eidx + 1)
-
-                                if (sb.length > pk.length) {
-                                    sidx = eidx + 1
-                                    sb = StringBuilder(sb.substring(sidx, sb.length))
-                                } else {
-                                    sb = StringBuilder("")
-                                }
-                                Log.d("MED", pk)
-                            } else {
-                                break
-                            }
-
-//                            this@MainActivity.runOnUiThread(java.lang.Runnable {
-//                                tvReceiveMsg.text = pk
-//                            })
-                        }
-                    }
-                } catch (e: java.io.IOException) {
-                    Log.d("MEX", "$sidx/$eidx")
-                    e.printStackTrace()
-                    break
-                    //continue
-                }
-            }
-            Log.d("ME", "Display thread finished. ID : ${this.id}")
-        }
-    }
+//    //---------------------------------------------------------------------------------------//
+//    // Bluetooth Receive Thread 처리용 Inner Class
+//    //---------------------------------------------------------------------------------------//
+//    inner class ReceiveThread : Thread() {
+//        override fun run() {
+//
+//            var sidx:Int=0
+//            var eidx:Int=0
+//            var str:String=""
+//            var pk:String=""
+//            var bytes : Int
+//            var readMessage : String
+//
+//            Log.d("ME", "Receive thread started. ID : ${this.id}")
+//            while (GlobalVariables.rxThreadOn) {
+//                try {
+//                    //Log.d("MEA", "Receive Thread")
+//                    if (GlobalVariables.socket!!.isConnected) {
+//                        // Receive
+//                        bytes = GlobalVariables.inStream!!.read(mmRxBuffer)
+//
+//                        if (bytes > 0) {
+//                            readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
+//                            synchronized(this) { GlobalVariables.rStringQueue.add(readMessage) }
+//                        }
+//                    }
+//                } catch (e: java.io.IOException) {
+//                    e.printStackTrace()
+//                    break
+//                }
+//            }
+//            Log.d("ME", "Receive thread finished. ID : ${this.id}")
+//        }
+//    }
+//
+//    inner class DisplayThread : Thread() {
+//        override fun run() {
+//            var pk: String = ""
+//            var sb: StringBuilder = StringBuilder()
+//            var sidx: Int = 0
+//            var eidx: Int = 0
+//            var qEmpty: Boolean = true
+//            //var qCount: Int = -1
+//
+//            Log.d("ME", "Display thread started. ID : ${this.id}")
+//            while (GlobalVariables.displayThreadOn) {
+//                try {
+//                    //Log.d("MEA", "Display Thread")
+//                    synchronized(this) {
+//                        qEmpty = GlobalVariables.rStringQueue.isEmpty()
+//                        //qCount = GlobalVariables.sampleQueue.count()
+//                    }
+//
+//                    if (!qEmpty) {
+//                        //if (qCount > 0) {
+//                        try {
+//                            synchronized(this) {
+//                                sb.append(GlobalVariables.rStringQueue.remove())
+//                            }
+//
+//                        } catch (ex: NoSuchElementException) {
+//                            Log.d("MEX", GlobalVariables.rStringQueue.count().toString())
+//                            ex.printStackTrace()
+//                            //continue
+//                            break
+//                        }
+//
+//                        while (sb.isNotEmpty()) {
+//                            if (sb.contains('S')) {
+//                                sidx = sb.indexOf('S')
+//                            }
+//
+//                            if (sb.contains('Z')) {
+//                                eidx = sb.indexOf('Z')
+//                                pk = sb.substring(sidx, eidx + 1)
+//
+//                                if (sb.length > pk.length) {
+//                                    sidx = eidx + 1
+//                                    sb = StringBuilder(sb.substring(sidx, sb.length))
+//                                } else {
+//                                    sb = StringBuilder("")
+//                                }
+//                                Log.d("MED", pk)
+//                            } else {
+//                                break
+//                            }
+//
+////                            this@MainActivity.runOnUiThread(java.lang.Runnable {
+////                                tvReceiveMsg.text = pk
+////                            })
+//                        }
+//                    }
+//                } catch (e: java.io.IOException) {
+//                    Log.d("MEX", "$sidx/$eidx")
+//                    e.printStackTrace()
+//                    break
+//                    //continue
+//                }
+//            }
+//            Log.d("ME", "Display thread finished. ID : ${this.id}")
+//        }
+//    }
 }

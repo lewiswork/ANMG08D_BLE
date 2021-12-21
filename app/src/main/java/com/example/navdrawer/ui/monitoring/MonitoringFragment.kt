@@ -110,9 +110,9 @@ class MonitoringFragment : Fragment() {
                                 break
                             }
 
-//                            this@MainActivity.runOnUiThread(java.lang.Runnable {
-//                                tvReceiveMsg.text = pk
-                            //})
+                            activity?.runOnUiThread {
+                                _binding?.tvMonitoring?.text = pk
+                            }
                         }
                     }
                 } catch (e: java.io.IOException) {

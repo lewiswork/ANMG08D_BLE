@@ -68,60 +68,60 @@ class MonitoringFragment : Fragment() {
             //var qCount: Int = -1
 
             Log.d("ME", "Display thread started. ID : ${this.id}")
-            while (mmDisplayThreadOn) {
-                try {
-                    //Log.d("MEA", "Display Thread")
-                    synchronized(this) {
-                        qEmpty = GlobalVariables.rStringQueue.isEmpty()
-                        //qCount = GlobalVariables.sampleQueue.count()
-                    }
-
-                    if (!qEmpty) {
-                        //if (qCount > 0) {
-                        try {
-                            synchronized(this) {
-                                sb.append(GlobalVariables.rStringQueue.remove())
-                            }
-
-                        } catch (ex: NoSuchElementException) {
-                            Log.d("MEX", GlobalVariables.rStringQueue.count().toString())
-                            ex.printStackTrace()
-                            //continue
-                            break
-                        }
-
-                        while (sb.isNotEmpty()) {
-                            if (sb.contains('S')) {
-                                sidx = sb.indexOf('S')
-                            }
-
-                            if (sb.contains('Z')) {
-                                eidx = sb.indexOf('Z')
-                                pk = sb.substring(sidx, eidx + 1)
-
-                                if (sb.length > pk.length) {
-                                    sidx = eidx + 1
-                                    sb = StringBuilder(sb.substring(sidx, sb.length))
-                                } else {
-                                    sb = StringBuilder("")
-                                }
-                                Log.d("MED", pk)
-                            } else {
-                                break
-                            }
-
-                            activity?.runOnUiThread {
-                                _binding?.tvMonitoring?.text = pk
-                            }
-                        }
-                    }
-                } catch (e: java.io.IOException) {
-                    Log.d("MEX", "$sidx/$eidx")
-                    e.printStackTrace()
-                    break
-                    //continue
-                }
-            }
+//            while (mmDisplayThreadOn) {
+//                try {
+//                    //Log.d("MEA", "Display Thread")
+//                    synchronized(this) {
+//                        qEmpty = GlobalVariables.rByteQueue.isEmpty()
+//                        //qCount = GlobalVariables.sampleQueue.count()
+//                    }
+//
+//                    if (!qEmpty) {
+//                        //if (qCount > 0) {
+//                        try {
+//                            synchronized(this) {
+//                                sb.append(GlobalVariables.rByteQueue.remove())
+//                            }
+//
+//                        } catch (ex: NoSuchElementException) {
+//                            Log.d("MEX", GlobalVariables.rByteQueue.count().toString())
+//                            ex.printStackTrace()
+//                            //continue
+//                            break
+//                        }
+//
+//                        while (sb.isNotEmpty()) {
+//                            if (sb.contains('S')) {
+//                                sidx = sb.indexOf('S')
+//                            }
+//
+//                            if (sb.contains('Z')) {
+//                                eidx = sb.indexOf('Z')
+//                                pk = sb.substring(sidx, eidx + 1)
+//
+//                                if (sb.length > pk.length) {
+//                                    sidx = eidx + 1
+//                                    sb = StringBuilder(sb.substring(sidx, sb.length))
+//                                } else {
+//                                    sb = StringBuilder("")
+//                                }
+//                                Log.d("MED", pk)
+//                            } else {
+//                                break
+//                            }
+//
+//                            activity?.runOnUiThread {
+//                                _binding?.tvMonitoring?.text = pk
+//                            }
+//                        }
+//                    }
+//                } catch (e: java.io.IOException) {
+//                    Log.d("MEX", "$sidx/$eidx")
+//                    e.printStackTrace()
+//                    break
+//                    //continue
+//                }
+//            }
             Log.d("ME", "Display thread finished. ID : ${this.id}")
         }
     }

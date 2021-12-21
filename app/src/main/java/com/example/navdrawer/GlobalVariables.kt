@@ -3,6 +3,7 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
 import java.io.InputStream
 import java.io.OutputStream
@@ -13,7 +14,8 @@ class GlobalVariables {
     companion object {
         public lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         public lateinit var selectedDevice: BluetoothDevice
-        public var rStringQueue: Queue<String> = LinkedList()
+        //public var rByteQueue: Queue<String> = LinkedList()
+        public var rawByteQueue: Queue<Byte> = LinkedList()
         public var isBtConnected: Boolean = false           // BT 연결 상태
 
         public var inStream: InputStream? = null
@@ -21,8 +23,10 @@ class GlobalVariables {
         public var socket: BluetoothSocket? = null
 
         public var rxThreadOn = false
+        public var rxPacketThreadOn = false
         //public var displayThreadOn = false
 
-        public  var mmRxThread: RxThread?  = null
+        public  var rxThread: RxThread?  = null
+        public  var getPacketThread: GetPacketThread?  = null
     }
 }

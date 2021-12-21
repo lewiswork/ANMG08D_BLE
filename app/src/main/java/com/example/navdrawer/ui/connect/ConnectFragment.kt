@@ -5,7 +5,6 @@ import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.GlobalVariables
 import com.example.navdrawer.thread.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
+import com.example.navdrawer.thread.GetPacketThread
 
 class ConnectFragment : Fragment() {
 
@@ -100,8 +100,12 @@ class ConnectFragment : Fragment() {
                 try {
                     GlobalVariables.rxThreadOn =true
                     //mmRxThread = ReceiveThread()
-                    GlobalVariables.mmRxThread = RxThread()
-                    GlobalVariables.mmRxThread!!.start()
+                    GlobalVariables.rxThread = RxThread()
+                    GlobalVariables.rxThread!!.start()
+
+                    GlobalVariables.rxPacketThreadOn =true
+                    GlobalVariables.getPacketThread = GetPacketThread()
+                    GlobalVariables.getPacketThread!!.start()
 
 //                    GlobalVariables.displayThreadOn = true
 //                    mmDisplayThread = DisplayThread()
@@ -154,10 +158,11 @@ class ConnectFragment : Fragment() {
         if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
-        //GlobalVariables.displayThreadOn = false
+        GlobalVariables.rxPacketThreadOn = false
+
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        GlobalVariables.rStringQueue.clear()
+        GlobalVariables.rawByteQueue.clear()
         GlobalVariables.isBtConnected = false
     }
 

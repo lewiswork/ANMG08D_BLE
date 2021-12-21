@@ -1,7 +1,6 @@
 package com.example.navdrawer
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -78,10 +77,12 @@ class MainActivity : AppCompatActivity() {
         if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
+        GlobalVariables.rxPacketThreadOn = false
+
         //GlobalVariables.displayThreadOn = false
         //mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        GlobalVariables.rStringQueue.clear()
+        GlobalVariables.rawByteQueue.clear()
         GlobalVariables.isBtConnected = false
     }
 }

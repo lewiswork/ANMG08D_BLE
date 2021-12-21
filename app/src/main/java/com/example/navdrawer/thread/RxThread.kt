@@ -10,26 +10,23 @@ class RxThread : Thread(){
 
     override fun run() {
 
-//        var sidx:Int=0
-//        var eidx:Int=0
-//        var str:String=""
-//        var pk:String=""
         var bytes : Int
         var readMessage : String
 
         Log.d("ME", "Receive thread started. ID : ${this.id}")
         while (GlobalVariables.rxThreadOn) {
             try {
-                //Log.d("MEA", "Receive Thread")
                 if (GlobalVariables.socket!!.isConnected) {
                     // Receive
                     bytes = GlobalVariables.inStream!!.read(mmRxBuffer)
 
                     if (bytes > 0) {
-                        readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
+                        //readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
                         synchronized(this) {
-                            GlobalVariables.rStringQueue.add(readMessage)
-                            //Log.d("ME", "${readMessage}")
+                            for (i in 0 until bytes) {
+                                GlobalVariables.rawByteQueue.add(mmRxBuffer[i])
+                                //Log.d("ME", mmRxBuffer[i].toString())
+                            }
                         }
                     }
                 }

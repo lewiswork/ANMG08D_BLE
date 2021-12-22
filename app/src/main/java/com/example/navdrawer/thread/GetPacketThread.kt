@@ -4,6 +4,10 @@ import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.data.Packet
+import java.util.*
+import kotlin.NoSuchElementException
+import kotlin.collections.ArrayList
 
 enum class ExtractMode{ Header, Body }    // Header : STX~LEN, Body : Data~ETX
 
@@ -17,6 +21,7 @@ class GetPacketThread:Thread() {
 
     var mmCurIdx : Int = 0
     var mmRawByteList = mutableListOf<Byte>()
+    //var mmRawByteList = mutableListOf<ByteArray>()
     var mmDataList : ArrayList<Byte> = ArrayList()
     var mmExtractMode  = ExtractMode.Header
 
@@ -32,6 +37,7 @@ class GetPacketThread:Thread() {
 
         var category : PacketCategory? = null
         var kind : PacketKind? = null
+        var rawByteArray = byteArrayOf()
 
         Log.d("ME", "Get packet thread started. ID : ${this.id}")
 
@@ -44,16 +50,25 @@ class GetPacketThread:Thread() {
                 if (!qEmpty) {
                     try {
                         synchronized(this) {
-                            var len = Global.rawByteQueue.count()
+                            //var len = Global.rawByteQueue.count()
 
-                            for (i in 0 until len) {
-                                mmRawByteList.add(Global.rawByteQueue.remove())
-                            }
-                            Log.d("ME LEN", len.toString())
+                            //for (i in 0 until len) {
+                            //mmRawByteList.add(Global.rawByteQueue.remove())
+                            //}
+                            //mmRawByteList.add(Global.rawByteQueue.remove())
+                            //Log.d("ME LEN", len.toString())
+                            rawByteArray = Global.rawByteQueue.remove()
                         }
+
+                        var len = rawByteArray.count()
+                        for (i in 0 until len) {
+                            mmRawByteList.add(rawByteArray[i])
+                        }
+                        Log.d("ME LEN", len.toString())
+
                     } catch (ex: NoSuchElementException) {
                         Log.d("MEX", Global.rawByteQueue.count().toString())
-                        ex.printStackTrace()
+                        //ex.printStackTrace()
                         //continue
                         break
                     }
@@ -140,34 +155,25 @@ class GetPacketThread:Thread() {
                                 Log.d("ME", "ETX Error !")
                                 if (clearRawByteList()) continue    // Error 처리
                             }
+
+                            val pk = Packet(category, kind, dataLength, mmDataList)
+
+                            // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
+                            when(category) {
+                                PacketCategory.Rom -> Global.romQueue.add(pk)
+                                PacketCategory.Monitoring -> Global.monQueue.add(pk)
+                                PacketCategory.Hardware -> Global.hwQueue.add(pk)
+                                PacketCategory.Register -> Global.regQueue.add(pk)
+                                PacketCategory.Test -> Global.testQueue.add(pk)
+                            }
+
                             Log.d("ME", "Getting packet succeeded.")
-                            if (clearRawByteList()) continue
+
+                            Log.d("ME", "mmRawByteList size B :  ${mmDataList.size}")
+                            clearRawByteList()
+                            Log.d("ME", "mmRawByteList size A :  ${mmDataList.size}")
                         }
                         //------------------------------------------------------------------------------//
-
-
-//                        if (sb.contains('S')) {
-//                            sidx = sb.indexOf('S')
-//                        }
-//
-//                        if (sb.contains('Z')) {
-//                            eidx = sb.indexOf('Z')
-//                            pk = sb.substring(sidx, eidx + 1)
-//
-//                            if (sb.length > pk.length) {
-//                                sidx = eidx + 1
-//                                sb = StringBuilder(sb.substring(sidx, sb.length))
-//                            } else {
-//                                sb = StringBuilder("")
-//                            }
-//                            Log.d("MED", pk)
-//                        } else {
-//                            break
-//                        }
-
-//                        activity?.runOnUiThread {
-//                            _binding?.tvMonitoring?.text = pk
-//                        }
                     }
 
             } catch (e: java.io.IOException) {
@@ -181,7 +187,10 @@ class GetPacketThread:Thread() {
     }
 
     private fun clearRawByteList() : Boolean {
-        for (i in 0 until mmCurIdx) mmRawByteList.removeAt(i)
+        for (i in 0 until mmCurIdx) {
+            //mmRawByteList.removeAt(i)
+            mmRawByteList.removeAt(0)
+        }
         mmCurIdx = 0
         mmDataList.clear()
         mmExtractMode = ExtractMode.Header

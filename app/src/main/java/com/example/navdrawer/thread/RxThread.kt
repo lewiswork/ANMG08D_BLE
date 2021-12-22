@@ -12,6 +12,7 @@ class RxThread : Thread(){
 
         var bytes : Int
         var readMessage : String
+        var arrayCopy = byteArrayOf()
 
         Log.d("ME", "Receive thread started. ID : ${this.id}")
         while (Global.rxThreadOn) {
@@ -23,10 +24,12 @@ class RxThread : Thread(){
                     if (bytes > 0) {
                         //readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
                         synchronized(this) {
-                            for (i in 0 until bytes) {
-                                Global.rawByteQueue.add(mmRxBuffer[i])
+                            //for (i in 0 until bytes) {
+                                //Global.rawByteQueue.add(mmRxBuffer[i])
                                 //Log.d("ME", mmRxBuffer[i].toString())
-                            }
+                            //}
+                            arrayCopy = mmRxBuffer.copyOf(bytes)
+                            Global.rawByteQueue.add(arrayCopy)
                         }
                     }
                 }

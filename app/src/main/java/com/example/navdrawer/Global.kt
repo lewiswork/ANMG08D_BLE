@@ -3,6 +3,7 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import com.example.navdrawer.data.Packet
 import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
 import java.io.InputStream
@@ -17,25 +18,31 @@ enum class PacketKind{
 class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
-        public lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
-        public lateinit var selectedDevice: BluetoothDevice
+        lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
+        lateinit var selectedDevice: BluetoothDevice
 
         //public var rByteQueue: Queue<String> = LinkedList()
-        public var rawByteQueue: Queue<Byte> = LinkedList()
-        public var isBtConnected: Boolean = false           // BT 연결 상태
+        //var rawByteQueue: Queue<Byte> = LinkedList()
+        var rawByteQueue: Queue<ByteArray> = LinkedList()
+        var isBtConnected: Boolean = false           // BT 연결 상태
 
-        public var inStream: InputStream? = null
-        public var outStream: OutputStream? = null
-        public var socket: BluetoothSocket? = null
+        var inStream: InputStream? = null
+        var outStream: OutputStream? = null
+        var socket: BluetoothSocket? = null
 
-        public var rxThreadOn = false
-        public var rxPacketThreadOn = false
-        //public var displayThreadOn = false
+        var rxThreadOn = false
+        var rxPacketThreadOn = false
 
-        public var rxThread: RxThread? = null
-        public var getPacketThread: GetPacketThread? = null
+        var rxThread: RxThread? = null
+        var getPacketThread: GetPacketThread? = null
 
-        public val packetCategory = mapOf(
+        var romQueue : Queue<Packet> = LinkedList()
+        var monQueue : Queue<Packet> = LinkedList()
+        var hwQueue : Queue<Packet> = LinkedList()
+        var regQueue : Queue<Packet> = LinkedList()
+        var testQueue : Queue<Packet> = LinkedList()
+
+        val packetCategory = mapOf(
             "E" to PacketCategory.Rom,
             "M" to PacketCategory.Monitoring,
             "R" to PacketCategory.Register,
@@ -43,10 +50,12 @@ class Global {
             "T" to PacketCategory.Test
         )
 
-        public val packetKind = mapOf(
+        val packetKind = mapOf(
             "MT" to PacketKind.MonTouch,
             "MP" to PacketKind.MonPercent
         )
+
+
 
         fun validChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
             var result: UInt = 0u

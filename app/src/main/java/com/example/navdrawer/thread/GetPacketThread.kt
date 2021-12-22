@@ -51,31 +51,27 @@ class GetPacketThread:Thread() {
                 synchronized(this) { qEmpty = Global.rawByteQueue.isEmpty() }
                 if (!qEmpty) {
                     try {
-                        synchronized(this) {
-                            rawByteArray = Global.rawByteQueue.remove()
-                        }
+                        synchronized(this) { rawByteArray = Global.rawByteQueue.remove() }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {
                             mmRawByteList.add(rawByteArray[i])
                         }
-                        //Log.d("ME LEN", len.toString())
 
-//                        // 발췌 Packet Log 저장(DEBUG)
-//                        var str=StringBuilder()
-//                        for (element in rawByteArray) {
-//                            str.append(String.format("%02X", element))
-//                            str.append(" ")
-//                        }
-//                        Log.d("ME", "[RX RAW] $str")
+                        //  Log 저장(DEBUG)
+                        var str=StringBuilder()
+                        for (element in rawByteArray) {
+                            str.append(String.format("%02X", element))
+                            str.append(" ")
+                        }
+                        Log.d("ME", "[RX RAW] $str")
 
-//                        // 발췌 Packet Log 저장(DEBUG)
+//                        // 발췌 Log 저장(DEBUG)
 //                        str=StringBuilder()
 //                        for (i in 0 until mmRawByteList.size) {
 //                            str.append(String.format("%02X ", mmRawByteList[i]))
 //                        }
 //                        Log.d("ME", "[RX BUF] $str")
-
                     } catch (ex: NoSuchElementException) {
                         Log.d("MEX", Global.rawByteQueue.count().toString())
                         //ex.printStackTrace()
@@ -142,14 +138,16 @@ class GetPacketThread:Thread() {
                                 mmDataList.add(mmRawByteList[IDX_DATA_START + i])
                             }
 
-                            // Checksum(Valid Check)
-                            //mmCurIdx++
-                            checksum = mmRawByteList[IDX_DATA_START + dataLength]
+                            if(dataLength > 0) {
+                                // Checksum(Valid Check)
+                                //mmCurIdx++
+                                checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
-                            // Checksum Error 확인
-                            if(!Global.validChecksum(mmDataList, checksum)){
-                                Log.d("ME", "Checksum Error !")
-                                if (clearRawByteList()) continue    // Error 처리
+                                // Checksum Error 확인
+                                if (!Global.validChecksum(mmDataList, checksum)) {
+                                    Log.d("ME", "Checksum Error !")
+                                    if (clearRawByteList()) continue    // Error 처리
+                                }
                             }
 
                             // ETX

@@ -61,6 +61,21 @@ class GetPacketThread:Thread() {
                         }
                         //Log.d("ME LEN", len.toString())
 
+//                        // 발췌 Packet Log 저장(DEBUG)
+//                        var str=StringBuilder()
+//                        for (element in rawByteArray) {
+//                            str.append(String.format("%02X", element))
+//                            str.append(" ")
+//                        }
+//                        Log.d("ME", "[RX RAW] $str")
+
+//                        // 발췌 Packet Log 저장(DEBUG)
+//                        str=StringBuilder()
+//                        for (i in 0 until mmRawByteList.size) {
+//                            str.append(String.format("%02X ", mmRawByteList[i]))
+//                        }
+//                        Log.d("ME", "[RX BUF] $str")
+
                     } catch (ex: NoSuchElementException) {
                         Log.d("MEX", Global.rawByteQueue.count().toString())
                         //ex.printStackTrace()
@@ -79,18 +94,16 @@ class GetPacketThread:Thread() {
                             if (mmRawByteList.count() < SZ_UNTIL_LEN) continue
 
                             // STX
-                            mmCurIdx++
+                            //mmCurIdx++
+                            mmCurIdx = SZ_UNTIL_LEN  // Error 시 mmCurIdx 까지 버림
                             if (mmRawByteList[0] != STX) {
                                 Log.d("ME", "STX Error ! : ${mmRawByteList[0]}")
                                 if (clearRawByteList()) continue    // Error 처리
                             }
 
                             // Check Header : if in range of A to Z
-                            mmCurIdx+=2
+                            //mmCurIdx+=2
                             if ((mmRawByteList[1] in 0x41..0x5a) && (mmRawByteList[2] in 0x41..0x5a)) {
-//                                Log.d("ME",
-//                                    "Packet Header : ${mmRawByteList[1].toChar()}${mmRawByteList[2].toChar()}")
-
                                 val str1 = mmRawByteList[1].toChar().toString()
                                 val str2 = mmRawByteList[2].toChar().toString()
 
@@ -101,21 +114,18 @@ class GetPacketThread:Thread() {
                                     Log.d("ME", "Packet header error : $str1$str2")
                                     if (clearRawByteList()) continue    // Error 처리
                                 }
-//                                Log.d("ME", "Packet Category : $category")
-//                                Log.d("ME", "Packet kind : $kind")
                             } else {
                                 Log.d("ME", "Packet Header Error!!")
                                 if (clearRawByteList()) continue    // Error 처리
                             }
 
                             // Check Length : if in range of '0' to '9'
-                            mmCurIdx+=3
+                            //mmCurIdx+=3
                             if ((mmRawByteList[3] in 0x30..0x39) && (mmRawByteList[4] in 0x30..0x39)
                                 && (mmRawByteList[5] in 0x30..0x39)
                             ) {
                                 dataLength =
                                     (mmRawByteList[3].toInt() - 0x30) * 100 + (mmRawByteList[4].toInt() - 0x30) * 10 + (mmRawByteList[5].toInt() - 0x30)
-                                //Log.d("ME", "Packet Length(Int) : $dataLength")
                                 mmExtractMode = ExtractMode.Body
                             } else {
                                 Log.d("ME", "Packet Length Error!!")
@@ -126,13 +136,14 @@ class GetPacketThread:Thread() {
                             if (mmRawByteList.count() < SZ_UNTIL_LEN + dataLength + 2) continue // Data, Checksum, ETX
 
                             // Data
-                            mmCurIdx += dataLength
+                            //mmCurIdx += dataLength
+                            mmCurIdx += dataLength + 2  // Error 시 mmCurIdx 까지 버림
                             for (i in 0 until dataLength) {
                                 mmDataList.add(mmRawByteList[IDX_DATA_START + i])
                             }
 
                             // Checksum(Valid Check)
-                            mmCurIdx++
+                            //mmCurIdx++
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
@@ -142,7 +153,7 @@ class GetPacketThread:Thread() {
                             }
 
                             // ETX
-                            mmCurIdx++
+                            //mmCurIdx++
                             if (mmRawByteList[IDX_DATA_START + dataLength + 1] != ETX) {
                                 Log.d("ME", "ETX Error !")
                                 if (clearRawByteList()) continue    // Error 처리
@@ -159,16 +170,13 @@ class GetPacketThread:Thread() {
                                 PacketCategory.Test -> Global.testQueue.add(pk)
                             }
 
-                            //Log.d("ME", "Getting packet succeeded.")
-
+                            // 발췌 Packet Log 저장
                             for (i in 0 until mmCurIdx) {
                                 mmLogStr.append(String.format("%02X", mmRawByteList[i]))
                                 if (i in 1..5) mmLogStr.append("(${mmRawByteList[i].toChar()})")
                                 if (i < mmCurIdx - 1) mmLogStr.append(" ")
                             }
                             Log.d("ME", "[RX] $mmLogStr")
-
-//                            Log.d("ME", "Mon Q size : ${Global.monQueue.size}")
                             clearRawByteList()
                         }
                         //------------------------------------------------------------------------------//

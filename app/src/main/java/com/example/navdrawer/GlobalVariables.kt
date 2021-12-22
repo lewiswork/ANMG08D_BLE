@@ -9,6 +9,11 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
+enum class PacketClass{ Rom, Monitoring, Register, Hardware, Test }
+enum class PacketKind{
+    MonTouch, MonPercent
+}
+
 class GlobalVariables {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
@@ -28,5 +33,18 @@ class GlobalVariables {
 
         public  var rxThread: RxThread?  = null
         public  var getPacketThread: GetPacketThread?  = null
+
+        public val packetClass = mapOf(
+            "E" to PacketClass.Rom,
+            "M" to PacketClass.Monitoring,
+            "R" to PacketClass.Register,
+            "H" to PacketClass.Hardware,
+            "T" to PacketClass.Test
+        )
+
+        public val packetKind = mapOf(
+            "MT" to PacketKind.MonTouch,
+            "MP" to PacketKind.MonPercent
+        )
     }
 }

@@ -1,8 +1,8 @@
 package com.example.navdrawer.thread
 
 import android.util.Log
-import com.example.navdrawer.GlobalVariables
-import com.example.navdrawer.PacketClass
+import com.example.navdrawer.Global
+import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 
 enum class ExtractMode{ Header, Body }    // Header : STX~LEN, Body : Data~ETX
@@ -30,29 +30,29 @@ class GetPacketThread:Thread() {
         //var dataList : ArrayList<Byte> = ArrayList<Byte>()
         var checksum : Byte = 0x00
 
-        var packetClass : PacketClass? = null
-        var packetKind : PacketKind? = null
+        var category : PacketCategory? = null
+        var kind : PacketKind? = null
 
         Log.d("ME", "Get packet thread started. ID : ${this.id}")
 
-        while (GlobalVariables.rxPacketThreadOn) {
+        while (Global.rxPacketThreadOn) {
             try {
                 //------------------------------------------------------------------------------//
                 // rawByteQueue 데이터 -> byteList 로 이동
                 //------------------------------------------------------------------------------//
-                synchronized(this) { qEmpty = GlobalVariables.rawByteQueue.isEmpty() }
+                synchronized(this) { qEmpty = Global.rawByteQueue.isEmpty() }
                 if (!qEmpty) {
                     try {
                         synchronized(this) {
-                            var len = GlobalVariables.rawByteQueue.count()
+                            var len = Global.rawByteQueue.count()
 
                             for (i in 0 until len) {
-                                mmRawByteList.add(GlobalVariables.rawByteQueue.remove())
+                                mmRawByteList.add(Global.rawByteQueue.remove())
                             }
                             Log.d("ME LEN", len.toString())
                         }
                     } catch (ex: NoSuchElementException) {
-                        Log.d("MEX", GlobalVariables.rawByteQueue.count().toString())
+                        Log.d("MEX", Global.rawByteQueue.count().toString())
                         ex.printStackTrace()
                         //continue
                         break
@@ -84,15 +84,15 @@ class GetPacketThread:Thread() {
                                 val str1 = mmRawByteList[1].toChar().toString()
                                 val str2 = mmRawByteList[2].toChar().toString()
 
-                                packetClass = GlobalVariables.packetClass[str1]
-                                packetKind = GlobalVariables.packetKind["$str1$str2"]
+                                category = Global.packetCategory[str1]
+                                kind = Global.packetKind["$str1$str2"]
 
-                                if (packetClass == null || packetKind == null){
+                                if (category == null || kind == null){
                                     Log.d("ME", "Packet header error : $str1$str2")
                                     if (clearRawByteList()) continue    // Error 처리
                                 }
-                                Log.d("ME", "Packet Class : $packetClass")
-                                Log.d("ME", "Packet Kind : $packetKind")
+                                Log.d("ME", "Packet Category : $category")
+                                Log.d("ME", "Packet kind : $kind")
 
                             } else {
                                 Log.d("ME", "Packet Header Error!!")
@@ -127,6 +127,12 @@ class GetPacketThread:Thread() {
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
+                            if(Global.validChecksum(mmDataList, checksum)){
+                                Log.d("ME", "Checksum valid.")
+                            }
+                            else {
+                                Log.d("ME", "Checksum Error !")
+                            }
 
                             // ETX
                             mmCurIdx++

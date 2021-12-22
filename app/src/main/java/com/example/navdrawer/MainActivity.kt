@@ -72,17 +72,17 @@ class MainActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------//
     public fun DisconnectBt() {
 
-        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
-        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
-        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
+        if (Global.inStream != null) Global.inStream!!.close()
+        if (Global.outStream != null) Global.outStream!!.close()
+        if (Global.socket != null) Global.socket!!.close()
 
-        GlobalVariables.rxThreadOn = false
-        GlobalVariables.rxPacketThreadOn = false
+        Global.rxThreadOn = false
+        Global.rxPacketThreadOn = false
 
         //GlobalVariables.displayThreadOn = false
         //mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        GlobalVariables.rawByteQueue.clear()
-        GlobalVariables.isBtConnected = false
+        Global.rawByteQueue.clear()
+        Global.isBtConnected = false
     }
 }

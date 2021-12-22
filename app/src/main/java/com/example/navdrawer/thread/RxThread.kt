@@ -1,7 +1,7 @@
 package com.example.navdrawer.thread
 
 import android.util.Log
-import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.Global
 
 class RxThread : Thread(){
 
@@ -14,17 +14,17 @@ class RxThread : Thread(){
         var readMessage : String
 
         Log.d("ME", "Receive thread started. ID : ${this.id}")
-        while (GlobalVariables.rxThreadOn) {
+        while (Global.rxThreadOn) {
             try {
-                if (GlobalVariables.socket!!.isConnected) {
+                if (Global.socket!!.isConnected) {
                     // Receive
-                    bytes = GlobalVariables.inStream!!.read(mmRxBuffer)
+                    bytes = Global.inStream!!.read(mmRxBuffer)
 
                     if (bytes > 0) {
                         //readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
                         synchronized(this) {
                             for (i in 0 until bytes) {
-                                GlobalVariables.rawByteQueue.add(mmRxBuffer[i])
+                                Global.rawByteQueue.add(mmRxBuffer[i])
                                 //Log.d("ME", mmRxBuffer[i].toString())
                             }
                         }

@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 
 class MonitoringFragment : Fragment() {
@@ -35,7 +35,7 @@ class MonitoringFragment : Fragment() {
 
         Log.d("ME", "Monitoring Fragment > onCreateView")
 
-        if (GlobalVariables.isBtConnected) {
+        if (Global.isBtConnected) {
             _binding?.tvMonitoring?.text = "BT Connected"
 
             mmDisplayThreadOn = true

@@ -9,16 +9,17 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
-enum class PacketClass{ Rom, Monitoring, Register, Hardware, Test }
+enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
     MonTouch, MonPercent
 }
 
-class GlobalVariables {
+class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
         public lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         public lateinit var selectedDevice: BluetoothDevice
+
         //public var rByteQueue: Queue<String> = LinkedList()
         public var rawByteQueue: Queue<Byte> = LinkedList()
         public var isBtConnected: Boolean = false           // BT 연결 상태
@@ -31,20 +32,33 @@ class GlobalVariables {
         public var rxPacketThreadOn = false
         //public var displayThreadOn = false
 
-        public  var rxThread: RxThread?  = null
-        public  var getPacketThread: GetPacketThread?  = null
+        public var rxThread: RxThread? = null
+        public var getPacketThread: GetPacketThread? = null
 
-        public val packetClass = mapOf(
-            "E" to PacketClass.Rom,
-            "M" to PacketClass.Monitoring,
-            "R" to PacketClass.Register,
-            "H" to PacketClass.Hardware,
-            "T" to PacketClass.Test
+        public val packetCategory = mapOf(
+            "E" to PacketCategory.Rom,
+            "M" to PacketCategory.Monitoring,
+            "R" to PacketCategory.Register,
+            "H" to PacketCategory.Hardware,
+            "T" to PacketCategory.Test
         )
 
         public val packetKind = mapOf(
             "MT" to PacketKind.MonTouch,
             "MP" to PacketKind.MonPercent
         )
+
+        fun validChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
+            var result: UInt = 0u
+
+            for (data in buf) {
+                result += data.toUInt()
+            }
+            result = result.inv()
+            result = result and 0x000000ff.toUInt()
+            result++
+
+            return result.toByte() == checksum
+        }
     }
 }

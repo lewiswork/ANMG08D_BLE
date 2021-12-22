@@ -13,7 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.Global
 import com.example.navdrawer.thread.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
 import com.example.navdrawer.thread.GetPacketThread
@@ -60,7 +60,7 @@ class ConnectFragment : Fragment() {
         })
 
         try {
-            GlobalVariables.adapter = BluetoothAdapter.getDefaultAdapter()
+            Global.adapter = BluetoothAdapter.getDefaultAdapter()
         }catch (ex:Exception){
             Toast.makeText(this@ConnectFragment.context, "Error occurred while getting BT adapter", Toast.LENGTH_SHORT)
                 .show()
@@ -86,26 +86,26 @@ class ConnectFragment : Fragment() {
 
         if (requestCode == CONNECT_ACTIVYTY){
             if (resultCode == RESULT_OK){
-                val device = GlobalVariables.selectedDevice
+                val device = Global.selectedDevice
 
                 // Get Socket and Connect using UUID
-                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                GlobalVariables.socket!!.connect()
+                Global.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
+                Global.socket!!.connect()
 
                 // Get Input/Output Stream using socket
-                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
-                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
+                Global.inStream = Global.socket!!.inputStream
+                Global.outStream = Global.socket!!.outputStream
 
                 // Receive Thread 시작
                 try {
-                    GlobalVariables.rxThreadOn =true
+                    Global.rxThreadOn =true
                     //mmRxThread = ReceiveThread()
-                    GlobalVariables.rxThread = RxThread()
-                    GlobalVariables.rxThread!!.start()
+                    Global.rxThread = RxThread()
+                    Global.rxThread!!.start()
 
-                    GlobalVariables.rxPacketThreadOn =true
-                    GlobalVariables.getPacketThread = GetPacketThread()
-                    GlobalVariables.getPacketThread!!.start()
+                    Global.rxPacketThreadOn =true
+                    Global.getPacketThread = GetPacketThread()
+                    Global.getPacketThread!!.start()
 
 //                    GlobalVariables.displayThreadOn = true
 //                    mmDisplayThread = DisplayThread()
@@ -115,7 +115,7 @@ class ConnectFragment : Fragment() {
                     .show()
                 }
 
-                GlobalVariables.isBtConnected = true
+                Global.isBtConnected = true
                 DisplayBtStatus()
 
                 Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
@@ -127,13 +127,13 @@ class ConnectFragment : Fragment() {
     }
 
     private fun DisplayBtStatus() {
-        if (GlobalVariables.isBtConnected) {
+        if (Global.isBtConnected) {
             mmBinding?.btnConnect?.isEnabled = false
             mmBinding?.btnDisconnect?.isEnabled = true
             mmBinding?.tvStatus?.text = "Status : Connected"
 
-            mmBinding?.tvDeviceName?.append(GlobalVariables.selectedDevice.name)
-            mmBinding?.tvMac?.append(GlobalVariables.selectedDevice.address)
+            mmBinding?.tvDeviceName?.append(Global.selectedDevice.name)
+            mmBinding?.tvMac?.append(Global.selectedDevice.address)
         }
         else
         {
@@ -153,28 +153,28 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     private fun DisconnectBt() {
 
-        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
-        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
-        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
+        if (Global.inStream != null) Global.inStream!!.close()
+        if (Global.outStream != null) Global.outStream!!.close()
+        if (Global.socket != null) Global.socket!!.close()
 
-        GlobalVariables.rxThreadOn = false
-        GlobalVariables.rxPacketThreadOn = false
+        Global.rxThreadOn = false
+        Global.rxPacketThreadOn = false
 
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        GlobalVariables.rawByteQueue.clear()
-        GlobalVariables.isBtConnected = false
+        Global.rawByteQueue.clear()
+        Global.isBtConnected = false
     }
 
     //---------------------------------------------------------------------------------------//
     // btnConnect 의 OnClickListener
     //---------------------------------------------------------------------------------------//
     private val listenerConnect = View.OnClickListener {
-        if (GlobalVariables.adapter == null) {
+        if (Global.adapter == null) {
             Toast.makeText(this@ConnectFragment.context, "Bluetooth Not Supported", Toast.LENGTH_SHORT)
                 .show()
         } else {
-            if (GlobalVariables.adapter.isEnabled) {
+            if (Global.adapter.isEnabled) {
                 //val intent = Intent(this, ConnectActivity::class.java)
                 val intent = Intent(this@ConnectFragment.context, ConnectActivity::class.java)
 

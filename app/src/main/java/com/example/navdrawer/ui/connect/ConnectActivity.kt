@@ -2,15 +2,11 @@ package com.example.navdrawer.ui.connect
 
 import android.app.Activity
 import android.bluetooth.BluetoothDevice
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
-import com.example.navdrawer.GlobalVariables
+import com.example.navdrawer.Global
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.ActivityConnectBinding
 
@@ -54,7 +50,7 @@ class ConnectActivity : AppCompatActivity() {
     // ListView 의 OnItemClickListener
     //--------------------------------------------------------------------------//
     private val listenerItemClick =  AdapterView.OnItemClickListener { parent, view, position, id ->
-        GlobalVariables.selectedDevice = mmDevices[position]
+        Global.selectedDevice = mmDevices[position]
         setResult(android.app.Activity.RESULT_OK, intent)
         finish()
     }
@@ -64,7 +60,7 @@ class ConnectActivity : AppCompatActivity() {
     //--------------------------------------------------------------------------//
     private fun getPairedDevices() {
         // Get Paired Device Information
-        val pairedDevices = GlobalVariables.adapter.bondedDevices
+        val pairedDevices = Global.adapter.bondedDevices
         if (pairedDevices.size > 0) {
             for (device in pairedDevices) {
                 mmNames.add(device.name)        // ListView 표시를 위해 사용

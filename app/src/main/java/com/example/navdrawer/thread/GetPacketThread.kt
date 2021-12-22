@@ -5,6 +5,7 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.data.Packet
+import java.lang.StringBuilder
 import java.util.*
 import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
@@ -25,16 +26,17 @@ class GetPacketThread:Thread() {
     var mmDataList : ArrayList<Byte> = ArrayList()
     var mmExtractMode  = ExtractMode.Header
 
+    var mmLogStr = StringBuilder()
+
     override fun run() {
         super.run()
 
         var qEmpty = true
 
-        var header : String = ""
-        var dataLength : Int = 0
-        //var dataList : ArrayList<Byte> = ArrayList<Byte>()
-        var checksum : Byte = 0x00
 
+
+        var dataLength : Int = 0
+        var checksum : Byte = 0x00
         var category : PacketCategory? = null
         var kind : PacketKind? = null
         var rawByteArray = byteArrayOf()
@@ -50,13 +52,6 @@ class GetPacketThread:Thread() {
                 if (!qEmpty) {
                     try {
                         synchronized(this) {
-                            //var len = Global.rawByteQueue.count()
-
-                            //for (i in 0 until len) {
-                            //mmRawByteList.add(Global.rawByteQueue.remove())
-                            //}
-                            //mmRawByteList.add(Global.rawByteQueue.remove())
-                            //Log.d("ME LEN", len.toString())
                             rawByteArray = Global.rawByteQueue.remove()
                         }
 
@@ -64,7 +59,7 @@ class GetPacketThread:Thread() {
                         for (i in 0 until len) {
                             mmRawByteList.add(rawByteArray[i])
                         }
-                        Log.d("ME LEN", len.toString())
+                        //Log.d("ME LEN", len.toString())
 
                     } catch (ex: NoSuchElementException) {
                         Log.d("MEX", Global.rawByteQueue.count().toString())
@@ -93,8 +88,8 @@ class GetPacketThread:Thread() {
                             // Check Header : if in range of A to Z
                             mmCurIdx+=2
                             if ((mmRawByteList[1] in 0x41..0x5a) && (mmRawByteList[2] in 0x41..0x5a)) {
-                                Log.d("ME",
-                                    "Packet Header : ${mmRawByteList[1].toChar()}${mmRawByteList[2].toChar()}")
+//                                Log.d("ME",
+//                                    "Packet Header : ${mmRawByteList[1].toChar()}${mmRawByteList[2].toChar()}")
 
                                 val str1 = mmRawByteList[1].toChar().toString()
                                 val str2 = mmRawByteList[2].toChar().toString()
@@ -106,9 +101,8 @@ class GetPacketThread:Thread() {
                                     Log.d("ME", "Packet header error : $str1$str2")
                                     if (clearRawByteList()) continue    // Error 처리
                                 }
-                                Log.d("ME", "Packet Category : $category")
-                                Log.d("ME", "Packet kind : $kind")
-
+//                                Log.d("ME", "Packet Category : $category")
+//                                Log.d("ME", "Packet kind : $kind")
                             } else {
                                 Log.d("ME", "Packet Header Error!!")
                                 if (clearRawByteList()) continue    // Error 처리
@@ -121,7 +115,7 @@ class GetPacketThread:Thread() {
                             ) {
                                 dataLength =
                                     (mmRawByteList[3].toInt() - 0x30) * 100 + (mmRawByteList[4].toInt() - 0x30) * 10 + (mmRawByteList[5].toInt() - 0x30)
-                                Log.d("ME", "Packet Length(Int) : $dataLength")
+                                //Log.d("ME", "Packet Length(Int) : $dataLength")
                                 mmExtractMode = ExtractMode.Body
                             } else {
                                 Log.d("ME", "Packet Length Error!!")
@@ -142,11 +136,9 @@ class GetPacketThread:Thread() {
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
-                            if(Global.validChecksum(mmDataList, checksum)){
-                                Log.d("ME", "Checksum valid.")
-                            }
-                            else {
+                            if(!Global.validChecksum(mmDataList, checksum)){
                                 Log.d("ME", "Checksum Error !")
+                                if (clearRawByteList()) continue    // Error 처리
                             }
 
                             // ETX
@@ -167,11 +159,17 @@ class GetPacketThread:Thread() {
                                 PacketCategory.Test -> Global.testQueue.add(pk)
                             }
 
-                            Log.d("ME", "Getting packet succeeded.")
+                            //Log.d("ME", "Getting packet succeeded.")
 
-                            Log.d("ME", "mmRawByteList size B :  ${mmDataList.size}")
+                            for (i in 0 until mmCurIdx) {
+                                mmLogStr.append(String.format("%02X", mmRawByteList[i]))
+                                if (i in 1..5) mmLogStr.append("(${mmRawByteList[i].toChar()})")
+                                if (i < mmCurIdx - 1) mmLogStr.append(" ")
+                            }
+                            Log.d("ME", "[RX] $mmLogStr")
+
+//                            Log.d("ME", "Mon Q size : ${Global.monQueue.size}")
                             clearRawByteList()
-                            Log.d("ME", "mmRawByteList size A :  ${mmDataList.size}")
                         }
                         //------------------------------------------------------------------------------//
                     }
@@ -194,6 +192,9 @@ class GetPacketThread:Thread() {
         mmCurIdx = 0
         mmDataList.clear()
         mmExtractMode = ExtractMode.Header
+
+        mmLogStr.clear()
+
         return true
     }
 }

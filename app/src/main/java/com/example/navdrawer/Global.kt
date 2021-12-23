@@ -55,8 +55,6 @@ class Global {
             "MP" to PacketKind.MonPercent
         )
 
-
-
         fun validChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
             var result: UInt = 0u
 

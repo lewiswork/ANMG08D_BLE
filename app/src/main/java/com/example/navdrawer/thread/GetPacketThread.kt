@@ -1,11 +1,17 @@
 package com.example.navdrawer.thread
 
+import android.os.Environment
 import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.data.Packet
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.OutputStream
+import java.io.OutputStreamWriter
 import java.lang.StringBuilder
+import java.nio.charset.Charset
 import java.util.*
 import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
@@ -66,7 +72,7 @@ class GetPacketThread:Thread() {
                         }
                         Log.d("ME", "[RX RAW] $str")
 
-//                        // 발췌 Log 저장(DEBUG)
+//                        // mmRawByteList 저장(DEBUG)
 //                        str=StringBuilder()
 //                        for (i in 0 until mmRawByteList.size) {
 //                            str.append(String.format("%02X ", mmRawByteList[i]))
@@ -138,7 +144,7 @@ class GetPacketThread:Thread() {
                                 mmDataList.add(mmRawByteList[IDX_DATA_START + i])
                             }
 
-                            if(dataLength > 0) {
+                            if (dataLength > 0) {
                                 // Checksum(Valid Check)
                                 //mmCurIdx++
                                 checksum = mmRawByteList[IDX_DATA_START + dataLength]
@@ -160,7 +166,7 @@ class GetPacketThread:Thread() {
                             val pk = Packet(category, kind, dataLength, mmDataList)
 
                             // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
-                            when(category) {
+                            when (category) {
                                 PacketCategory.Rom -> Global.romQueue.add(pk)
                                 PacketCategory.Monitoring -> Global.monQueue.add(pk)
                                 PacketCategory.Hardware -> Global.hwQueue.add(pk)
@@ -168,14 +174,42 @@ class GetPacketThread:Thread() {
                                 PacketCategory.Test -> Global.testQueue.add(pk)
                             }
 
-                            // 발췌 Packet Log 저장
+                            //------------------------------------------------------------------------------//
+                            // 발췌 Packet Log(Logcat) 저장
+                            //------------------------------------------------------------------------------//
                             for (i in 0 until mmCurIdx) {
                                 mmLogStr.append(String.format("%02X", mmRawByteList[i]))
                                 if (i in 1..5) mmLogStr.append("(${mmRawByteList[i].toChar()})")
                                 if (i < mmCurIdx - 1) mmLogStr.append(" ")
                             }
                             Log.d("ME", "[RX] $mmLogStr")
-                            clearRawByteList()
+                            //------------------------------------------------------------------------------//
+
+                            //------------------------------------------------------------------------------//
+                            // 발췌 Packet Log 파일 저장
+                            // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
+                            //------------------------------------------------------------------------------//
+                            // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
+                            var pathname = System.getProperty("java.io.tmpdir")
+                            var someFile = File(pathname + "/some-file.txt")
+
+                            // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
+                            // 이미 파일이 존재할 경우 덮어쓰기로 저장
+                            // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
+                            try {
+                                //someFile.writeText("가나다라마바사")
+                                someFile.appendText("가나다라마바사")
+                                someFile.appendText(mmLogStr.toString())
+                                Log.d("ME", "File saved at : $someFile")
+                            } catch (e: FileNotFoundException) {
+                                Log.d("ME", "FileNotFound: $someFile")
+                            }
+
+                            // 저장시 캐릭터셋으로 EUC-KR을 명시하여 저장
+                            //someFile.writeText("가나다라마바사", Charset.forName("UTF-8"))
+                            //------------------------------------------------------------------------------//
+
+                            clearRawByteList()  // Packet 저장 완료된 Raw Data 제거
                         }
                         //------------------------------------------------------------------------------//
                     }

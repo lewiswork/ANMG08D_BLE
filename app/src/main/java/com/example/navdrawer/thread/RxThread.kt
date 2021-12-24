@@ -9,10 +9,8 @@ class RxThread : Thread(){
     private var mmRxBuffer: ByteArray = ByteArray(2048)
 
     override fun run() {
-
         var bytes : Int
-        var readMessage : String
-        var arrayCopy = byteArrayOf()
+        var arrayCopy :ByteArray
 
         Log.d("ME", "Receive thread started. ID : ${this.id}")
         while (Global.rxThreadOn) {
@@ -22,12 +20,7 @@ class RxThread : Thread(){
                     bytes = Global.inStream!!.read(mmRxBuffer)
 
                     if (bytes > 0) {
-                        //readMessage = kotlin.text.String(mmRxBuffer, 0, bytes)
                         synchronized(this) {
-                            //for (i in 0 until bytes) {
-                                //Global.rawByteQueue.add(mmRxBuffer[i])
-                                //Log.d("ME", mmRxBuffer[i].toString())
-                            //}
                             arrayCopy = mmRxBuffer.copyOf(bytes)
                             Global.rawByteQueue.add(arrayCopy)
                         }

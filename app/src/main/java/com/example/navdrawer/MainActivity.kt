@@ -64,13 +64,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        DisconnectBt()
+        disconnectBt()
     }
 
     //---------------------------------------------------------------------------------------//
     // BT Disconnect 함수, Stream, Socket Close 및 Thread 종료
     //---------------------------------------------------------------------------------------//
-    public fun DisconnectBt() {
+    private fun disconnectBt() {
 
         if (Global.inStream != null) Global.inStream!!.close()
         if (Global.outStream != null) Global.outStream!!.close()
@@ -78,9 +78,6 @@ class MainActivity : AppCompatActivity() {
 
         Global.rxThreadOn = false
         Global.rxPacketThreadOn = false
-
-        //GlobalVariables.displayThreadOn = false
-        //mmBinding?.tvStatus?.text = "Status : Disconnected"
 
         Global.rawByteQueue.clear()
         Global.isBtConnected = false

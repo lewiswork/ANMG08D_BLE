@@ -3,6 +3,7 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import com.example.navdrawer.data.Monitoring
 import com.example.navdrawer.data.Packet
 import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
@@ -18,11 +19,9 @@ enum class PacketKind{
 class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
+        // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
-
-        //public var rByteQueue: Queue<String> = LinkedList()
-        //var rawByteQueue: Queue<Byte> = LinkedList()
         var rawByteQueue: Queue<ByteArray> = LinkedList()
         var isBtConnected: Boolean = false           // BT 연결 상태
 
@@ -55,7 +54,11 @@ class Global {
             "MP" to PacketKind.MonPercent
         )
 
-        fun validChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
+        val monitoring = Monitoring()
+
+
+
+        fun verifyChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
             var result: UInt = 0u
 
             for (data in buf) {

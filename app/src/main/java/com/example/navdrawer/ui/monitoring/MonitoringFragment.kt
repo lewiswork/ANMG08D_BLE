@@ -28,11 +28,6 @@ class MonitoringFragment : Fragment() {
         _binding = FragmentMonitoringBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-//        val textView: TextView = binding.tvMonitoring
-//        monitoringViewModel.text.observe(viewLifecycleOwner, Observer {
-//            textView.text = it
-//        })
-
         Log.d("ME", "Monitoring Fragment > onCreateView")
 
         if (Global.isBtConnected) {

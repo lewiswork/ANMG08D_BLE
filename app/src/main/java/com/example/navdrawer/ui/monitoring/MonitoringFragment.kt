@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.navdrawer.Global
+import com.example.navdrawer.Global.Companion.monitoring
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 
 class MonitoringFragment : Fragment() {
@@ -63,60 +64,33 @@ class MonitoringFragment : Fragment() {
             //var qCount: Int = -1
 
             Log.d("ME", "Display thread started. ID : ${this.id}")
-//            while (mmDisplayThreadOn) {
-//                try {
-//                    //Log.d("MEA", "Display Thread")
-//                    synchronized(this) {
-//                        qEmpty = GlobalVariables.rByteQueue.isEmpty()
-//                        //qCount = GlobalVariables.sampleQueue.count()
+            while (mmDisplayThreadOn) {
+
+                var str = java.lang.StringBuilder()
+
+                synchronized(this) {
+                    for (i in Global.monitoring.mmChData.indices) {
+                        if (i == Global.monitoring.DM_CH_IDX)
+                            str.append("CH DM : ${Global.monitoring.mmChData[i].touch}")
+                        else
+                            str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
+                    }
+
+//                    for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+//                        if (i == Global.monitoring.DM_CH_IDX)
+//                            Log.d("ME/TCH2",
+//                                "CH DM ${Global.monitoring.mmChData[i].touch}")
+//                        else
+//                            Log.d("ME/TCH2",
+//                                "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
 //                    }
-//
-//                    if (!qEmpty) {
-//                        //if (qCount > 0) {
-//                        try {
-//                            synchronized(this) {
-//                                sb.append(GlobalVariables.rByteQueue.remove())
-//                            }
-//
-//                        } catch (ex: NoSuchElementException) {
-//                            Log.d("MEX", GlobalVariables.rByteQueue.count().toString())
-//                            ex.printStackTrace()
-//                            //continue
-//                            break
-//                        }
-//
-//                        while (sb.isNotEmpty()) {
-//                            if (sb.contains('S')) {
-//                                sidx = sb.indexOf('S')
-//                            }
-//
-//                            if (sb.contains('Z')) {
-//                                eidx = sb.indexOf('Z')
-//                                pk = sb.substring(sidx, eidx + 1)
-//
-//                                if (sb.length > pk.length) {
-//                                    sidx = eidx + 1
-//                                    sb = StringBuilder(sb.substring(sidx, sb.length))
-//                                } else {
-//                                    sb = StringBuilder("")
-//                                }
-//                                Log.d("MED", pk)
-//                            } else {
-//                                break
-//                            }
-//
-//                            activity?.runOnUiThread {
-//                                _binding?.tvMonitoring?.text = pk
-//                            }
-//                        }
-//                    }
-//                } catch (e: java.io.IOException) {
-//                    Log.d("MEX", "$sidx/$eidx")
-//                    e.printStackTrace()
-//                    break
-//                    //continue
-//                }
-//            }
+                }
+                activity?.runOnUiThread {
+                    _binding?.tvMonitoring?.text = str.toString()
+                }
+
+                Thread.sleep(10)
+            }
             Log.d("ME", "Display thread finished. ID : ${this.id}")
         }
     }

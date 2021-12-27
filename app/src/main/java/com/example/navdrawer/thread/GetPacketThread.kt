@@ -141,34 +141,17 @@ class GetPacketThread:Thread() {
                         when (category) {
                             PacketCategory.Rom -> Global.romQueue.add(pk)
 
+                            //-------------------------------------------------------------------//
                             // Monitoring 데이터는 Queue 에 저장하지 않음
                             // Monitoring Class Data 갱신 처리
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
-                            //PacketCategory.Monitoring -> Global.monQueue.add(pk)
+                            //-------------------------------------------------------------------//
+                            PacketCategory.Monitoring -> updateMontiringData(kind, dataContents)
+                            //-------------------------------------------------------------------//
 
                             PacketCategory.Hardware -> Global.hwQueue.add(pk)
                             PacketCategory.Register -> Global.regQueue.add(pk)
                             PacketCategory.Test -> Global.testQueue.add(pk)
-                        }
-
-                        when (kind) {
-                            PacketKind.MonTouch -> {
-                                var booleanArray = Global.byteToBooleanArray(dataContents[0],
-                                    Global.monitoring.TCH_CH_CNT)
-
-                                for (i in booleanArray.indices){
-                                    Global.monitoring.mmChData[i].touch = booleanArray[i]
-                                }
-
-                                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
-                                    if (i == Global.monitoring.DM_CH_IDX)
-                                        Log.d("ME/PER",
-                                            "CH DM ${Global.monitoring.mmChData[i].touch}")
-                                    else
-                                        Log.d("ME/PER",
-                                            "CH ${i+1} ${Global.monitoring.mmChData[i].touch}")
-                                }
-                            }
                         }
 
                         prepareLog()
@@ -187,6 +170,33 @@ class GetPacketThread:Thread() {
             }
         }
         Log.d("ME", "Get packet thread finished. ID : ${this.id}")
+    }
+
+    private fun updateMontiringData(
+        kind: PacketKind?,
+        dataContents: ByteArray,
+    ) {
+        when (kind) {
+            PacketKind.MonTouch -> {
+                var booleanArray = Global.byteToBooleanArray(dataContents[0],
+                    Global.monitoring.TCH_CH_CNT)
+
+                synchronized(this) {
+                    for (i in booleanArray.indices) {
+                        Global.monitoring.mmChData[i].touch = booleanArray[i]
+                    }
+                }
+
+                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+                    if (i == Global.monitoring.DM_CH_IDX)
+                        Log.d("ME/TCH",
+                            "CH DM ${Global.monitoring.mmChData[i].touch}")
+                    else
+                        Log.d("ME/TCH",
+                            "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
+                }
+            }
+        }
     }
 
     private fun logRawByteArray(rawByteArray: ByteArray) {

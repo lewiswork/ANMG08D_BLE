@@ -20,6 +20,9 @@ enum class PacketKind{
 class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
+
+
+
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
@@ -86,6 +89,19 @@ class Global {
             }
 
             return result
+        }
+
+        fun byteToBooleanArray(input :Byte, size:Int):BooleanArray {
+            var arr = BooleanArray(size)
+            var mask: Int = 1
+
+            val value = input.toInt()
+
+            for (i in arr.indices) {
+                arr[i] = (value and mask) > 0
+                mask = mask shl 1
+            }
+            return arr
         }
     }
 }

@@ -9,7 +9,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.lang.StringBuilder
 import kotlin.NoSuchElementException
-import kotlin.collections.ArrayList
 
 enum class ExtractMode{ Header, Body }    // Header : STX~LEN, Body : Data~ETX
 
@@ -32,14 +31,13 @@ class GetPacketThread:Thread() {
         super.run()
 
         var qEmpty = true
-
-        var dataLength : Int = 0
-        var checksum : Byte = 0x00
-        var category : PacketCategory? = null
-        var kind : PacketKind? = null
         var rawByteArray: ByteArray
 
-        var mmDataList : ByteArray
+        var category : PacketCategory? = null
+        var kind : PacketKind? = null
+        var dataLength : Int = 0
+        var dataContents : ByteArray
+        var checksum : Byte = 0x00
 
         Log.d("ME", "Get packet thread started. ID : ${this.id}")
 
@@ -115,17 +113,17 @@ class GetPacketThread:Thread() {
 
                         // Data
                         mmCurIdx += dataLength + 2  // Error 시 mmCurIdx 까지 버림
-                        mmDataList = ByteArray(dataLength)
+                        dataContents = ByteArray(dataLength)
                         for (i in 0 until dataLength) {
                             //mmDataList.add(mmRawByteList[IDX_DATA_START + i])
-                            mmDataList[i] = mmRawByteList[IDX_DATA_START + i]
+                            dataContents[i] = mmRawByteList[IDX_DATA_START + i]
                         }
 
                         if (dataLength > 0) {
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
-                            if (!Global.verifyChecksum(mmDataList, checksum)) {
+                            if (!Global.verifyChecksum(dataContents, checksum)) {
                                 Log.d("ME", "Checksum Error !")
                                 if (clearRawByteList()) continue    // Error 처리
                             }
@@ -137,7 +135,7 @@ class GetPacketThread:Thread() {
                             if (clearRawByteList()) continue    // Error 처리
                         }
 
-                        val pk = Packet(category, kind, dataLength, mmDataList)
+                        val pk = Packet(category, kind, dataLength, dataContents)
 
                         // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
                         when (category) {
@@ -151,6 +149,26 @@ class GetPacketThread:Thread() {
                             PacketCategory.Hardware -> Global.hwQueue.add(pk)
                             PacketCategory.Register -> Global.regQueue.add(pk)
                             PacketCategory.Test -> Global.testQueue.add(pk)
+                        }
+
+                        when (kind) {
+                            PacketKind.MonTouch -> {
+                                var booleanArray = Global.byteToBooleanArray(dataContents[0],
+                                    Global.monitoring.TCH_CH_CNT)
+
+                                for (i in booleanArray.indices){
+                                    Global.monitoring.mmChData[i].touch = booleanArray[i]
+                                }
+
+                                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+                                    if (i == Global.monitoring.DM_CH_IDX)
+                                        Log.d("ME/PER",
+                                            "CH DM ${Global.monitoring.mmChData[i].touch}")
+                                    else
+                                        Log.d("ME/PER",
+                                            "CH ${i+1} ${Global.monitoring.mmChData[i].touch}")
+                                }
+                            }
                         }
 
                         prepareLog()

@@ -1,6 +1,7 @@
 package com.example.navdrawer
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        //Log.d("ME", Global.monitoring.mmChData.count().toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         Global.rxThreadOn = false
         Global.rxPacketThreadOn = false
 
-        Global.rawByteQueue.clear()
+        Global.rawRxBytesQueue.clear()
         Global.isBtConnected = false
     }
 }

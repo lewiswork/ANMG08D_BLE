@@ -162,7 +162,7 @@ class ConnectFragment : Fragment() {
 
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        Global.rawByteQueue.clear()
+        Global.rawRxBytesQueue.clear()
         Global.isBtConnected = false
     }
 

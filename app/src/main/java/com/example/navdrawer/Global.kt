@@ -3,6 +3,7 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.util.Log
 import com.example.navdrawer.data.Monitoring
 import com.example.navdrawer.data.Packet
 import com.example.navdrawer.thread.GetPacketThread
@@ -22,7 +23,7 @@ class Global {
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
-        var rawByteQueue: Queue<ByteArray> = LinkedList()
+        var rawRxBytesQueue: Queue<ByteArray> = LinkedList()
         var isBtConnected: Boolean = false           // BT 연결 상태
 
         var inStream: InputStream? = null
@@ -57,18 +58,34 @@ class Global {
         val monitoring = Monitoring()
 
 
-
-        fun verifyChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
-            var result: UInt = 0u
+        //fun verifyChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
+        fun verifyChecksum(buf:ByteArray, checksum:Byte):Boolean {
+            var calcVal: UInt = 0u
+            var result = false
 
             for (data in buf) {
-                result += data.toUInt()
+                calcVal += data.toUInt()
             }
-            result = result.inv()
-            result = result and 0x000000ff.toUInt()
-            result++
+            calcVal = calcVal.inv()
+            calcVal = calcVal and 0x000000ff.toUInt()
+            calcVal++
 
-            return result.toByte() == checksum
+            //------------------------------------------------------------------------//
+            // Kotlin 에서 Byte 는 Signed(Unsigned 는 UByte)
+            // UInt Type 인 calcVal 을 Signed Type 으로 변환(.toByte)
+            // Signed Type 으로 변환된 계산값과 Signed Type Checksum 수신값 비교
+            //------------------------------------------------------------------------//
+            result = calcVal.toByte() == checksum
+
+            // 두 변수를 모두 Unsigned Type 으로 변환 후 비교하여도 결과 동일
+            //result = calcVal.toUByte() == checksum.toUByte()
+            //------------------------------------------------------------------------//
+
+            if (!result){
+                Log.d("ME", "Checksum fail / Rx Val : ${checksum},Calc Val : ${calcVal.toByte()}")
+            }
+
+            return result
         }
     }
 }

@@ -7,5 +7,6 @@ data class Packet (
     val category: PacketCategory? = null,
     val kind: PacketKind? = null,
     val dataLength: Int,
-    val dataList: ArrayList<Byte> = ArrayList()
+    //val dataList: ArrayList<Byte> = ArrayList()
+    val dataList: ByteArray
 )

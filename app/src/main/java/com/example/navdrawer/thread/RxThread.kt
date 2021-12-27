@@ -22,7 +22,7 @@ class RxThread : Thread(){
                     if (bytes > 0) {
                         synchronized(this) {
                             arrayCopy = mmRxBuffer.copyOf(bytes)
-                            Global.rawByteQueue.add(arrayCopy)
+                            Global.rawRxBytesQueue.add(arrayCopy)
                         }
                     }
                 }

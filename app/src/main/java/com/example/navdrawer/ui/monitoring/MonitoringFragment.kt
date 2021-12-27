@@ -31,14 +31,14 @@ class MonitoringFragment : Fragment() {
         Log.d("ME", "Monitoring Fragment > onCreateView")
 
         if (Global.isBtConnected) {
-            _binding?.tvMonitoring?.text = "BT Connected"
+            _binding?.tvMonitoring?.text = "BT connected."
 
             mmDisplayThreadOn = true
             mmDisplayThread = DisplayThread()
             mmDisplayThread.start()
 
         } else {
-            _binding?.tvMonitoring?.text = "BT Not Connected"
+            _binding?.tvMonitoring?.text = "BT disconnected."
         }
         return root
     }
@@ -55,12 +55,6 @@ class MonitoringFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     inner class DisplayThread : Thread() {
         override fun run() {
-            var pk: String = ""
-            var sb: StringBuilder = StringBuilder()
-            var sidx: Int = 0
-            var eidx: Int = 0
-            var qEmpty: Boolean = true
-            //var qCount: Int = -1
 
             Log.d("ME", "Display thread started. ID : ${this.id}")
             while (mmDisplayThreadOn) {
@@ -78,7 +72,6 @@ class MonitoringFragment : Fragment() {
                 activity?.runOnUiThread {
                     _binding?.tvMonitoring?.text = str.toString()
                 }
-
                 Thread.sleep(10)
             }
             Log.d("ME", "Display thread finished. ID : ${this.id}")

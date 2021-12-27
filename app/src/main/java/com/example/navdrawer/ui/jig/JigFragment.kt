@@ -12,6 +12,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentJigBinding
 import com.example.navdrawer.ui.jig.JigFragment
+import android.widget.CompoundButton
+
+
+
 
 class JigFragment : Fragment() {
 
@@ -28,7 +32,7 @@ class JigFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         jigViewModel =
             ViewModelProvider(this).get(JigViewModel::class.java)
@@ -39,17 +43,33 @@ class JigFragment : Fragment() {
         Log.d("ME", "Jig Fragment > onCreateView")
 
         if (Global.isBtConnected) {
-            _binding?.tvJig?.text = "BT Connected"
+            //_binding?.tvJig?.text = "BT connected"
 
             mmJigThreadOn = true
             mmJigThread = JigThread()
             mmJigThread.start()
 
+            _binding?.swVdd?.isEnabled = true
+            _binding?.swI2c?.isEnabled = true
+
         } else {
-            _binding?.tvJig?.text = "BT Not Connected"
+            //_binding?.tvJig?.text = "BT disconnected"
+
+//            _binding?.swVdd?.isEnabled = false
+//            _binding?.swI2c?.isEnabled = false
         }
 
+        _binding?.swVdd?.setOnCheckedChangeListener(listenerCheckedChanged)
+        _binding?.swI2c?.setOnCheckedChangeListener(listenerCheckedChanged)
+
         return root
+    }
+
+    private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+        when (buttonView) {
+            _binding?.swVdd -> _binding?.textView3?.text = "VDD Switch change to $isChecked"
+            _binding?.swI2c -> _binding?.textView3?.text = "I2C Switch change to $isChecked"
+        }
     }
 
     override fun onDestroyView() {
@@ -64,12 +84,6 @@ class JigFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     inner class JigThread : Thread() {
         override fun run() {
-//            var pk: String = ""
-//            var sb: StringBuilder = StringBuilder()
-//            var sidx: Int = 0
-//            var eidx: Int = 0
-//            var qEmpty: Boolean = true
-//            //var qCount: Int = -1
 
             Log.d("ME", "Jig thread started. ID : ${this.id}")
             while (mmJigThreadOn) {

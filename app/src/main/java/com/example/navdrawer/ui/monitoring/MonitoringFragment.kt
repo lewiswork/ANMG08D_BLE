@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.navdrawer.Global
-import com.example.navdrawer.Global.Companion.monitoring
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 
 class MonitoringFragment : Fragment() {
@@ -16,7 +15,7 @@ class MonitoringFragment : Fragment() {
     private var _binding: FragmentMonitoringBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var displayThread: DisplayThread
+    private lateinit var mmDisplayThread: DisplayThread
     private var mmDisplayThreadOn:Boolean = false
 
     override fun onCreateView(
@@ -35,8 +34,8 @@ class MonitoringFragment : Fragment() {
             _binding?.tvMonitoring?.text = "BT Connected"
 
             mmDisplayThreadOn = true
-            displayThread = DisplayThread()
-            displayThread.start()
+            mmDisplayThread = DisplayThread()
+            mmDisplayThread.start()
 
         } else {
             _binding?.tvMonitoring?.text = "BT Not Connected"
@@ -75,15 +74,6 @@ class MonitoringFragment : Fragment() {
                         else
                             str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
                     }
-
-//                    for (i in 0 until Global.monitoring.MAX_CH_CNT) {
-//                        if (i == Global.monitoring.DM_CH_IDX)
-//                            Log.d("ME/TCH2",
-//                                "CH DM ${Global.monitoring.mmChData[i].touch}")
-//                        else
-//                            Log.d("ME/TCH2",
-//                                "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
-//                    }
                 }
                 activity?.runOnUiThread {
                     _binding?.tvMonitoring?.text = str.toString()

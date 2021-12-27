@@ -146,7 +146,7 @@ class GetPacketThread:Thread() {
                             // Monitoring Class Data 갱신 처리
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
                             //-------------------------------------------------------------------//
-                            PacketCategory.Monitoring -> updateMontiringData(kind, dataContents)
+                            PacketCategory.Monitoring -> updateMonitoringData(kind, dataContents)
                             //-------------------------------------------------------------------//
 
                             PacketCategory.Hardware -> Global.hwQueue.add(pk)
@@ -172,7 +172,7 @@ class GetPacketThread:Thread() {
         Log.d("ME", "Get packet thread finished. ID : ${this.id}")
     }
 
-    private fun updateMontiringData(
+    private fun updateMonitoringData(
         kind: PacketKind?,
         dataContents: ByteArray,
     ) {
@@ -187,14 +187,14 @@ class GetPacketThread:Thread() {
                     }
                 }
 
-                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
-                    if (i == Global.monitoring.DM_CH_IDX)
-                        Log.d("ME/TCH",
-                            "CH DM ${Global.monitoring.mmChData[i].touch}")
-                    else
-                        Log.d("ME/TCH",
-                            "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
-                }
+//                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+//                    if (i == Global.monitoring.DM_CH_IDX)
+//                        Log.d("ME/TCH",
+//                            "CH DM ${Global.monitoring.mmChData[i].touch}")
+//                    else
+//                        Log.d("ME/TCH",
+//                            "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
+//                }
             }
         }
     }

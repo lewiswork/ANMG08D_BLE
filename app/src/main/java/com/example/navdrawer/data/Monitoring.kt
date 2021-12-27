@@ -14,6 +14,6 @@ class Monitoring {
         for (i in 0 until MAX_CH_CNT) {
             mmChData.add(ChannelData())
         }
-        Log.d("ME", mmChData.count().toString())
+        //Log.d("ME", mmChData.count().toString())
     }
 }

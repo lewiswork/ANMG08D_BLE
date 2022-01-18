@@ -22,22 +22,20 @@ class GetPacketThread:Thread() {
 
     var mmCurIdx : Int = 0
     var mmRawByteList = mutableListOf<Byte>()
-    //var mmDataList : ArrayList<Byte> = ArrayList()
-    //var mmDataList : ByteArray
     var mmExtractMode  = ExtractMode.Header
     var mmLogStr = StringBuilder()
 
     override fun run() {
         super.run()
 
-        var qEmpty = true
+        var qEmpty :Boolean
         var rawByteArray: ByteArray
 
         var category : PacketCategory? = null
         var kind : PacketKind? = null
         var dataLength : Int = 0
         var dataContents : ByteArray
-        var checksum : Byte = 0x00
+        var checksum : Byte
 
         Log.d("ME", "Get packet thread started. ID : ${this.id}")
 
@@ -115,7 +113,6 @@ class GetPacketThread:Thread() {
                         mmCurIdx += dataLength + 2  // Error 시 mmCurIdx 까지 버림
                         dataContents = ByteArray(dataLength)
                         for (i in 0 until dataLength) {
-                            //mmDataList.add(mmRawByteList[IDX_DATA_START + i])
                             dataContents[i] = mmRawByteList[IDX_DATA_START + i]
                         }
 

@@ -164,6 +164,8 @@ class ConnectFragment : Fragment() {
 
         Global.rawRxBytesQueue.clear()
         Global.isBtConnected = false
+
+        Global.hwStat = 0
     }
 
     //---------------------------------------------------------------------------------------//

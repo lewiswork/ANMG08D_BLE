@@ -1,6 +1,6 @@
 package com.example.navdrawer.function
 
-class AdFunction {
+class AdsFunction {
 
     fun ByteToBits(input :UByte):BooleanArray {
         var arr = BooleanArray(8)

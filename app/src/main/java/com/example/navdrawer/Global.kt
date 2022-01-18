@@ -14,14 +14,13 @@ import java.util.*
 
 enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
+    HwRead, HwWrite,
     MonTouch, MonPercent
 }
 
 class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
-
-
 
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
@@ -54,11 +53,15 @@ class Global {
         )
 
         val packetKind = mapOf(
+            "HW" to PacketKind.HwWrite,
+            "HR" to PacketKind.HwRead,
+
             "MT" to PacketKind.MonTouch,
             "MP" to PacketKind.MonPercent
         )
 
         val monitoring = Monitoring()
+        var hwStat: Byte = 0x00
 
 
         //fun verifyChecksum(buf:ArrayList<Byte>, checksum:Byte):Boolean {
@@ -83,11 +86,9 @@ class Global {
             // 두 변수를 모두 Unsigned Type 으로 변환 후 비교하여도 결과 동일
             //result = calcVal.toUByte() == checksum.toUByte()
             //------------------------------------------------------------------------//
-
             if (!result){
                 Log.d("ME", "Checksum fail / Rx Val : ${checksum},Calc Val : ${calcVal.toByte()}")
             }
-
             return result
         }
 
@@ -102,6 +103,29 @@ class Global {
                 mask = mask shl 1
             }
             return arr
+        }
+
+        fun makeChecksum(data :Byte):Byte {
+            var calcVal: UInt = 0u
+
+            calcVal = data.toUInt().inv()
+            calcVal = calcVal and 0x000000ff.toUInt()
+            calcVal++
+
+            return calcVal.toByte()
+        }
+
+        fun makeChecksum(buf :ByteArray):Byte {
+            var calcVal: UInt = 0u
+
+            for (data in buf) {
+                calcVal += data.toUInt()
+            }
+            calcVal = calcVal.inv()
+            calcVal = calcVal and 0x000000ff.toUInt()
+            calcVal++
+
+            return calcVal.toByte()
         }
     }
 }

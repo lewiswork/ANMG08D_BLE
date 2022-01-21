@@ -89,6 +89,7 @@ class JigFragment : Fragment() {
         mmTxBuffer.add('H'.toByte())    // 0x48
         mmTxBuffer.add('W'.toByte())    // 0x57
 
+
         // Size
         mmTxBuffer.add('0'.toByte())    // 0x30(48)
         mmTxBuffer.add('0'.toByte())    // 0x30(48)

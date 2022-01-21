@@ -3,14 +3,14 @@ package com.example.navdrawer.thread
 import android.util.Log
 import com.example.navdrawer.Global
 
-class RxThread : Thread(){
+class RxThread : Thread() {
 
     private var mmTxBuffer: ByteArray = ByteArray(2048)
     private var mmRxBuffer: ByteArray = ByteArray(2048)
 
     override fun run() {
-        var bytes : Int
-        var arrayCopy :ByteArray
+        var bytes: Int
+        var arrayCopy: ByteArray
 
         Log.d("ME", "Receive thread started. ID : ${this.id}")
         while (Global.rxThreadOn) {

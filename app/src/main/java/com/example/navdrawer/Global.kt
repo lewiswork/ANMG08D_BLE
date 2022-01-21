@@ -78,7 +78,7 @@ class Global {
 
             //------------------------------------------------------------------------//
             // Kotlin 에서 Byte 는 Signed(Unsigned 는 UByte)
-            // UInt Type 인 calcVal 을 Signed Type 으로 변환(.toByte)
+            // UInt Type 인 calcVal 을 Signed Type 으로 변환(.toByte())
             // Signed Type 으로 변환된 계산값과 Signed Type Checksum 수신값 비교
             //------------------------------------------------------------------------//
             result = calcVal.toByte() == checksum

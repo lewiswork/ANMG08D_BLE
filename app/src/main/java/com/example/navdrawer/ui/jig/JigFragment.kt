@@ -5,14 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentJigBinding
-import com.example.navdrawer.ui.jig.JigFragment
 import android.widget.CompoundButton
+import com.example.navdrawer.function.Packet
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -79,46 +77,32 @@ class JigFragment : Fragment() {
         var ofs = 0
         var ofsDatStart = 0
 
-        if (_binding?.swVdd?.isChecked == true) mask = mask or 0x01
-        if (_binding?.swI2c?.isChecked == true) mask = mask or 0x02
+        if (_binding?.swVdd?.isChecked == true) mask = mask or 0x02
+        if (_binding?.swI2c?.isChecked == true) mask = mask or 0x04
 
         Global.hwStat = mask
 
         // Send Set Relay Command Here
-        mmTxBuffer.add(0x02);    // 0x02
-        //mmTxBuffer.add(0x03);    // 고의 Fail test
+        mmTxBuffer.add(Packet.STX);    // 0x02
 
         // Header
         mmTxBuffer.add('H'.toByte())    // 0x48
         mmTxBuffer.add('W'.toByte())    // 0x57
-        //mmTxBuffer.add('Z'.toByte())    // 고의 Fail test
-
 
         // Size
-        mmTxBuffer.add('0'.toByte())    // 0x30(48)
-        mmTxBuffer.add('0'.toByte())    // 0x30(48)
-        //mmTxBuffer.add('1'.toByte())    // 0x31(49)
-        mmTxBuffer.add('2'.toByte())
-        //mmTxBuffer.add('a'.toByte())    // 고의 Fail test
+//        mmTxBuffer.add('0'.toByte())    // 0x30(48)
+//        mmTxBuffer.add('0'.toByte())    // 0x30(48)
+//        mmTxBuffer.add('1'.toByte())    // 0x31(49)
+        Packet.setSize(mmTxBuffer, 1)
 
         // Data
-        //ofsDatStart = mmTxBuffer.size
-        //mmTxBuffer.add(Global.hwStat)
-        tmpBuf[0] = 0x11
-        tmpBuf[1] = 0x22
-
-        mmTxBuffer.add(tmpBuf[0])
-        mmTxBuffer.add(tmpBuf[1])
+        mmTxBuffer.add(Global.hwStat)
 
         // Checksum
-        //mmTxBuffer.add(0xff.toByte())   // 0x01 checksum, temporary
-        //mmTxBuffer.add(Global.makeChecksum(Global.hwStat))
-        mmTxBuffer.add(Global.makeChecksum(tmpBuf))
-        //mmTxBuffer.add(0x03) // 고의 Fail test
+        mmTxBuffer.add(Packet.makeChecksum(Global.hwStat))
 
         // End
-        mmTxBuffer.add(0x03)
-        //mmTxBuffer.add(0x04)  // 고의 Fail test
+        mmTxBuffer.add(Packet.ETX)
 
         // Send Packet
         val ba: ByteArray = mmTxBuffer.toByteArray()

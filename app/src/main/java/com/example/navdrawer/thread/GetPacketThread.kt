@@ -4,7 +4,9 @@ import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.data.Packet
+import com.example.navdrawer.data.RPacket
+import com.example.navdrawer.function.Function
+import com.example.navdrawer.function.Packet
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.StringBuilder
@@ -14,8 +16,8 @@ enum class ExtractMode{ Front, Rear }    // Front : STX~LEN, Rear : Data~ETX
 
 class GetPacketThread:Thread() {
 
-    val STX : Byte = 0x02
-    val ETX : Byte = 0x03
+//    val STX : Byte = 0x02
+//    val ETX : Byte = 0x03
 
     val SZ_UNTIL_LEN = 6
     val IDX_DATA_START = 6
@@ -72,7 +74,7 @@ class GetPacketThread:Thread() {
 
                         // STX
                         mmCurIdx = SZ_UNTIL_LEN  // Error 시 mmCurIdx 까지 버림
-                        if (mmRawByteList[0] != STX) {
+                        if (mmRawByteList[0] != Packet.STX) {
                             Log.d("ME", "STX Error ! : ${mmRawByteList[0]}")
                             if (clearRawByteList()) continue    // Error 처리
                         }
@@ -82,8 +84,8 @@ class GetPacketThread:Thread() {
                             val str1 = mmRawByteList[1].toChar().toString()
                             val str2 = mmRawByteList[2].toChar().toString()
 
-                            category = Global.packetCategory[str1]
-                            kind = Global.packetKind["$str1$str2"]
+                            category = Packet.packetCategory[str1]
+                            kind = Packet.packetKind["$str1$str2"]
 
                             if (category == null || kind == null){
                                 Log.d("ME", "Packet header error : $str1$str2")
@@ -120,19 +122,23 @@ class GetPacketThread:Thread() {
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
-                            if (!Global.verifyChecksum(dataContents, checksum)) {
-                                Log.d("ME", "Checksum Error !")
+                            //if (!Global.verifyChecksum(dataContents, checksum)) {
+                            val calcChecksum = Packet.makeChecksum(dataContents)
+                            if (calcChecksum != checksum) {
+                                Log.d("ME",
+                                    "Checksum Error ! / Rx Val : ${checksum},Calc Val : ${calcChecksum}")
+
                                 if (clearRawByteList()) continue    // Error 처리
                             }
                         }
 
                         // ETX
-                        if (mmRawByteList[IDX_DATA_START + dataLength + 1] != ETX) {
+                        if (mmRawByteList[IDX_DATA_START + dataLength + 1] != Packet.ETX) {
                             Log.d("ME", "ETX Error !")
                             if (clearRawByteList()) continue    // Error 처리
                         }
 
-                        val pk = Packet(category, kind, dataLength, dataContents)
+                        val pk = RPacket(category, kind, dataLength, dataContents)
 
                         // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
                         when (category) {
@@ -175,7 +181,7 @@ class GetPacketThread:Thread() {
     ) {
         when (kind) {
             PacketKind.MonTouch -> {
-                var booleanArray = Global.byteToBooleanArray(dataContents[0],
+                var booleanArray = Function.byteToBooleanArray(dataContents[0],
                     Global.monitoring.TCH_CH_CNT)
 
                 synchronized(this) {

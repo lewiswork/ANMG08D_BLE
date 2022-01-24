@@ -10,7 +10,7 @@ import java.io.FileNotFoundException
 import java.lang.StringBuilder
 import kotlin.NoSuchElementException
 
-enum class ExtractMode{ Header, Body }    // Header : STX~LEN, Body : Data~ETX
+enum class ExtractMode{ Front, Rear }    // Front : STX~LEN, Rear : Data~ETX
 
 class GetPacketThread:Thread() {
 
@@ -22,7 +22,7 @@ class GetPacketThread:Thread() {
 
     var mmCurIdx : Int = 0
     var mmRawByteList = mutableListOf<Byte>()
-    var mmExtractMode  = ExtractMode.Header
+    var mmExtractMode  = ExtractMode.Front
     var mmLogStr = StringBuilder()
 
     override fun run() {
@@ -67,7 +67,7 @@ class GetPacketThread:Thread() {
                 // byteList 데이터 -> Packet 추출
                 //------------------------------------------------------------------------------//
                 if (mmRawByteList.count() > 0) {
-                    if (mmExtractMode == ExtractMode.Header) {
+                    if (mmExtractMode == ExtractMode.Front) {
                         if (mmRawByteList.count() < SZ_UNTIL_LEN) continue
 
                         // STX
@@ -100,12 +100,12 @@ class GetPacketThread:Thread() {
                         ) {
                             dataLength =
                                 (mmRawByteList[3].toInt() - 0x30) * 100 + (mmRawByteList[4].toInt() - 0x30) * 10 + (mmRawByteList[5].toInt() - 0x30)
-                            mmExtractMode = ExtractMode.Body
+                            mmExtractMode = ExtractMode.Rear
                         } else {
                             Log.d("ME", "Packet Length Error!!")
                             if (clearRawByteList()) continue    // Error 처리
                         }
-                    } else if (mmExtractMode == ExtractMode.Body) {
+                    } else if (mmExtractMode == ExtractMode.Rear) {
 
                         if (mmRawByteList.count() < SZ_UNTIL_LEN + dataLength + 2) continue // Data, Checksum, ETX
 
@@ -275,7 +275,7 @@ class GetPacketThread:Thread() {
         }
         mmCurIdx = 0
         //mmDataList.clear()
-        mmExtractMode = ExtractMode.Header
+        mmExtractMode = ExtractMode.Front
 
         mmLogStr.clear()
 

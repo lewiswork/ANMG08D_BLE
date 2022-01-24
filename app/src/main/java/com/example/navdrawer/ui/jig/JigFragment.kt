@@ -74,6 +74,8 @@ class JigFragment : Fragment() {
         var mmTxBuffer: ArrayList<Byte> = ArrayList()
         var mask: Byte = 0x00
 
+        var tmpBuf = ByteArray(2)
+
         var ofs = 0
         var ofsDatStart = 0
 
@@ -84,26 +86,41 @@ class JigFragment : Fragment() {
 
         // Send Set Relay Command Here
         mmTxBuffer.add(0x02);    // 0x02
+        //mmTxBuffer.add(0x03);    // 고의 Fail test
 
         // Header
         mmTxBuffer.add('H'.toByte())    // 0x48
         mmTxBuffer.add('W'.toByte())    // 0x57
+        //mmTxBuffer.add('Z'.toByte())    // 고의 Fail test
 
 
         // Size
         mmTxBuffer.add('0'.toByte())    // 0x30(48)
         mmTxBuffer.add('0'.toByte())    // 0x30(48)
-        mmTxBuffer.add('1'.toByte())    // 0x31(49)
+        //mmTxBuffer.add('1'.toByte())    // 0x31(49)
+        mmTxBuffer.add('2'.toByte())
+        //mmTxBuffer.add('a'.toByte())    // 고의 Fail test
 
+        // Data
         //ofsDatStart = mmTxBuffer.size
-        mmTxBuffer.add(Global.hwStat)
+        //mmTxBuffer.add(Global.hwStat)
+        tmpBuf[0] = 0x11
+        tmpBuf[1] = 0x22
+
+        mmTxBuffer.add(tmpBuf[0])
+        mmTxBuffer.add(tmpBuf[1])
 
         // Checksum
         //mmTxBuffer.add(0xff.toByte())   // 0x01 checksum, temporary
-        mmTxBuffer.add(Global.makeChecksum(Global.hwStat))
+        //mmTxBuffer.add(Global.makeChecksum(Global.hwStat))
+        mmTxBuffer.add(Global.makeChecksum(tmpBuf))
+        //mmTxBuffer.add(0x03) // 고의 Fail test
 
         // End
         mmTxBuffer.add(0x03)
+        //mmTxBuffer.add(0x04)  // 고의 Fail test
+
+        // Send Packet
         val ba: ByteArray = mmTxBuffer.toByteArray()
         Global.outStream!!.write(ba)
 

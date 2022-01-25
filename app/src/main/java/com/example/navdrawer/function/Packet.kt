@@ -29,51 +29,73 @@ class Packet {
             "MP" to PacketKind.MonPercent
         )
 
+        val listTxPacket: ArrayList<Byte> = ArrayList()
+
         //--------------------------------------------------------------------------------------//
         // Make packet of 1-byte data
         // 1-byte 데이터 전송용 Packet 생성 함수
         //--------------------------------------------------------------------------------------//
-        fun make(kind: PacketKind, list: ArrayList<Byte>, b: Byte) {
-            list.clear()
+        fun make(kind: PacketKind) {
+            listTxPacket.clear()
 
             // Set Start of Packet(STX)
-            list.add(STX)
+            listTxPacket.add(STX)
             // Set Header
-            setHeader(list, kind)
-            // Set Size
-            setSize(list, 1)
-            // Set Data
-            list.add(b)
-            // Set checksum
-            setChecksum(list, makeChecksum(b))
+            setHeader(kind)
+            // Set Size as 0
+            setSize(0)
+            // Set checksum as 0
+            listTxPacket.add(0)
             // Set End of Packet(ETX)
-            list.add(ETX)
+            listTxPacket.add(ETX)
         }
         //--------------------------------------------------------------------------------------//
 
-        private fun setHeader(list: ArrayList<Byte>, kind: PacketKind) {
+        //--------------------------------------------------------------------------------------//
+        // Make packet with 1-byte data
+        // 1-byte 데이터 전송용 Packet 생성
+        //--------------------------------------------------------------------------------------//
+        fun make(kind: PacketKind, b: Byte) {
+            listTxPacket.clear()
+
+            // Set Start of Packet(STX)
+            listTxPacket.add(STX)
+            // Set Header
+            setHeader(kind)
+            // Set Size
+            setSize(1)
+            // Set Data
+            listTxPacket.add(b)
+            // Set checksum
+            setChecksum(makeChecksum(b))
+            // Set End of Packet(ETX)
+            listTxPacket.add(ETX)
+        }
+        //--------------------------------------------------------------------------------------//
+
+        private fun setHeader(kind: PacketKind) {
             val str : String = packetKind.entries.find{it.value == kind}!!.key
             val ba = str.toByteArray()
             if (str.length == 2) {
-                list.add(ba[0])
-                list.add(ba[1])
+                listTxPacket.add(ba[0])
+                listTxPacket.add(ba[1])
             }
             else{
                 throw Exception("Error while setting packet header.")
             }
         }
 
-        private fun setChecksum(list: ArrayList<Byte>, checksum: Byte) {
-            list.add(checksum);
+        private fun setChecksum(checksum: Byte) {
+            listTxPacket.add(checksum);
         }
 
-        private fun setSize(list: ArrayList<Byte>, size: Int) {
+        private fun setSize(size: Int) {
             if (size < 256) {
                 val str = String.format("%03d", size)
                 val ca = str.toCharArray()
 
                 for (c in ca) {
-                    list.add(c.toByte())
+                    listTxPacket.add(c.toByte())
                 }
             } else {
                 throw Exception("Data size error while making packet.")
@@ -103,8 +125,8 @@ class Packet {
             return calcVal.toByte()
         }
 
-        fun sendPacket(out: OutputStream?, list: ArrayList<Byte>) {
-            val ba: ByteArray = list.toByteArray()
+        fun sendPacket(out: OutputStream?) {
+            val ba: ByteArray = listTxPacket.toByteArray()
             Global.outStream!!.write(ba)
         }
     }

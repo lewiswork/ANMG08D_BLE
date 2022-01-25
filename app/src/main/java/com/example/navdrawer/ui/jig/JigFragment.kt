@@ -30,7 +30,9 @@ class JigFragment : Fragment() {
 
     // Hardware Read Packet 용 Timer
     var i = 0
-    val timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000) {
+
+    // for test
+    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 1000) {
         binding.textView3.text = i.toString()
         i++
     }
@@ -71,18 +73,11 @@ class JigFragment : Fragment() {
         binding.swVdd.setOnCheckedChangeListener(listenerCheckedChanged)
         binding.swI2c.setOnCheckedChangeListener(listenerCheckedChanged)
 
-        //val timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000) {
-//            activity?.runOnUiThread {
-//                binding.textView3.text = i.toString()
-//                i++
-//            }
-        //}
-
         return root
     }
 
     private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-        var packetBuf: ArrayList<Byte> = ArrayList()
+        //var packetBuf: ArrayList<Byte> = ArrayList()
         var mask: Byte = 0x00
 
         try {
@@ -92,10 +87,10 @@ class JigFragment : Fragment() {
             Global.hwStat = mask
 
             // Make packet
-            Packet.make(PacketKind.HwWrite, packetBuf, Global.hwStat)
+            Packet.make(PacketKind.HwWrite, Global.hwStat)
 
             // Send packet
-            Packet.sendPacket(Global.outStream, packetBuf)
+            Packet.sendPacket(Global.outStream)
 
             binding.textView3.text = mask.toString()    // for debugging
 

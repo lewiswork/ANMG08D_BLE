@@ -5,6 +5,7 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 import java.io.OutputStream
+import java.lang.Exception
 
 class Packet {
     companion object {
@@ -28,18 +29,48 @@ class Packet {
             "MP" to PacketKind.MonPercent
         )
 
-        fun setStart(list: ArrayList<Byte>) {
-            list.add(STX);    // 0x02
+        // Make packet of 1-byte data
+        fun make(kind: PacketKind, list: ArrayList<Byte>, b: Byte) {
+            list.clear()
+
+            // Set Start of Packet(STX)
+            list.add(STX);
+
+            // Set Header
+            setHeader(list, kind)
+
+            // Set Size
+            setSize(list, 1)
+
+            // Set Data
+            list.add(b)
+
+            // Set checksum
+            setChecksum(list, makeChecksum(b))
+
+            // Set End of Packet(ETX)
+            list.add(ETX);
         }
 
-        fun setEnd(list: ArrayList<Byte>) {
-            list.add(ETX);    // 0x03
+//        fun setStart(list: ArrayList<Byte>) {
+//            list.add(STX);    // 0x02
+//        }
+
+        fun setHeader(list: ArrayList<Byte>, kind: PacketKind) {
+            val str : String = packetKind.entries.find{it.value == kind}!!.key
+            val ba = str.toByteArray()
+            if (str.length == 2) {
+                list.add(ba[0])
+                list.add(ba[1])
+            }
+            else{
+                throw Exception("Error while setting packet header.")
+            }
         }
 
-        fun sendPacket(out: OutputStream?, list: ArrayList<Byte>) {
-            val ba: ByteArray = list.toByteArray()
-            Global.outStream!!.write(ba)
-        }
+//        fun setEnd(list: ArrayList<Byte>) {
+//            list.add(ETX);    // 0x03
+//        }
 
         fun setChecksum(list: ArrayList<Byte>, checksum: Byte) {
             list.add(checksum);
@@ -54,7 +85,7 @@ class Packet {
                     list.add(c.toByte())
                 }
             } else {
-                Log.d("[ADS]", "Data size error while making packet.")
+                throw Exception("Data size error while making packet.")
             }
         }
 
@@ -79,6 +110,11 @@ class Packet {
             calcVal++
 
             return calcVal.toByte()
+        }
+
+        fun sendPacket(out: OutputStream?, list: ArrayList<Byte>) {
+            val ba: ByteArray = list.toByteArray()
+            Global.outStream!!.write(ba)
         }
     }
 }

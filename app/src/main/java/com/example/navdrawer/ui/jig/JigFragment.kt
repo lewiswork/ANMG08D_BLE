@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentJigBinding
 import android.widget.CompoundButton
+import com.example.navdrawer.PacketKind
 import com.example.navdrawer.function.Packet
+import java.lang.Exception
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -72,45 +74,40 @@ class JigFragment : Fragment() {
         var mmTxBuffer: ArrayList<Byte> = ArrayList()
         var mask: Byte = 0x00
 
-        var tmpBuf = ByteArray(2)
+        try {
+            if (binding.swVdd.isChecked) mask = mask or 0x02
+            if (binding.swI2c.isChecked) mask = mask or 0x04
 
-        var ofs = 0
-        var ofsDatStart = 0
+            Global.hwStat = mask
 
-        if (_binding?.swVdd?.isChecked == true) mask = mask or 0x02
-        if (_binding?.swI2c?.isChecked == true) mask = mask or 0x04
+            // Make packet to send
+            Packet.make(PacketKind.HwWrite, mmTxBuffer, Global.hwStat)
 
-        Global.hwStat = mask
+//            // Start(STX)
+//            Packet.setStart(mmTxBuffer)
 
-        // Send Set Relay Command Here
-        //mmTxBuffer.add(Packet.STX);    // 0x02
-        Packet.setStart(mmTxBuffer)
+//            // Header
+//            Packet.setHeader(mmTxBuffer, PacketKind.HwWrite)
+//
+//            // Size
+//            Packet.setSize(mmTxBuffer, 1)
 
-        // Header
-        mmTxBuffer.add('H'.toByte())    // 0x48
-        mmTxBuffer.add('W'.toByte())    // 0x57
+//            // Data
+//            mmTxBuffer.add(Global.hwStat)
 
-        // Size
-        Packet.setSize(mmTxBuffer, 1)
+//            // Checksum
+//            Packet.setChecksum(mmTxBuffer, Packet.makeChecksum(Global.hwStat))
 
-        // Data
-        mmTxBuffer.add(Global.hwStat)
+//            // End
+//            Packet.setEnd(mmTxBuffer)
 
-        // Checksum
-        //mmTxBuffer.add(Packet.makeChecksum(Global.hwStat))
-        Packet.setChecksum(mmTxBuffer, Packet.makeChecksum(Global.hwStat))
+            // Send Packet
+            Packet.sendPacket(Global.outStream, mmTxBuffer)
 
-        // End
-        //mmTxBuffer.add(Packet.ETX)
-        Packet.setEnd(mmTxBuffer)
-
-        // Send Packet
-//        val ba: ByteArray = mmTxBuffer.toByteArray()
-//        Global.outStream!!.write(ba)
-        Packet.sendPacket(Global.outStream, mmTxBuffer)
-
-        //_binding?.textView3?.text = mask.toString()
-        binding.textView3.text = mask.toString()
+            binding.textView3.text = mask.toString()    // for debugging
+        }catch (ex:Exception){
+            Log.d("[ADS]", "Making packet error ! / ${ex.message}}")
+        }
     }
 
     override fun onDestroyView() {

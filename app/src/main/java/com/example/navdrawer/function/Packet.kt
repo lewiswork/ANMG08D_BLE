@@ -10,8 +10,8 @@ import java.lang.Exception
 class Packet {
     companion object {
 
-        val STX : Byte = 0x02
-        val ETX : Byte = 0x03
+        const val STX : Byte = 0x02
+        const val ETX : Byte = 0x03
 
         val packetCategory = mapOf(
             "E" to PacketCategory.Rom,
@@ -29,34 +29,29 @@ class Packet {
             "MP" to PacketKind.MonPercent
         )
 
+        //--------------------------------------------------------------------------------------//
         // Make packet of 1-byte data
+        // 1-byte 데이터 전송용 Packet 생성 함수
+        //--------------------------------------------------------------------------------------//
         fun make(kind: PacketKind, list: ArrayList<Byte>, b: Byte) {
             list.clear()
 
             // Set Start of Packet(STX)
-            list.add(STX);
-
+            list.add(STX)
             // Set Header
             setHeader(list, kind)
-
             // Set Size
             setSize(list, 1)
-
             // Set Data
             list.add(b)
-
             // Set checksum
             setChecksum(list, makeChecksum(b))
-
             // Set End of Packet(ETX)
-            list.add(ETX);
+            list.add(ETX)
         }
+        //--------------------------------------------------------------------------------------//
 
-//        fun setStart(list: ArrayList<Byte>) {
-//            list.add(STX);    // 0x02
-//        }
-
-        fun setHeader(list: ArrayList<Byte>, kind: PacketKind) {
+        private fun setHeader(list: ArrayList<Byte>, kind: PacketKind) {
             val str : String = packetKind.entries.find{it.value == kind}!!.key
             val ba = str.toByteArray()
             if (str.length == 2) {
@@ -68,15 +63,11 @@ class Packet {
             }
         }
 
-//        fun setEnd(list: ArrayList<Byte>) {
-//            list.add(ETX);    // 0x03
-//        }
-
-        fun setChecksum(list: ArrayList<Byte>, checksum: Byte) {
+        private fun setChecksum(list: ArrayList<Byte>, checksum: Byte) {
             list.add(checksum);
         }
 
-        fun setSize(list: ArrayList<Byte>, size: Int) {
+        private fun setSize(list: ArrayList<Byte>, size: Int) {
             if (size < 256) {
                 val str = String.format("%03d", size)
                 val ca = str.toCharArray()

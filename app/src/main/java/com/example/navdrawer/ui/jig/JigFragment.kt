@@ -13,6 +13,9 @@ import android.widget.CompoundButton
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.function.Packet
 import java.lang.Exception
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.timer
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -22,9 +25,15 @@ class JigFragment : Fragment() {
     private lateinit var jigViewModel: JigViewModel
     private var _binding: FragmentJigBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
+
+    // Hardware Read Packet 용 Timer
+    var i = 0
+    val timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000) {
+        binding.textView3.text = i.toString()
+        i++
+    }
 
     private lateinit var mmJigThread: JigFragment.JigThread
     private var mmJigThreadOn:Boolean = false
@@ -43,35 +52,37 @@ class JigFragment : Fragment() {
         Log.d("ME", "Jig Fragment > onCreateView")
 
         if (Global.isBtConnected) {
-            //_binding?.tvJig?.text = "BT connected"
 
             mmJigThreadOn = true
             mmJigThread = JigThread()
             mmJigThread.start()
 
-            _binding?.swVdd?.isEnabled = true
-            _binding?.swI2c?.isEnabled = true
+            binding.swVdd.isEnabled = true
+            binding.swI2c.isEnabled = true
 
         } else {
-            //_binding?.tvJig?.text = "BT disconnected"
-
-            _binding?.swVdd?.isEnabled = false
-            _binding?.swI2c?.isEnabled = false
-            binding.swI2c.isEnabled = true
+            binding.swVdd.isEnabled = false
+            binding.swI2c.isEnabled = false
         }
 
-        if ((Global.hwStat and 0x01.toByte()) == 0x01.toByte())_binding?.swVdd?.isChecked = true
-        if ((Global.hwStat and 0x02.toByte()) == 0x02.toByte())_binding?.swI2c?.isChecked = true
+        if ((Global.hwStat and 0x02.toByte()) == 0x02.toByte()) binding.swVdd.isChecked = true
+        if ((Global.hwStat and 0x04.toByte()) == 0x04.toByte()) binding.swI2c.isChecked = true
 
-        _binding?.swVdd?.setOnCheckedChangeListener(listenerCheckedChanged)
-        _binding?.swI2c?.setOnCheckedChangeListener(listenerCheckedChanged)
+        binding.swVdd.setOnCheckedChangeListener(listenerCheckedChanged)
+        binding.swI2c.setOnCheckedChangeListener(listenerCheckedChanged)
+
+        //val timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000) {
+//            activity?.runOnUiThread {
+//                binding.textView3.text = i.toString()
+//                i++
+//            }
+        //}
 
         return root
     }
 
     private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-
-        var mmTxBuffer: ArrayList<Byte> = ArrayList()
+        var packetBuf: ArrayList<Byte> = ArrayList()
         var mask: Byte = 0x00
 
         try {
@@ -80,33 +91,16 @@ class JigFragment : Fragment() {
 
             Global.hwStat = mask
 
-            // Make packet to send
-            Packet.make(PacketKind.HwWrite, mmTxBuffer, Global.hwStat)
+            // Make packet
+            Packet.make(PacketKind.HwWrite, packetBuf, Global.hwStat)
 
-//            // Start(STX)
-//            Packet.setStart(mmTxBuffer)
-
-//            // Header
-//            Packet.setHeader(mmTxBuffer, PacketKind.HwWrite)
-//
-//            // Size
-//            Packet.setSize(mmTxBuffer, 1)
-
-//            // Data
-//            mmTxBuffer.add(Global.hwStat)
-
-//            // Checksum
-//            Packet.setChecksum(mmTxBuffer, Packet.makeChecksum(Global.hwStat))
-
-//            // End
-//            Packet.setEnd(mmTxBuffer)
-
-            // Send Packet
-            Packet.sendPacket(Global.outStream, mmTxBuffer)
+            // Send packet
+            Packet.sendPacket(Global.outStream, packetBuf)
 
             binding.textView3.text = mask.toString()    // for debugging
-        }catch (ex:Exception){
-            Log.d("[ADS]", "Making packet error ! / ${ex.message}}")
+
+        } catch (ex: Exception) {
+            Log.d("[ADS]", "Making packet error! / ${ex.message}}")
         }
     }
 

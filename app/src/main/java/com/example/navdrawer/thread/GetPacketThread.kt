@@ -16,9 +16,6 @@ enum class ExtractMode{ Front, Rear }    // Front : STX~LEN, Rear : Data~ETX
 
 class GetPacketThread:Thread() {
 
-//    val STX : Byte = 0x02
-//    val ETX : Byte = 0x03
-
     val SZ_UNTIL_LEN = 6
     val IDX_DATA_START = 6
 
@@ -32,7 +29,6 @@ class GetPacketThread:Thread() {
 
         var qEmpty :Boolean
         var rawByteArray: ByteArray
-
         var category : PacketCategory? = null
         var kind : PacketKind? = null
         var dataLength : Int = 0

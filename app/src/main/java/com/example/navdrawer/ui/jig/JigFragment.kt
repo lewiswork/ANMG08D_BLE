@@ -28,17 +28,19 @@ class JigFragment : Fragment() {
     // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
-    // Hardware Read Packet 용 Timer
-    var i = 0
-
-    // for test
-    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 1000) {
-        binding.textView3.text = i.toString()
-        i++
-    }
-
     private lateinit var mmJigThread: JigFragment.JigThread
     private var mmJigThreadOn:Boolean = false
+
+    // Hardware Read Packet 용 Timer
+    var i = 0;
+    var tick=false
+    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 1000) {
+        //activity?.runOnUiThread {
+        //Packet.send(Global.outStream, PacketKind.HwWrite, 0x03) // Send packet
+        i++
+        tick = true
+        //}
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +53,7 @@ class JigFragment : Fragment() {
         _binding = FragmentJigBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        Log.d("ME", "Jig Fragment > onCreateView")
+        Log.d("ADS", "Jig Fragment > onCreateView")
 
         if (Global.isBtConnected) {
 
@@ -77,7 +79,6 @@ class JigFragment : Fragment() {
     }
 
     private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-        //var packetBuf: ArrayList<Byte> = ArrayList()
         var mask: Byte = 0x00
 
         try {
@@ -86,11 +87,7 @@ class JigFragment : Fragment() {
 
             Global.hwStat = mask
 
-            // Make packet
-            Packet.make(PacketKind.HwWrite, Global.hwStat)
-
-            // Send packet
-            Packet.sendPacket(Global.outStream)
+            Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
 
             binding.textView3.text = mask.toString()    // for debugging
 
@@ -103,7 +100,7 @@ class JigFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         mmJigThreadOn = false
-        Log.d("ME", "Jig Fragment > onDestroyView")
+        Log.d("ADS", "Jig Fragment > onDestroyView")
     }
 
     //---------------------------------------------------------------------------------------//
@@ -112,8 +109,18 @@ class JigFragment : Fragment() {
     inner class JigThread : Thread() {
         override fun run() {
 
-            Log.d("ME", "Jig thread started. ID : ${this.id}")
+            Log.d("ADS", "Jig thread started. ID : ${this.id}")
             while (mmJigThreadOn) {
+
+                if (tick){
+//                    binding.textView3.text = i.toString()
+//                    Log.d("ADS", "Jig thread started. ID : ${i}")
+                    Packet.send(Global.outStream, PacketKind.HwWrite, 0x06) // Send packet
+                    //Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
+                    tick = false
+                }
+                //Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
+                //Packet.send(Global.outStream, PacketKind.HwWrite, 0x03) // Send packet
 //
 //                //var str = java.lang.StringBuilder()
 //
@@ -131,7 +138,7 @@ class JigFragment : Fragment() {
 //
                 Thread.sleep(10)
             }
-            Log.d("ME", "Jig thread finished. ID : ${this.id}")
+            Log.d("ADS", "Jig thread finished. ID : ${this.id}")
         }
     }
 }

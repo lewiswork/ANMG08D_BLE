@@ -83,30 +83,31 @@ class JigFragment : Fragment() {
         Global.hwStat = mask
 
         // Send Set Relay Command Here
-        mmTxBuffer.add(Packet.STX);    // 0x02
+        //mmTxBuffer.add(Packet.STX);    // 0x02
+        Packet.setStart(mmTxBuffer)
 
         // Header
         mmTxBuffer.add('H'.toByte())    // 0x48
         mmTxBuffer.add('W'.toByte())    // 0x57
 
         // Size
-//        mmTxBuffer.add('0'.toByte())    // 0x30(48)
-//        mmTxBuffer.add('0'.toByte())    // 0x30(48)
-//        mmTxBuffer.add('1'.toByte())    // 0x31(49)
         Packet.setSize(mmTxBuffer, 1)
 
         // Data
         mmTxBuffer.add(Global.hwStat)
 
         // Checksum
-        mmTxBuffer.add(Packet.makeChecksum(Global.hwStat))
+        //mmTxBuffer.add(Packet.makeChecksum(Global.hwStat))
+        Packet.setChecksum(mmTxBuffer, Packet.makeChecksum(Global.hwStat))
 
         // End
-        mmTxBuffer.add(Packet.ETX)
+        //mmTxBuffer.add(Packet.ETX)
+        Packet.setEnd(mmTxBuffer)
 
         // Send Packet
-        val ba: ByteArray = mmTxBuffer.toByteArray()
-        Global.outStream!!.write(ba)
+//        val ba: ByteArray = mmTxBuffer.toByteArray()
+//        Global.outStream!!.write(ba)
+        Packet.sendPacket(Global.outStream, mmTxBuffer)
 
         //_binding?.textView3?.text = mask.toString()
         binding.textView3.text = mask.toString()

@@ -1,8 +1,10 @@
 package com.example.navdrawer.function
 
 import android.util.Log
+import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
+import java.io.OutputStream
 
 class Packet {
     companion object {
@@ -26,13 +28,30 @@ class Packet {
             "MP" to PacketKind.MonPercent
         )
 
-        fun setSize(ar: ArrayList<Byte>, size: Int) {
+        fun setStart(list: ArrayList<Byte>) {
+            list.add(STX);    // 0x02
+        }
+
+        fun setEnd(list: ArrayList<Byte>) {
+            list.add(ETX);    // 0x03
+        }
+
+        fun sendPacket(out: OutputStream?, list: ArrayList<Byte>) {
+            val ba: ByteArray = list.toByteArray()
+            Global.outStream!!.write(ba)
+        }
+
+        fun setChecksum(list: ArrayList<Byte>, checksum: Byte) {
+            list.add(checksum);
+        }
+
+        fun setSize(list: ArrayList<Byte>, size: Int) {
             if (size < 256) {
                 val str = String.format("%03d", size)
                 val ca = str.toCharArray()
 
                 for (c in ca) {
-                    ar.add(c.toByte())
+                    list.add(c.toByte())
                 }
             } else {
                 Log.d("[ADS]", "Data size error while making packet.")

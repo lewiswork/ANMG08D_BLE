@@ -35,7 +35,7 @@ class GetPacketThread:Thread() {
         var dataContents : ByteArray
         var checksum : Byte
 
-        Log.d("ME", "Get packet thread started. ID : ${this.id}")
+        Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
         while (Global.rxPacketThreadOn) {
             try {
@@ -71,7 +71,7 @@ class GetPacketThread:Thread() {
                         // STX
                         mmCurIdx = SZ_UNTIL_LEN  // Error 시 mmCurIdx 까지 버림
                         if (mmRawByteList[0] != Packet.STX) {
-                            Log.d("ME", "STX Error ! : ${mmRawByteList[0]}")
+                            Log.d("[ADS] ", "STX Error ! : ${mmRawByteList[0]}")
                             if (clearRawByteList()) continue    // Error 처리
                         }
 
@@ -84,11 +84,11 @@ class GetPacketThread:Thread() {
                             kind = Packet.packetKind["$str1$str2"]
 
                             if (category == null || kind == null){
-                                Log.d("ME", "Packet header error : $str1$str2")
+                                Log.d("[ADS] ", "Packet header error : $str1$str2")
                                 if (clearRawByteList()) continue    // Error 처리
                             }
                         } else {
-                            Log.d("ME", "Packet Header Error!!")
+                            Log.d("[ADS] ", "Packet Header Error!!")
                             if (clearRawByteList()) continue    // Error 처리
                         }
 
@@ -100,7 +100,7 @@ class GetPacketThread:Thread() {
                                 (mmRawByteList[3].toInt() - 0x30) * 100 + (mmRawByteList[4].toInt() - 0x30) * 10 + (mmRawByteList[5].toInt() - 0x30)
                             mmExtractMode = ExtractMode.Rear
                         } else {
-                            Log.d("ME", "Packet Length Error!!")
+                            Log.d("[ADS] ", "Packet Length Error!!")
                             if (clearRawByteList()) continue    // Error 처리
                         }
                     } else if (mmExtractMode == ExtractMode.Rear) {
@@ -121,7 +121,7 @@ class GetPacketThread:Thread() {
                             //if (!Global.verifyChecksum(dataContents, checksum)) {
                             val calcChecksum = Packet.makeChecksum(dataContents)
                             if (calcChecksum != checksum) {
-                                Log.d("ME",
+                                Log.d("[ADS] ",
                                     "Checksum Error ! / Rx Val : ${checksum},Calc Val : ${calcChecksum}")
 
                                 if (clearRawByteList()) continue    // Error 처리
@@ -130,7 +130,7 @@ class GetPacketThread:Thread() {
 
                         // ETX
                         if (mmRawByteList[IDX_DATA_START + dataLength + 1] != Packet.ETX) {
-                            Log.d("ME", "ETX Error !")
+                            Log.d("[ADS] ", "ETX Error !")
                             if (clearRawByteList()) continue    // Error 처리
                         }
 
@@ -154,7 +154,7 @@ class GetPacketThread:Thread() {
                         }
 
                         prepareLog()
-                        logToFile(mmLogStr.toString())
+                        //logToFile(mmLogStr.toString())
 
                         clearRawByteList()  // Packet 저장 완료된 Raw Data 제거
                     }
@@ -168,7 +168,7 @@ class GetPacketThread:Thread() {
                 //continue
             }
         }
-        Log.d("ME", "Get packet thread finished. ID : ${this.id}")
+        Log.d("[ADS] ", "Get packet thread finished. ID : ${this.id}")
     }
 
     private fun updateMonitoringData(
@@ -207,7 +207,7 @@ class GetPacketThread:Thread() {
             str.append(String.format("%02X", element))
             str.append(" ")
         }
-        Log.d("ME", "[RX RAW ARRAY] $str")
+        Log.d("[ADS] ", "[RX RAW ARRAY] $str")
         //-----------------------------------------------------------------------//
     }
 
@@ -219,7 +219,7 @@ class GetPacketThread:Thread() {
             mmLogStr.append(String.format("%02X", mmRawByteList[i]))
             if (i < mmCurIdx - 1) mmLogStr.append(" ")
         }
-        Log.d("ME", "[RX PK HEX] $mmLogStr")
+        Log.d("[ADS] ", "[RX PK HEX] $mmLogStr")
         //------------------------------------------------------------------------------//
 
         //------------------------------------------------------------------------------//
@@ -230,7 +230,7 @@ class GetPacketThread:Thread() {
             if (i == 0) {
                 // STX
                 mmLogStr.append("STX ")
-            } else if (i > 0 && i < IDX_DATA_START) {
+            } else if (i in 1 until IDX_DATA_START) {
                 // Header, Length
                 if (i == 3) mmLogStr.append(" ")
                 mmLogStr.append(mmRawByteList[i].toChar())
@@ -244,7 +244,7 @@ class GetPacketThread:Thread() {
                 //println(mmLogStr::class.java.typeName) // Type Print
             }
         }
-        Log.d("ME", "[RX PK ELE] $mmLogStr")
+        Log.d("[ADS] ", "[RX PK ELE] $mmLogStr")
         //------------------------------------------------------------------------------//
     }
 
@@ -263,9 +263,9 @@ class GetPacketThread:Thread() {
         try {
             someFile.appendText("가나다라마바사")
             someFile.appendText(str.toString())
-            //Log.d("ME", "File saved at : $someFile")
+            //Log.d("[ADS] ", "File saved at : $someFile")
         } catch (e: FileNotFoundException) {
-            Log.d("ME", "FileNotFound: $someFile")
+            Log.d("[ADS] ", "FileNotFound: $someFile")
         }
         //------------------------------------------------------------------------------//
     }

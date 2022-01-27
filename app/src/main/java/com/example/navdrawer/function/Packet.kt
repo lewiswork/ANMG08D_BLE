@@ -150,12 +150,12 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-            var str = ""
-            for (b in ba)
-            {
-                str += String.format("%02X", b) + " "
-            }
-            Log.d("[ADS] ", "Packet sent : $str")
+//            var str = ""
+//            for (b in ba)
+//            {
+//                str += String.format("%02X", b) + " "
+//            }
+//            Log.d("[ADS] ", "Packet sent : $str")
         }
 
         //--------------------------------------------------------------------------------------//
@@ -181,9 +181,9 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-            var str = ""
-            for (b in ba) str += String.format("%02X", b) + " "
-            Log.d("[ADS] ", "Packet sent : $str")
+//            var str = ""
+//            for (b in ba) str += String.format("%02X", b) + " "
+//            Log.d("[ADS] ", "Packet sent : $str")
         }
     }
 }

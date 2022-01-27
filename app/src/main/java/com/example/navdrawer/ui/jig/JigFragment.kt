@@ -32,15 +32,11 @@ class JigFragment : Fragment() {
     private var mmJigThreadOn:Boolean = false
 
     // Hardware Read Packet 용 Timer
-    var i = 0;
     var tick=false
-    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 1000) {
-        //activity?.runOnUiThread {
-        //Packet.send(Global.outStream, PacketKind.HwWrite, 0x03) // Send packet
-        i++
-        tick = true
-        //}
-    }
+    var timer : Timer? = null
+//    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 3000) {
+//        tick = true
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +49,7 @@ class JigFragment : Fragment() {
         _binding = FragmentJigBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        Log.d("ADS", "Jig Fragment > onCreateView")
+        Log.d("[ADS] ", "Jig Fragment > onCreateView")
 
         if (Global.isBtConnected) {
 
@@ -100,7 +96,26 @@ class JigFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         mmJigThreadOn = false
-        Log.d("ADS", "Jig Fragment > onDestroyView")
+        Log.d("[ADS] ", "Jig Fragment > onDestroyView")
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
+            tick = true
+        }
+
+        Log.d("[ADS] ", "Jig Fragment > onResume")
+        Log.d("[ADS] ", "Jig Fragment > onResume > Timer started : $timer")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        timer!!.cancel()
+
+        Log.d("[ADS] ", "Jig Fragment > onPause")
+        Log.d("[ADS] ", "Jig Fragment > onResume > Timer canceled : $timer")
     }
 
     //---------------------------------------------------------------------------------------//
@@ -109,14 +124,14 @@ class JigFragment : Fragment() {
     inner class JigThread : Thread() {
         override fun run() {
 
-            Log.d("ADS", "Jig thread started. ID : ${this.id}")
+            Log.d("[ADS] ", "Jig thread started. ID : ${this.id}")
             while (mmJigThreadOn) {
 
                 if (tick){
 //                    binding.textView3.text = i.toString()
-//                    Log.d("ADS", "Jig thread started. ID : ${i}")
-                    Packet.send(Global.outStream, PacketKind.HwWrite, 0x06) // Send packet
-                    //Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
+//                    Log.d("[ADS] ", "Jig thread started. ID : ${i}")
+                    //Packet.send(Global.outStream, PacketKind.HwWrite, 0x06) // Send packet
+                    Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
                     tick = false
                 }
                 //Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
@@ -138,7 +153,7 @@ class JigFragment : Fragment() {
 //
                 Thread.sleep(10)
             }
-            Log.d("ADS", "Jig thread finished. ID : ${this.id}")
+            Log.d("[ADS] ", "Jig thread finished. ID : ${this.id}")
         }
     }
 }

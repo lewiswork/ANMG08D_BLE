@@ -11,6 +11,7 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentJigBinding
 import android.widget.CompoundButton
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.data.RPacket
 import com.example.navdrawer.function.Packet
 import java.lang.Exception
 import java.util.*
@@ -34,9 +35,9 @@ class JigFragment : Fragment() {
     // Hardware Read Packet 용 Timer
     var tick=false
     var timer : Timer? = null
-//    val timer = kotlin.concurrent.timer( period = 1000, initialDelay = 3000) {
-//        tick = true
-//    }
+
+    //
+    //var sendPacketEnabled = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,13 +69,37 @@ class JigFragment : Fragment() {
         if ((Global.hwStat and 0x02.toByte()) == 0x02.toByte()) binding.swVdd.isChecked = true
         if ((Global.hwStat and 0x04.toByte()) == 0x04.toByte()) binding.swI2c.isChecked = true
 
-        binding.swVdd.setOnCheckedChangeListener(listenerCheckedChanged)
-        binding.swI2c.setOnCheckedChangeListener(listenerCheckedChanged)
+//        binding.swVdd.setOnCheckedChangeListener(listenerCheckedChanged)
+//        binding.swI2c.setOnCheckedChangeListener(listenerCheckedChanged)
+
+        binding.swVdd.setOnClickListener(listenerOnClick)
+        binding.swI2c.setOnClickListener(listenerOnClick)
 
         return root
     }
 
-    private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+//    private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+//
+//        //if (sendPacketEnabled) {
+//            var mask: Byte = 0x00
+//
+//            try {
+//                if (binding.swVdd.isChecked) mask = mask or 0x02
+//                if (binding.swI2c.isChecked) mask = mask or 0x04
+//
+//                Global.hwStat = mask
+//
+//                Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
+//
+//                binding.textView3.text = mask.toString()    // for debugging
+//
+//            } catch (ex: Exception) {
+//                Log.d("[ADS]", "Making packet error! / ${ex.message}}")
+//            }
+//        //}
+//    }
+
+    private val listenerOnClick = View.OnClickListener {
         var mask: Byte = 0x00
 
         try {
@@ -123,34 +148,55 @@ class JigFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     inner class JigThread : Thread() {
         override fun run() {
-
+            var qEmpty :Boolean
+            var packet : RPacket
+            
             Log.d("[ADS] ", "Jig thread started. ID : ${this.id}")
-            while (mmJigThreadOn) {
 
+            while (mmJigThreadOn) {
+                //------------------------------------------------------------------------------//
+                // Timer 처리
+                //------------------------------------------------------------------------------//
                 if (tick){
-//                    binding.textView3.text = i.toString()
-//                    Log.d("[ADS] ", "Jig thread started. ID : ${i}")
-                    //Packet.send(Global.outStream, PacketKind.HwWrite, 0x06) // Send packet
                     Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
                     tick = false
                 }
-                //Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
-                //Packet.send(Global.outStream, PacketKind.HwWrite, 0x03) // Send packet
-//
-//                //var str = java.lang.StringBuilder()
-//
-//                synchronized(this) {
-//                    for (i in Global.monitoring.mmChData.indices) {
-//                        if (i == Global.monitoring.DM_CH_IDX)
-//                            str.append("CH DM : ${Global.monitoring.mmChData[i].touch}")
-//                        else
-//                            str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
-//                    }
-//                }
-//                activity?.runOnUiThread {
-//                    _binding?.tvMonitoring?.text = str.toString()
-//                }
-//
+
+                // Packet 처리
+                synchronized(this) { qEmpty = Global.hwQueue.isEmpty() }
+
+                if (!qEmpty) {
+                    try {
+                        synchronized(this) { packet = Global.hwQueue.remove() }
+
+                        when(packet.kind){
+                            PacketKind.HwRead ->{
+                                // using packet queue test
+//                                val str = String.format("%02X", packet.dataList[0])
+//                                Log.d("[ADS] ", "Rx HR Packet Data is $str.")
+
+                                val relayStatus = packet.dataList[0]
+//                                if (binding.swVdd.isChecked) (relayStatus and 0x02) == 0x02.toByte()
+//                                if (binding.swI2c.isChecked) (relayStatus and 0x04) == 0x04.toByte()
+
+                                //sendPacketEnabled=false
+                                activity?.runOnUiThread {
+                                    binding.swVdd.isChecked = (relayStatus and 0x02) == 0x02.toByte()
+                                    binding.swI2c.isChecked = (relayStatus and 0x04) == 0x04.toByte()
+                                }
+                                //sendPacketEnabled=true
+
+                                //binding.swVdd.setChecked
+                            }
+                        }
+
+                    } catch (ex: NoSuchElementException) {
+                        Log.d("[ADS/ERR] ", ex.toString())
+                        continue
+                    }
+                }
+                //------------------------------------------------------------------------------//
+
                 Thread.sleep(10)
             }
             Log.d("[ADS] ", "Jig thread finished. ID : ${this.id}")

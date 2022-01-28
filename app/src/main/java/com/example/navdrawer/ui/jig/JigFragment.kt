@@ -66,38 +66,13 @@ class JigFragment : Fragment() {
             binding.swI2c.isEnabled = false
         }
 
-        if ((Global.hwStat and 0x02.toByte()) == 0x02.toByte()) binding.swVdd.isChecked = true
-        if ((Global.hwStat and 0x04.toByte()) == 0x04.toByte()) binding.swI2c.isChecked = true
-
-//        binding.swVdd.setOnCheckedChangeListener(listenerCheckedChanged)
-//        binding.swI2c.setOnCheckedChangeListener(listenerCheckedChanged)
+        DisplayRelayStatus()
 
         binding.swVdd.setOnClickListener(listenerOnClick)
         binding.swI2c.setOnClickListener(listenerOnClick)
 
         return root
     }
-
-//    private val listenerCheckedChanged = CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-//
-//        //if (sendPacketEnabled) {
-//            var mask: Byte = 0x00
-//
-//            try {
-//                if (binding.swVdd.isChecked) mask = mask or 0x02
-//                if (binding.swI2c.isChecked) mask = mask or 0x04
-//
-//                Global.hwStat = mask
-//
-//                Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
-//
-//                binding.textView3.text = mask.toString()    // for debugging
-//
-//            } catch (ex: Exception) {
-//                Log.d("[ADS]", "Making packet error! / ${ex.message}}")
-//            }
-//        //}
-//    }
 
     private val listenerOnClick = View.OnClickListener {
         var mask: Byte = 0x00
@@ -107,8 +82,12 @@ class JigFragment : Fragment() {
             if (binding.swI2c.isChecked) mask = mask or 0x04
 
             Global.hwStat = mask
-
             Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
+
+//            var ba = ByteArray(3)
+//            ba[0] = 2
+//            ba[1] = 3
+//            Packet.send(Global.outStream, PacketKind.HwWrite, ba, 2) // Test
 
             binding.textView3.text = mask.toString()    // for debugging
 
@@ -127,11 +106,11 @@ class JigFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
-            tick = true
-        }
+//        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
+//            tick = true
+//        }
 
-        Log.d("[ADS] ", "Jig Fragment > onResume")
+        //Log.d("[ADS] ", "Jig Fragment > onResume")
         Log.d("[ADS] ", "Jig Fragment > onResume > Timer started : $timer")
     }
 
@@ -139,8 +118,8 @@ class JigFragment : Fragment() {
         super.onPause()
         timer!!.cancel()
 
-        Log.d("[ADS] ", "Jig Fragment > onPause")
-        Log.d("[ADS] ", "Jig Fragment > onResume > Timer canceled : $timer")
+        //Log.d("[ADS] ", "Jig Fragment > onPause")
+        Log.d("[ADS] ", "Jig Fragment > onPause > Timer canceled : $timer")
     }
 
     //---------------------------------------------------------------------------------------//
@@ -169,27 +148,14 @@ class JigFragment : Fragment() {
                     try {
                         synchronized(this) { packet = Global.hwQueue.remove() }
 
-                        when(packet.kind){
-                            PacketKind.HwRead ->{
-                                // using packet queue test
-//                                val str = String.format("%02X", packet.dataList[0])
-//                                Log.d("[ADS] ", "Rx HR Packet Data is $str.")
-
-                                val relayStatus = packet.dataList[0]
-//                                if (binding.swVdd.isChecked) (relayStatus and 0x02) == 0x02.toByte()
-//                                if (binding.swI2c.isChecked) (relayStatus and 0x04) == 0x04.toByte()
-
-                                //sendPacketEnabled=false
+                        when (packet.kind) {
+                            PacketKind.HwRead -> {
+                                Global.hwStat = packet.dataList[0]
                                 activity?.runOnUiThread {
-                                    binding.swVdd.isChecked = (relayStatus and 0x02) == 0x02.toByte()
-                                    binding.swI2c.isChecked = (relayStatus and 0x04) == 0x04.toByte()
+                                    DisplayRelayStatus()
                                 }
-                                //sendPacketEnabled=true
-
-                                //binding.swVdd.setChecked
                             }
                         }
-
                     } catch (ex: NoSuchElementException) {
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
@@ -201,5 +167,12 @@ class JigFragment : Fragment() {
             }
             Log.d("[ADS] ", "Jig thread finished. ID : ${this.id}")
         }
+    }
+
+    private fun DisplayRelayStatus() {
+        binding.swVdd.isChecked =
+            (Global.hwStat and 0x02) == 0x02.toByte()
+        binding.swI2c.isChecked =
+            (Global.hwStat and 0x04) == 0x04.toByte()
     }
 }

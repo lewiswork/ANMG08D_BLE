@@ -12,7 +12,7 @@ class RxThread : Thread() {
         var bytes: Int
         var arrayCopy: ByteArray
 
-        Log.d("ME", "Receive thread started. ID : ${this.id}")
+        Log.d("[ADS] ", "Receive thread started. ID : ${this.id}")
         while (Global.rxThreadOn) {
             try {
                 if (Global.socket!!.isConnected) {
@@ -31,6 +31,6 @@ class RxThread : Thread() {
                 break
             }
         }
-        Log.d("ME", "Receive thread finished. ID : ${this.id}")
+        Log.d("[ADS] ", "Receive thread finished. ID : ${this.id}")
     }
 }

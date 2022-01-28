@@ -118,11 +118,10 @@ class GetPacketThread:Thread() {
                             checksum = mmRawByteList[IDX_DATA_START + dataLength]
 
                             // Checksum Error 확인
-                            //if (!Global.verifyChecksum(dataContents, checksum)) {
                             val calcChecksum = Packet.makeChecksum(dataContents)
                             if (calcChecksum != checksum) {
                                 Log.d("[ADS] ",
-                                    "Checksum Error ! / Rx Val : ${checksum},Calc Val : ${calcChecksum}")
+                                    "Checksum Error ! / Rx Val : ${checksum},Calc Val : $calcChecksum")
 
                                 if (clearRawByteList()) continue    // Error 처리
                             }

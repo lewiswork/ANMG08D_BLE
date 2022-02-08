@@ -25,6 +25,7 @@ class Packet {
             "HW" to PacketKind.HwWrite,
             "HR" to PacketKind.HwRead,
 
+            "MS" to PacketKind.MonSet,
             "MT" to PacketKind.MonTouch,
             "MP" to PacketKind.MonPercent
         )
@@ -136,22 +137,19 @@ class Packet {
         fun send(os: OutputStream?, kind: PacketKind, b: Byte) {
             listTxPacket.clear()
 
-            // Set Start of Packet(STX)
-            listTxPacket.add(STX)
-            // Set Header
-            setHeader(kind)
-            // Set Size
-            setSize(1)
-            // Set Data
-            listTxPacket.add(b)
-            // Set checksum
-            setChecksum(makeChecksum(b))
-            // Set End of Packet(ETX)
-            listTxPacket.add(ETX)
+            // make packet
+            listTxPacket.add(STX)           // Set Start of Packet(STX)
+            setHeader(kind)                 // Set Header
+            setSize(1)                      // Set Size
+            listTxPacket.add(b)             // Set Data
+            setChecksum(makeChecksum(b))    // Set checksum
+            listTxPacket.add(ETX)           // Set End of Packet(ETX)
 
+            // send packet
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
+            // log
             var str = ""
             for (item in ba) str += String.format("%02X", item) + " "
             Log.d("[ADS] ", "Packet sent : $str")

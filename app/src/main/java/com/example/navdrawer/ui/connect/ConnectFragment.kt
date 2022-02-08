@@ -5,6 +5,7 @@ import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +15,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.Global
+import com.example.navdrawer.PacketKind
 import com.example.navdrawer.thread.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
+import com.example.navdrawer.function.Packet
 import com.example.navdrawer.thread.GetPacketThread
+import kotlin.experimental.and
 
 class ConnectFragment : Fragment() {
 
@@ -99,7 +103,6 @@ class ConnectFragment : Fragment() {
                 // Receive Thread 시작
                 try {
                     Global.rxThreadOn =true
-                    //mmRxThread = ReceiveThread()
                     Global.rxThread = RxThread()
                     Global.rxThread!!.start()
 
@@ -107,9 +110,6 @@ class ConnectFragment : Fragment() {
                     Global.getPacketThread = GetPacketThread()
                     Global.getPacketThread!!.start()
 
-//                    GlobalVariables.displayThreadOn = true
-//                    mmDisplayThread = DisplayThread()
-//                    mmDisplayThread!!.start()
                 } catch (ex: Exception) {
                     Toast.makeText(this@ConnectFragment.context, "Error occurred while starting threads.", Toast.LENGTH_LONG)
                     .show()
@@ -151,7 +151,17 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     // BT Disconnect 함수, Stream, Socket Close 및 Thread 종료
     //---------------------------------------------------------------------------------------//
-    private fun DisconnectBt() {
+    private fun disconnectBt() {
+
+        // Clear Relays
+
+        if ((Global.hwStat and 0x06) == 0x06.toByte()) {
+            Packet.send(Global.outStream, PacketKind.MonSet, 0x00)  // Stop All Monitoring
+            Log.d("[ADS]", "Monitoring stopped.")
+            Thread.sleep(10) // ok
+        }
+        Global.hwStat = 0x00
+        Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
 
         if (Global.inStream != null) Global.inStream!!.close()
         if (Global.outStream != null) Global.outStream!!.close()
@@ -201,7 +211,7 @@ class ConnectFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     private val listenerDisconnect = View.OnClickListener {
 
-        DisconnectBt()
+        disconnectBt()
 
         //GlobalVariables.rStringQueue.clear()
 

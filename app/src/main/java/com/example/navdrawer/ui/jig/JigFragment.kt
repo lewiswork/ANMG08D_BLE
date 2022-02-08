@@ -9,14 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.navdrawer.Global
 import com.example.navdrawer.databinding.FragmentJigBinding
-import android.widget.CompoundButton
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.data.RPacket
 import com.example.navdrawer.function.Packet
 import java.lang.Exception
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.concurrent.timer
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -36,24 +33,52 @@ class JigFragment : Fragment() {
     var tick=false
     var timer : Timer? = null
 
-    //
-    //var sendPacketEnabled = true
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        jigViewModel =
-            ViewModelProvider(this).get(JigViewModel::class.java)
-
+        jigViewModel = ViewModelProvider(this)[JigViewModel::class.java]
         _binding = FragmentJigBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        //setControlEnabled()        // BT 연결상태 별 초기화 처리
+        setListeners()          // Listener 등록
+
         Log.d("[ADS] ", "Jig Fragment > onCreateView")
+        return root
+    }
 
+    override fun onPause() {
+        super.onPause()
+        timer!!.cancel()
+
+        Log.d("[ADS] ", "Jig Fragment > onPause > Timer canceled : $timer")
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setControlEnabled()        // BT 연결상태 별 초기화 처리
+
+        //timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
+        //timer = kotlin.concurrent.timer(period = 1000 ) {
+        timer = kotlin.concurrent.timer(period = 1000 ) {
+            tick = true
+        }
+
+        Log.d("[ADS] ", "Jig Fragment > onResume > Timer started : $timer")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mmJigThreadOn = false
+        Log.d("[ADS] ", "Jig Fragment > onDestroyView")
+    }
+
+    private fun setControlEnabled() {
         if (Global.isBtConnected) {
-
             mmJigThreadOn = true
             mmJigThread = JigThread()
             mmJigThread.start()
@@ -65,62 +90,69 @@ class JigFragment : Fragment() {
             binding.swVdd.isEnabled = false
             binding.swI2c.isEnabled = false
         }
-
-        DisplayRelayStatus()
-
-        binding.swVdd.setOnClickListener(listenerOnClick)
-        binding.swI2c.setOnClickListener(listenerOnClick)
-
-        return root
     }
 
-    private val listenerOnClick = View.OnClickListener {
+    private fun setListeners() {
+        binding.swVdd.setOnClickListener(listenerForRelays)
+        binding.swI2c.setOnClickListener(listenerForRelays)
+        binding.btnClearRelays.setOnClickListener(listenerForRelays)
+    }
+//
+//    private val listenerOnClick = View.OnClickListener {
+//        var mask: Byte = 0x00
+//
+//        try {
+//            if (binding.swVdd.isChecked) mask = mask or 0x02
+//            if (binding.swI2c.isChecked) mask = mask or 0x04
+//            Global.hwStat = mask
+//            Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
+//
+//            binding.textView3.text = Global.hwStat.toString()    // for debugging
+//
+//        } catch (ex: Exception) {
+//            Log.d("[ADS]", "Sending packet error! / ${ex.message}}")
+//        }
+//    }
+//
+//    private val listenerBtnClear = View.OnClickListener {
+//        Global.hwStat = 0x00
+//        Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
+//
+//        binding.textView3.text = Global.hwStat.toString()    // for debugging
+//    }
+
+    private val listenerForRelays = View.OnClickListener {
         var mask: Byte = 0x00
 
         try {
-            if (binding.swVdd.isChecked) mask = mask or 0x02
-            if (binding.swI2c.isChecked) mask = mask or 0x04
+            when (it) {
+                binding.swVdd, binding.swI2c -> {
+                    if (binding.swVdd.isChecked) mask = mask or 0x02
+                    if (binding.swI2c.isChecked) mask = mask or 0x04
+                    Global.hwStat = mask
+                }
+                binding.btnClearRelays -> {
+                    Global.hwStat = 0x00
+                    binding.swVdd.isChecked = false
+                    binding.swI2c.isChecked = false
+                }
+            }
 
-            Global.hwStat = mask
+            if (Global.hwStatPrev == 0x06.toByte() && Global.hwStat != 0x06.toByte()) {
+                Packet.send(Global.outStream, PacketKind.MonSet, 0x00)  // Stop All Monitoring
+                Log.d("[ADS]", "Monitoring stopped.")
+                //Thread.sleep(100) // ok
+                Thread.sleep(10) // ok
+            }
             Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
+            Global.hwStatPrev = Global.hwStat
 
-//            var ba = ByteArray(3)
-//            ba[0] = 2
-//            ba[1] = 3
-//            Packet.send(Global.outStream, PacketKind.HwWrite, ba, 2) // Test
-
-            binding.textView3.text = mask.toString()    // for debugging
-
+            binding.textView3.text = Global.hwStat.toString()    // for debugging
         } catch (ex: Exception) {
-            Log.d("[ADS]", "Making packet error! / ${ex.message}}")
+            Log.d("[ADS]", "Sending packet error! / ${ex.message}}")
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mmJigThreadOn = false
-        Log.d("[ADS] ", "Jig Fragment > onDestroyView")
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-//        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
-//            tick = true
-//        }
-
-        //Log.d("[ADS] ", "Jig Fragment > onResume")
-        Log.d("[ADS] ", "Jig Fragment > onResume > Timer started : $timer")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        timer!!.cancel()
-
-        //Log.d("[ADS] ", "Jig Fragment > onPause")
-        Log.d("[ADS] ", "Jig Fragment > onPause > Timer canceled : $timer")
-    }
 
     //---------------------------------------------------------------------------------------//
     // Jig 처리용 Inner Class
@@ -152,7 +184,7 @@ class JigFragment : Fragment() {
                             PacketKind.HwRead -> {
                                 Global.hwStat = packet.dataList[0]
                                 activity?.runOnUiThread {
-                                    DisplayRelayStatus()
+                                    displayRelayStatus()
                                 }
                             }
                         }
@@ -169,10 +201,8 @@ class JigFragment : Fragment() {
         }
     }
 
-    private fun DisplayRelayStatus() {
-        binding.swVdd.isChecked =
-            (Global.hwStat and 0x02) == 0x02.toByte()
-        binding.swI2c.isChecked =
-            (Global.hwStat and 0x04) == 0x04.toByte()
+    private fun displayRelayStatus() {
+        binding.swVdd.isChecked = (Global.hwStat and 0x02) == 0x02.toByte()
+        binding.swI2c.isChecked = (Global.hwStat and 0x04) == 0x04.toByte()
     }
 }

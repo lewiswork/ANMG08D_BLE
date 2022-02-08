@@ -14,7 +14,7 @@ import java.util.*
 enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
     HwRead, HwWrite,
-    MonTouch, MonPercent
+    MonSet, MonTouch, MonPercent
 }
 
 class Global {
@@ -45,6 +45,7 @@ class Global {
         var testQueue : Queue<RPacket> = LinkedList()
 
         var hwStat: Byte = 0x00
+        var hwStatPrev: Byte = 0x00
 
     }
 }

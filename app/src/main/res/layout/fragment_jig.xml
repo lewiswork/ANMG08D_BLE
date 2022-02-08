@@ -8,13 +8,13 @@
     tools:context=".ui.jig.JigFragment">
 
     <TextView
-        android:id="@+id/tvStatus2"
+        android:id="@+id/tvStatusJigFrag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
-        android:text="BT Status : Disconnected"
+        android:text="BT Status(Jig Fragment)"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
@@ -25,7 +25,7 @@
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Relay"
+        android:text="Set Relay"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"
         android:textSize="20sp" />
@@ -64,6 +64,18 @@
         android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
         android:text="I2C"
         android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btnClearRelays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:paddingLeft="5dp" />
 
     <TextView
         android:id="@+id/textView3"

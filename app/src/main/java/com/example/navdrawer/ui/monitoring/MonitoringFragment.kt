@@ -1,5 +1,6 @@
 package com.example.navdrawer.ui.monitoring
 
+import android.content.DialogInterface
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -7,8 +8,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.SimpleAdapter
+import androidx.appcompat.app.AlertDialog
 import com.example.navdrawer.Global
+import com.example.navdrawer.MainActivity
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 import com.example.navdrawer.function.Packet
 import java.lang.Exception
@@ -23,7 +30,19 @@ class MonitoringFragment : Fragment() {
     private lateinit var mmDisplayThread: DisplayThread
     private var mmDisplayThreadOn:Boolean = false
 
-    //private var waitForStopMon = false
+    val data1 = arrayOf("CH1",        "CH2",        "CH3",        "CH4",        "CH5",        "CH6",        "CH7",        "CH8",        "DM"    )
+    val data2 = arrayOf(0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,)
+    val imgRes = intArrayOf(
+        R.drawable.blue_dot,
+        R.drawable.white_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+        R.drawable.blue_dot,
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +57,42 @@ class MonitoringFragment : Fragment() {
         setListeners()          // Listener 등록
 
         Log.d("[ADS] ", "Monitoring Fragment > onCreateView")
+
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+//        val context = context as MainActivity
+//        val centerlist = data1
+//
+//        val lv = binding.list1
+//        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, centerlist)
+//        lv.adapter = adapter
+
+        //
+        val dataList = ArrayList<HashMap<String, Any>>()
+        for (i in imgRes.indices) {
+            val map = HashMap<String, Any>()
+            map["img"] = imgRes[i]
+            map["data1"] = data1[i]
+            map["data2"] = data2[i]
+            dataList.add(map)
+        }
+
+        //
+        val keys = arrayOf("img", "data1", "data2")
+
+        //
+        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+
+        val adapter1 = SimpleAdapter(view.context, dataList, R.layout.monitoring_list, keys, ids)
+        binding.list1.adapter = adapter1
+
+        binding.list1.setOnItemClickListener { adapterView, view, i, l ->
+            binding.textView8.text = "${data2[i]} clicked "
+        }
     }
 
     override fun onResume() {
@@ -144,7 +198,7 @@ class MonitoringFragment : Fragment() {
 
             Log.d("[ADS] ", "Display thread started. ID : ${this.id}")
             while (mmDisplayThreadOn) {
-                if (Global.monitoring.updated){
+                if (Global.monitoring.updated) {
                     var str = java.lang.StringBuilder()
 
                     synchronized(this) {
@@ -157,12 +211,9 @@ class MonitoringFragment : Fragment() {
                     }
                     activity?.runOnUiThread {
                         binding.tvStatusMonFrag.text = str.toString()
-                        if (Global.waitForStopMon){
-                            stopMonitoring()
-                        }
+                        if (Global.waitForStopMon) stopMonitoring()
                     }
-
-
+                    Global.monitoring.updated = false
                 }
                 Thread.sleep(10)
             }

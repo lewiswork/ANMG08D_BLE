@@ -87,6 +87,11 @@
         android:textColor="@color/white"
         android:textSize="20sp" />
 
+    <ListView
+        android:id="@+id/list1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/textView7"
         android:layout_width="match_parent"

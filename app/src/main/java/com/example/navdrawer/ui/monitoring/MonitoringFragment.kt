@@ -23,6 +23,8 @@ class MonitoringFragment : Fragment() {
     private lateinit var mmDisplayThread: DisplayThread
     private var mmDisplayThreadOn:Boolean = false
 
+    //private var waitForStopMon = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -35,21 +37,25 @@ class MonitoringFragment : Fragment() {
         //setControlEnabled()        // BT 연결상태 별 초기화 처리
         setListeners()          // Listener 등록
 
-        Log.d("ME", "Monitoring Fragment > onCreateView")
+        Log.d("[ADS] ", "Monitoring Fragment > onCreateView")
         return root
     }
 
     override fun onResume() {
         super.onResume()
         setControlEnabled()        // BT 연결상태 별 초기화 처리
-        Log.d("ME", "Monitoring Fragment > onResume")
+        Log.d("[ADS] ", "Monitoring Fragment > onResume")
     }
 
     override fun onPause() {
         super.onPause()
         mmDisplayThreadOn = false
 
-        Log.d("ME", "Monitoring Fragment > onPause")
+        stopMonitoring()
+        Global.waitForStopMon = true
+
+        //Log.d("[ADS] ", "Monitoring Fragment > onPause> Monitoring stopped.")
+        Log.d("[ADS] ", "Monitoring Fragment > onPause")
     }
 
     override fun onDestroyView() {
@@ -57,22 +63,32 @@ class MonitoringFragment : Fragment() {
         _binding = null
 
         //mmDisplayThreadOn = false
-        Log.d("ME", "Monitoring Fragment > onDestroyView")
+        Log.d("[ADS] ", "Monitoring Fragment > onDestroyView")
     }
 
     private fun setControlEnabled() {
         if (Global.isBtConnected) {
-            //binding.tvStatusMonFrag.text = "BT connected."
-
             if ((Global.hwStat and 0x06) != 0x06.toByte()) {
-                binding.tvStatusMonFrag.text = "Relays are turned off."
+                binding.swTouch.isEnabled = false
+                binding.swPercent.isEnabled = false
+                binding.btnClearMon.isEnabled = false
+
+                binding.tvStatusMonFrag.text = "Relays are off."
             } else {
+                binding.swTouch.isEnabled = true
+                binding.swPercent.isEnabled = true
+                binding.btnClearMon.isEnabled = true
+
                 mmDisplayThreadOn = true
                 mmDisplayThread = DisplayThread()
                 mmDisplayThread.start()
-                binding.tvStatusMonFrag.text = "BT connected and relays are turned off."
+                binding.tvStatusMonFrag.text = "BT connected and relays are on."
             }
         } else {
+            binding.swTouch.isEnabled = false
+            binding.swPercent.isEnabled = false
+            binding.btnClearMon.isEnabled = false
+
             binding.tvStatusMonFrag.text = "BT disconnected."
         }
     }
@@ -87,28 +103,38 @@ class MonitoringFragment : Fragment() {
         var mask: Byte =0x00
 
         try {
-            when(it)
-            {
-                binding.swTouch, binding.swPercent ->{
+            when(it) {
+                binding.swTouch, binding.swPercent -> {
                     if (binding.swTouch.isChecked) mask = mask or 0x01
                     if (binding.swPercent.isChecked) mask = mask or 0x02
 
-                    Packet.send(Global.outStream, PacketKind.MonSet, mask) // Send packet
+                    //Packet.send(Global.outStream, PacketKind.MonSet, mask) // Send packet
+                    if (mask == 0x00.toByte()) {
+                        stopMonitoring()
+                        Global.waitForStopMon = true
+                    }
+                    else Packet.send(Global.outStream, PacketKind.MonSet, mask) // Send packet
                 }
-
-                binding.btnClearMon -> Packet.send(Global.outStream, PacketKind.MonSet, 0x00) // Send packet
+                binding.btnClearMon -> {
+                    stopMonitoring()
+                    Global.waitForStopMon = true
+                }
             }
-
-//
-//
             binding.textView8.text = mask.toString()    // for debugging
 
         } catch (ex: Exception) {
-            Log.d("[ADS]", "Making packet error! / ${ex.message}")
+            Log.d("[ADS] ", "Making packet error! / ${ex.message}")
         }
     }
 
+    private fun stopMonitoring() {
+        binding.swTouch.isChecked = false
+        binding.swPercent.isChecked = false
+        Packet.send(Global.outStream, PacketKind.MonSet, 0x00)
+        //Log.d("[ADS] ", "Monitoring stopped.$waitEnable")
 
+        //Global.waitForStopMon = waitEnable
+    }
 
     //---------------------------------------------------------------------------------------//
     // Display 처리용 Inner Class
@@ -116,25 +142,31 @@ class MonitoringFragment : Fragment() {
     inner class DisplayThread : Thread() {
         override fun run() {
 
-            Log.d("ME", "Display thread started. ID : ${this.id}")
+            Log.d("[ADS] ", "Display thread started. ID : ${this.id}")
             while (mmDisplayThreadOn) {
+                if (Global.monitoring.updated){
+                    var str = java.lang.StringBuilder()
 
-                var str = java.lang.StringBuilder()
-
-                synchronized(this) {
-                    for (i in Global.monitoring.mmChData.indices) {
-                        if (i == Global.monitoring.DM_CH_IDX)
-                            str.append("CH DM : ${Global.monitoring.mmChData[i].touch}")
-                        else
-                            str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
+                    synchronized(this) {
+                        for (i in Global.monitoring.mmChData.indices) {
+                            if (i == Global.monitoring.DM_CH_IDX)
+                                str.append("CH DM : ${Global.monitoring.mmChData[i].touch}")
+                            else
+                                str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
+                        }
                     }
-                }
-                activity?.runOnUiThread {
-                    binding.tvStatusMonFrag.text = str.toString()
+                    activity?.runOnUiThread {
+                        binding.tvStatusMonFrag.text = str.toString()
+                        if (Global.waitForStopMon){
+                            stopMonitoring()
+                        }
+                    }
+
+
                 }
                 Thread.sleep(10)
             }
-            Log.d("ME", "Display thread finished. ID : ${this.id}")
+            Log.d("[ADS] ", "Display thread finished. ID : ${this.id}")
         }
     }
 }

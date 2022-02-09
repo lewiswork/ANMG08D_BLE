@@ -47,5 +47,7 @@ class Global {
         var hwStat: Byte = 0x00
         var hwStatPrev: Byte = 0x00
 
+         var waitForStopMon :Boolean = false
+
     }
 }

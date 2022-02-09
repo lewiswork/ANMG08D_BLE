@@ -53,10 +53,11 @@ class GetPacketThread:Thread() {
                         }
                         //logRawByteArray(rawByteArray)
                     } catch (ex: NoSuchElementException) {
-                        Log.d("MEX", Global.rawRxBytesQueue.count().toString())
+                        Log.d("[ADS/ERR] ", Global.rawRxBytesQueue.count().toString())
                         //ex.printStackTrace()
-                        //continue
-                        break
+                        Global.rawRxBytesQueue.clear()
+                        continue
+                        //break
                     }
                 }
                 //------------------------------------------------------------------------------//
@@ -144,7 +145,10 @@ class GetPacketThread:Thread() {
                             // Monitoring Class Data 갱신 처리
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
                             //-------------------------------------------------------------------//
-                            PacketCategory.Monitoring -> updateMonitoringData(kind, dataContents)
+                            PacketCategory.Monitoring -> {
+                                if (kind == PacketKind.MonSet && Global.waitForStopMon) Global.waitForStopMon = false
+                                else updateMonitoringData(kind, dataContents)
+                            }
                             //-------------------------------------------------------------------//
 
                             PacketCategory.Hardware -> Global.hwQueue.add(pk)
@@ -161,7 +165,7 @@ class GetPacketThread:Thread() {
                 }
 
             } catch (e: java.io.IOException) {
-                Log.d("MEX", e.message.toString())
+                Log.d("[ADS/ERR]", e.message.toString())
                 e.printStackTrace()
                 break
                 //continue
@@ -195,6 +199,7 @@ class GetPacketThread:Thread() {
 //                }
             }
         }
+        Global.monitoring.updated = true
     }
 
     private fun logRawByteArray(rawByteArray: ByteArray) {
@@ -211,15 +216,15 @@ class GetPacketThread:Thread() {
     }
 
     private fun prepareLog() {
-        //------------------------------------------------------------------------------//
-        // 발췌 Packet Logcat 저장(HEX)
-        //------------------------------------------------------------------------------//
-        for (i in 0 until mmCurIdx) {
-            mmLogStr.append(String.format("%02X", mmRawByteList[i]))
-            if (i < mmCurIdx - 1) mmLogStr.append(" ")
-        }
-        Log.d("[ADS] ", "[RX PK HEX] $mmLogStr")
-        //------------------------------------------------------------------------------//
+//        //------------------------------------------------------------------------------//
+//        // 발췌 Packet Logcat 저장(HEX)
+//        //------------------------------------------------------------------------------//
+//        for (i in 0 until mmCurIdx) {
+//            mmLogStr.append(String.format("%02X", mmRawByteList[i]))
+//            if (i < mmCurIdx - 1) mmLogStr.append(" ")
+//        }
+//        Log.d("[ADS] ", "[RX PK HEX] $mmLogStr")
+//        //------------------------------------------------------------------------------//
 
         //------------------------------------------------------------------------------//
         // 발췌 Packet Logcat 저장(Elements, 필요 시 Character 로 표시)
@@ -261,7 +266,7 @@ class GetPacketThread:Thread() {
         // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
         try {
             someFile.appendText("가나다라마바사")
-            someFile.appendText(str.toString())
+            someFile.appendText(str)
             //Log.d("[ADS] ", "File saved at : $someFile")
         } catch (e: FileNotFoundException) {
             Log.d("[ADS] ", "FileNotFound: $someFile")

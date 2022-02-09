@@ -10,6 +10,8 @@ class Monitoring {
 
     var mmChData : ArrayList<ChannelData> = ArrayList()
 
+    var updated = false
+
     constructor() {
         for (i in 0 until MAX_CH_CNT) {
             mmChData.add(ChannelData())

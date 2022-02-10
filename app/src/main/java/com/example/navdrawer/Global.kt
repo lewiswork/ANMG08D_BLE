@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import com.example.navdrawer.data.Monitoring
-import com.example.navdrawer.data.RPacket
+import com.example.navdrawer.packet.RPacket
 import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
 import java.io.InputStream

@@ -1,4 +1,4 @@
-package com.example.navdrawer.function
+package com.example.navdrawer.packet
 
 import android.util.Log
 import com.example.navdrawer.PacketCategory
@@ -12,8 +12,6 @@ class Packet {
 
         const val STX: Byte = 0x02
         const val ETX: Byte = 0x03
-
-        const val SZ_UNTIL_LEN : Int = 6
         const val IDX_DATA_START : Int = 6
 
         val packetCategory = mapOf(
@@ -104,29 +102,16 @@ class Packet {
         fun send(os: OutputStream?, kind: PacketKind) {
             listTxPacket.clear()
 
-            // Set Start of Packet(STX)
-            listTxPacket.add(STX)
-            // Set Header
-            setHeader(kind)
-            // Set Size as 0
-            setSize(0)
-            // Set checksum as 0
-            listTxPacket.add(0)
-            // Set End of Packet(ETX)
-            listTxPacket.add(ETX)
+            listTxPacket.add(STX)   // Set Start of Packet(STX)
+            setHeader(kind) // Set Header
+            setSize(0)  // Set Size as 0
+            listTxPacket.add(0) // Set checksum as 0
+            listTxPacket.add(ETX)   // Set End of Packet(ETX)
 
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-//            var str = ""
-//            for (b in ba)
-//            {
-//                str += String.format("%02X", b) + " "
-//            }
-//            Log.d("[ADS] ", "Packet sent : $str")
-
             logTxPacket(ba)
-
         }
 
         fun logTxPacket(ba: ByteArray) {
@@ -169,10 +154,6 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-            // log
-//            var str = ""
-//            for (item in ba) str += String.format("%02X", item) + " "
-            //Log.d("[ADS] ", "Packet sent : $str")
             logTxPacket(ba)
         }
 
@@ -192,9 +173,6 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-//            var str = ""
-//            for (item in ba) str += String.format("%02X", item) + " "
-            //Log.d("[ADS] ", "Packet sent : $str")
             logTxPacket(ba)
         }
 
@@ -215,9 +193,6 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
             os!!.write(ba)
 
-//            var str = ""
-//            for (item in ba) str += String.format("%02X", item) + " "
-            //Log.d("[ADS] ", "Packet sent : $str")
             logTxPacket(ba)
         }
     }

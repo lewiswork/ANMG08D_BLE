@@ -4,8 +4,8 @@ import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.data.RPacket
-import com.example.navdrawer.function.Packet
+import com.example.navdrawer.packet.RPacket
+import com.example.navdrawer.packet.Packet
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.StringBuilder

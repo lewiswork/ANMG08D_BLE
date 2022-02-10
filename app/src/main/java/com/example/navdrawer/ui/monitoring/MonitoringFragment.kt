@@ -12,7 +12,7 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
-import com.example.navdrawer.function.Packet
+import com.example.navdrawer.packet.Packet
 import java.lang.Exception
 import kotlin.experimental.and
 import kotlin.experimental.or
@@ -240,12 +240,19 @@ class MonitoringFragment : Fragment() {
                 if (Global.monitoring.updated) {
                     var str = java.lang.StringBuilder()
 
+                    // Display Touch and Percent(임시)
                     synchronized(this) {
                         for (i in Global.monitoring.mmChData.indices) {
+                            var touch = Global.monitoring.mmChData[i].touch
+                            var percent = Global.monitoring.mmChData[i].percent
+
                             if (i == Global.monitoring.DM_CH_IDX)
-                                str.append("CH DM : ${Global.monitoring.mmChData[i].touch}")
+                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
                             else
-                                str.append("CH ${i + 1} : ${Global.monitoring.mmChData[i].touch}\n")
+                                str.append("CH ${i + 1} : $touch / ${
+                                    String.format("%.3f",
+                                        percent)
+                                }\n")
                         }
                     }
                     activity?.runOnUiThread {

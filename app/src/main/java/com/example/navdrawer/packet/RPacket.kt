@@ -1,4 +1,4 @@
-package com.example.navdrawer.data
+package com.example.navdrawer.packet
 
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind

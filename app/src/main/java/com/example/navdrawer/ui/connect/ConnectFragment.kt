@@ -18,7 +18,7 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.thread.RxThread
 import com.example.navdrawer.databinding.FragmentConnectBinding
-import com.example.navdrawer.function.Packet
+import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.thread.GetPacketThread
 import kotlin.experimental.and
 

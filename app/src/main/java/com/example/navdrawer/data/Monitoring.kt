@@ -1,6 +1,8 @@
 package com.example.navdrawer.data
 
 import android.util.Log
+import com.example.navdrawer.Global
+import com.example.navdrawer.function.Function
 
 class Monitoring {
     val MAX_CH_CNT = 9
@@ -18,4 +20,15 @@ class Monitoring {
         }
         //Log.d("ME", mmChData.count().toString())
     }
+
+    fun setTouch(touch: Byte) {
+        var booleanArray = Function.byteToBooleanArray(touch, Global.monitoring.TCH_CH_CNT)
+
+        synchronized(this) {
+            for (i in booleanArray.indices)
+                mmChData[i].touch = booleanArray[i]
+        }
+    }
+
+
 }

@@ -179,28 +179,20 @@ class GetPacketThread:Thread() {
         dataContents: ByteArray,
     ) {
         when (kind) {
-            PacketKind.MonTouch -> {
-                var booleanArray = Function.byteToBooleanArray(dataContents[0],
-                    Global.monitoring.TCH_CH_CNT)
-
-                synchronized(this) {
-                    for (i in booleanArray.indices) {
-                        Global.monitoring.mmChData[i].touch = booleanArray[i]
-                    }
-                }
-
-//                for (i in 0 until Global.monitoring.MAX_CH_CNT) {
-//                    if (i == Global.monitoring.DM_CH_IDX)
-//                        Log.d("ME/TCH",
-//                            "CH DM ${Global.monitoring.mmChData[i].touch}")
-//                    else
-//                        Log.d("ME/TCH",
-//                            "CH ${i + 1} ${Global.monitoring.mmChData[i].touch}")
-//                }
-            }
+            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
         }
         Global.monitoring.updated = true
     }
+
+//    private fun setTouch(touch: Byte) {
+//        var booleanArray = Function.byteToBooleanArray(touch, Global.monitoring.TCH_CH_CNT)
+//
+//        synchronized(this) {
+//            for (i in booleanArray.indices) {
+//                Global.monitoring.mmChData[i].touch = booleanArray[i]
+//            }
+//        }
+//    }
 
     private fun logRawByteArray(rawByteArray: ByteArray) {
         //-----------------------------------------------------------------------//
@@ -259,7 +251,7 @@ class GetPacketThread:Thread() {
         //------------------------------------------------------------------------------//
         // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
         var pathname = System.getProperty("java.io.tmpdir")
-        var someFile = File(pathname + "/some-file.txt")
+        var someFile = File("$pathname/some-file.txt")
 
         // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
         // 이미 파일이 존재할 경우 덮어쓰기로 저장

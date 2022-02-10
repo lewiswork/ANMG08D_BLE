@@ -248,7 +248,7 @@ class GetPacketThread:Thread() {
             }
         }
         //Log.d("[ADS] ", "[RX PK ELE] $mmLogStr")
-        Log.d("[ADS] ", "[PK RX]  $mmLogStr")
+        Log.d("[ADS] ", "[PK RX] $mmLogStr")
         //------------------------------------------------------------------------------//
     }
 

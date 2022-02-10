@@ -139,11 +139,11 @@ class Packet {
                     // Header, Length
                     if (i == 3) logStr.append(" ")
                     logStr.append(ba[i].toChar())
-                } else if (i >= IDX_DATA_START && i < i - 1) {
+                } else if (i >= IDX_DATA_START && i < ba.size - 1) {
                     logStr.append(" ")
                     // Data, Checksum
                     logStr.append(String.format("%02X", ba[i]))
-                } else if (i == i - 1) {
+                } else if (i == ba.size - 1) {
                     // ETX
                     logStr.append(" ETX")
                 }

@@ -5,7 +5,6 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.data.RPacket
-import com.example.navdrawer.function.Function
 import com.example.navdrawer.function.Packet
 import java.io.File
 import java.io.FileNotFoundException
@@ -54,7 +53,6 @@ class GetPacketThread:Thread() {
                         //logRawByteArray(rawByteArray)
                     } catch (ex: NoSuchElementException) {
                         Log.d("[ADS/ERR] ", Global.rawRxBytesQueue.count().toString())
-                        //ex.printStackTrace()
                         Global.rawRxBytesQueue.clear()
                         continue
                         //break
@@ -146,8 +144,11 @@ class GetPacketThread:Thread() {
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
                             //-------------------------------------------------------------------//
                             PacketCategory.Monitoring -> {
-                                if (kind == PacketKind.MonSet && Global.waitForStopMon) Global.waitForStopMon = false
-                                else updateMonitoringData(kind, dataContents)
+                                if (kind == PacketKind.MonSet && Global.waitForStopMon) {
+                                    Global.waitForStopMon = false
+                                } else {
+                                    Global.monitoring.updateMonData(kind, dataContents)
+                                }
                             }
                             //-------------------------------------------------------------------//
 
@@ -165,7 +166,7 @@ class GetPacketThread:Thread() {
                 }
 
             } catch (e: java.io.IOException) {
-                Log.d("[ADS/ERR]", e.message.toString())
+                Log.d("[ADS/ERR] ", e.message.toString())
                 e.printStackTrace()
                 break
                 //continue
@@ -174,24 +175,15 @@ class GetPacketThread:Thread() {
         Log.d("[ADS] ", "Get packet thread finished. ID : ${this.id}")
     }
 
-    private fun updateMonitoringData(
-        kind: PacketKind?,
-        dataContents: ByteArray,
-    ) {
-        when (kind) {
-            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
-        }
-        Global.monitoring.updated = true
-    }
-
-//    private fun setTouch(touch: Byte) {
-//        var booleanArray = Function.byteToBooleanArray(touch, Global.monitoring.TCH_CH_CNT)
-//
-//        synchronized(this) {
-//            for (i in booleanArray.indices) {
-//                Global.monitoring.mmChData[i].touch = booleanArray[i]
-//            }
+//    private fun updateMonData(
+//        kind: PacketKind?,
+//        dataContents: ByteArray,
+//    ) {
+//        when (kind) {
+//            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
+//            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
 //        }
+//        Global.monitoring.updated = true
 //    }
 
     private fun logRawByteArray(rawByteArray: ByteArray) {

@@ -37,7 +37,7 @@
         android:paddingBottom="5dp"
         android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
         android:text="Touch"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <Space
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
         android:showText="false"
         android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
         android:text="Percent"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
     <Space
         android:layout_width="match_parent"
@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Clear"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <Space
         android:layout_width="match_parent"
@@ -82,7 +82,7 @@
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Touch"
+        android:text="Monitoring Data"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"
         android:textSize="20sp" />

@@ -1,6 +1,5 @@
 package com.example.navdrawer.ui.monitoring
 
-import android.content.DialogInterface
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -8,12 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import android.widget.SimpleAdapter
-import androidx.appcompat.app.AlertDialog
 import com.example.navdrawer.Global
-import com.example.navdrawer.MainActivity
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
@@ -28,10 +23,12 @@ class MonitoringFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var mmDisplayThread: DisplayThread
-    private var mmDisplayThreadOn:Boolean = false
+    private var mmDisplayThreadOn: Boolean = false
 
-    val data1 = arrayOf("CH1",        "CH2",        "CH3",        "CH4",        "CH5",        "CH6",        "CH7",        "CH8",        "DM"    )
-    val data2 = arrayOf(0.0, 0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,)
+    private  var viewMonitoring:View?=null
+
+    val data1 = arrayOf("CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8", "DM")
+    val data2 = arrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     val imgRes = intArrayOf(
         R.drawable.blue_dot,
         R.drawable.white_dot,
@@ -64,13 +61,11 @@ class MonitoringFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val context = context as MainActivity
-//        val centerlist = data1
-//
-//        val lv = binding.list1
-//        val adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, centerlist)
-//        lv.adapter = adapter
+        initListView(view)
+        viewMonitoring = view
+    }
 
+    private fun initListView(view: View) {
         //
         val dataList = ArrayList<HashMap<String, Any>>()
         for (i in imgRes.indices) {
@@ -87,12 +82,56 @@ class MonitoringFragment : Fragment() {
         //
         val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
 
-        val adapter1 = SimpleAdapter(view.context, dataList, R.layout.monitoring_list, keys, ids)
+        val adapter1 = SimpleAdapter(view.context, dataList, R.layout.list_monitoring, keys, ids)
         binding.list1.adapter = adapter1
 
-        binding.list1.setOnItemClickListener { adapterView, view, i, l ->
-            binding.textView8.text = "${data2[i]} clicked "
+//        binding.list1.setOnItemClickListener { adapterView, view, i, l ->
+//            binding.textView8.text = "${data2[i]} clicked "
+//        }
+    }
+
+//    private fun setListViewContents() {
+//        //
+//        val dataList = ArrayList<HashMap<String, Any>>()
+//        for (i in 5..5) {
+//            val map = HashMap<String, Any>()
+//            map["img"] = imgRes[1]
+//            map["data1"] = data1[i]
+//            map["data2"] = "2.5%"
+//            dataList.add(map)
+//        }
+//
+//        //
+//        val keys = arrayOf("img", "data1", "data2")
+//
+//        //
+//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+//
+//        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
+//        binding.list1.adapter = adapter1
+//
+//    }
+
+    private fun setListViewContents() {
+        //
+        val dataList = ArrayList<HashMap<String, Any>>()
+        for (i in 5..5) {
+            val map = HashMap<String, Any>()
+            map["img"] = imgRes[1]
+            map["data1"] = data1[i]
+            map["data2"] = "2.5%"
+            dataList.add(map)
         }
+
+        //
+        val keys = arrayOf("img", "data1", "data2")
+
+        //
+        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+
+        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
+        binding.list1.adapter = adapter1
+
     }
 
     override fun onResume() {
@@ -154,10 +193,10 @@ class MonitoringFragment : Fragment() {
     }
 
     private val listenerOnClick = View.OnClickListener {
-        var mask: Byte =0x00
+        var mask: Byte = 0x00
 
         try {
-            when(it) {
+            when (it) {
                 binding.swTouch, binding.swPercent -> {
                     if (binding.swTouch.isChecked) mask = mask or 0x01
                     if (binding.swPercent.isChecked) mask = mask or 0x02
@@ -166,12 +205,12 @@ class MonitoringFragment : Fragment() {
                     if (mask == 0x00.toByte()) {
                         stopMonitoring()
                         Global.waitForStopMon = true
-                    }
-                    else Packet.send(Global.outStream, PacketKind.MonSet, mask) // Send packet
+                    } else Packet.send(Global.outStream, PacketKind.MonSet, mask) // Send packet
                 }
                 binding.btnClearMon -> {
                     stopMonitoring()
                     Global.waitForStopMon = true
+                    setListViewContents()
                 }
             }
             binding.textView8.text = mask.toString()    // for debugging

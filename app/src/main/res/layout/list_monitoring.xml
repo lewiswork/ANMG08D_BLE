@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/ivDot"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         app:srcCompat="@drawable/blue_dot" />
 
     <LinearLayout

@@ -245,10 +245,10 @@ class GetPacketThread:Thread() {
             } else if (i == mmCurIdx - 1) {
                 // ETX
                 mmLogStr.append(" ETX")
-                //println(mmLogStr::class.java.typeName) // Type Print
             }
         }
-        Log.d("[ADS] ", "[RX PK ELE] $mmLogStr")
+        //Log.d("[ADS] ", "[RX PK ELE] $mmLogStr")
+        Log.d("[ADS] ", "[PK RX]  $mmLogStr")
         //------------------------------------------------------------------------------//
     }
 

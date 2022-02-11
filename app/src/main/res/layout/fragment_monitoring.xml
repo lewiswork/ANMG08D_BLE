@@ -15,7 +15,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/tvTitle1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_blue_light"
@@ -57,11 +57,6 @@
         android:text="Percent"
         android:textSize="20sp" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:paddingLeft="5dp" />
-
     <Button
         android:id="@+id/btnClearMon"
         android:layout_width="match_parent"
@@ -71,11 +66,11 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="10dp"
+        android:layout_height="5dp"
         android:paddingLeft="5dp" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/tvTitle2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_blue_light"
@@ -87,10 +82,32 @@
         android:textColor="@color/white"
         android:textSize="20sp" />
 
-    <ListView
-        android:id="@+id/list1"
+    <LinearLayout
+        android:id="@+id/linearWrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/linearMon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/listMon1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <ListView
+                android:id="@+id/listMon2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView7"

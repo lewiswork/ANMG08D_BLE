@@ -1,12 +1,9 @@
 package com.example.navdrawer.data
 
-import android.R.string
 import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.function.Function
-import com.example.navdrawer.packet.Packet
-import com.example.navdrawer.packet.Packet.Companion.packetCategory
 
 
 class Monitoring {
@@ -31,7 +28,7 @@ class Monitoring {
     val SENSE_LOOP = 13 // 임시
 
     var mmChData : ArrayList<ChannelData> = ArrayList()
-    var updated = false
+    var hasNewData = false
 
     constructor() {
         for (i in 0 until MAX_CH_CNT) mmChData.add(ChannelData())
@@ -45,7 +42,7 @@ class Monitoring {
             PacketKind.MonTouch -> setTouch(dataContents[0])
             PacketKind.MonPercent -> setPercent(dataContents)
         }
-        Global.monitoring.updated = true
+        Global.monitoring.hasNewData = true
     }
 
     fun setTouch(touch: Byte) {
@@ -60,6 +57,7 @@ class Monitoring {
         var chCodeStr = String.format("%02X%02X", contents[0], contents[1])
         var percentStr = String.format("%02X%02X%02X", contents[2], contents[3], contents[4])
         var dPercent = 0.0
+
         var ch = getChannel(chCodeStr)
 
         if (ch != null) {
@@ -69,12 +67,7 @@ class Monitoring {
             dPercent = iPercent.toDouble() / SENSE_LOOP.toDouble() * BIT_RESOLUTION
             mmChData[ch].percent = dPercent
         }
-
-//        synchronized(this) {
-//            for (i in booleanArray.indices) mmChData[i].touch = booleanArray[i]
-//        }
-
-        Log.d("[ADS] ", "Percent set : CH$ch / ${dPercent.toString()} %")
+        //Log.d("[ADS] ", "Percent set : CH$ch / ${dPercent.toString()} %")
     }
 
     private fun getChannel(chStr: String): Int? {

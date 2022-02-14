@@ -7,7 +7,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.SimpleAdapter
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
@@ -18,6 +21,8 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 
 class MonitoringFragment : Fragment() {
+
+
     private lateinit var monitoringViewModel: MonitoringViewModel
     private var _binding: FragmentMonitoringBinding? = null
     private val binding get() = _binding!!
@@ -40,7 +45,7 @@ class MonitoringFragment : Fragment() {
 //        R.drawable.img_white_dot,
 //        R.drawable.img_white_dot
 //    )
-
+//
     val dataChA = arrayOf("CH1", "CH2", "CH3", "CH4", "DM")
     val dataChB = arrayOf("CH5", "CH6", "CH7", "CH8")
     val dataValA = arrayOf(0.0, 0.0, 0.0, 0.0, 0.0)
@@ -88,6 +93,13 @@ class MonitoringFragment : Fragment() {
     }
 
     private fun initListView(view: View) {
+
+//        val adapter1 = ArrayAdapter(view.context, android.R.layout.simple_list_item_1, data1)
+//        binding.gridMon.adapter = adapter1
+        //grid1.setOnItemClickListener(listener1)
+
+
+
         // A
         val dataListA = ArrayList<HashMap<String, Any>>()
         for (i in imgA.indices) {
@@ -101,28 +113,27 @@ class MonitoringFragment : Fragment() {
         val keysA = arrayOf("img", "chNum", "chVal")
         val idsA = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
 
-        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.list_monitoring, keysA, idsA)
-        binding.listMon1.adapter = adapterA
-
-        // B
-        val dataListB = ArrayList<HashMap<String, Any>>()
-        for (i in imgB.indices) {
-            val map = HashMap<String, Any>()
-            map["img"] = imgB[i]
-            map["chNum"] = dataChB[i]
-            map["chVal"] = dataValB[i]
-            dataListB.add(map)
-        }
-
-        val keysB = arrayOf("img", "chNum", "chVal")
-        val idsB = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-
-        val adapterB = SimpleAdapter(view.context, dataListB, R.layout.list_monitoring, keysB, idsB)
-        binding.listMon2.adapter = adapterB
-
-//        binding.list1.setOnItemClickListener { adapterView, view, i, l ->
-//            binding.textView8.text = "${data2[i]} clicked "
+//        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.list_monitoring, keysA, idsA)
+//        binding.listMon1.adapter = adapterA
+        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.row_monitoring, keysA, idsA)
+        binding.gridMon.adapter = adapterA
+//
+//        // B
+//        val dataListB = ArrayList<HashMap<String, Any>>()
+//        for (i in imgB.indices) {
+//            val map = HashMap<String, Any>()
+//            map["img"] = imgB[i]
+//            map["chNum"] = dataChB[i]
+//            map["chVal"] = dataValB[i]
+//            dataListB.add(map)
 //        }
+//
+//        val keysB = arrayOf("img", "chNum", "chVal")
+//        val idsB = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+//
+//        val adapterB = SimpleAdapter(view.context, dataListB, R.layout.list_monitoring, keysB, idsB)
+//        binding.listMon2.adapter = adapterB
+
     }
 
 //    private fun setListViewContents() {
@@ -149,36 +160,36 @@ class MonitoringFragment : Fragment() {
 
     private fun setListViewContents() {
 
-        val dataList = ArrayList<HashMap<String, Any>>()
-        for (i in 2..3) {
-            val map = HashMap<String, Any>()
-            map["img"] = imgB[1]
-            map["data1"] = dataChA[i]
-            map["data2"] = "2.5%"
-            dataList.add(map)
-        }
-
-        //
-        val keys = arrayOf("img", "data1", "data2")
-
-        //
-        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-
-        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
-        binding.listMon1.adapter = adapter1
-
-        //binding.listMon1.adapter.
-
-        for (i in 0 until Global.monitoring.MAX_CH_CNT){
-            when(i){
-                9 -> {
-                    //var item = binding.listMon1.adapter.
-
-                } // Dummy channel
-                in 0..3 ->{}    // CH1~4
-                in 4..7 ->{}    // CH5~8
-            }
-        }
+//        val dataList = ArrayList<HashMap<String, Any>>()
+//        for (i in 2..3) {
+//            val map = HashMap<String, Any>()
+//            map["img"] = imgB[1]
+//            map["data1"] = dataChA[i]
+//            map["data2"] = "2.5%"
+//            dataList.add(map)
+//        }
+//
+//        //
+//        val keys = arrayOf("img", "data1", "data2")
+//
+//        //
+//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+//
+//        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
+//        binding.listMon1.adapter = adapter1
+//
+//        //binding.listMon1.adapter.
+//
+//        for (i in 0 until Global.monitoring.MAX_CH_CNT){
+//            when(i){
+//                9 -> {
+//                    //var item = binding.listMon1.adapter.
+//
+//                } // Dummy channel
+//                in 0..3 ->{}    // CH1~4
+//                in 4..7 ->{}    // CH5~8
+//            }
+//        }
 
     }
 

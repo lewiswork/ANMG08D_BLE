@@ -88,25 +88,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/linearMon"
+        <GridView
+            android:id="@+id/gridMon"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:numColumns="auto_fit" >
 
-            <ListView
-                android:id="@+id/listMon1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <ListView
-                android:id="@+id/listMon2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-        </LinearLayout>
+        </GridView>
     </LinearLayout>
 
     <TextView

@@ -26,28 +26,15 @@ class MonitoringFragment : Fragment() {
 
     private lateinit var mmDisplayThread: DisplayThread
     private var mmDisplayThreadOn: Boolean = false
-
     private  var viewMonitoring:View?=null
 
-//    val data1 = arrayOf("CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8", "DM")
-//    val data2 = arrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-//    val imgRes = intArrayOf(
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot,
-//        R.drawable.img_white_dot
-//    )
-
-    val imgTouchStat = intArrayOf(
+    private val imgTouchStat = intArrayOf(
         R.drawable.img_white_dot,   // not touched
         R.drawable.img_blue_dot     // touched
     )
 
+    val chStr = arrayOf("CH1", "CH2","CH3","CH4","CH5","CH6","CH7","CH8","DM")
+    private val dataListMon = ArrayList<HashMap<String, Any>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,116 +59,62 @@ class MonitoringFragment : Fragment() {
         initListView(view)
         viewMonitoring = view
 
-        setListViewContents()
+        //setListViewContents()
     }
 
     private fun initListView(view: View) {
+        //val dataList = ArrayList<HashMap<String, Any>>()
 
-//        val adapter1 = ArrayAdapter(view.context, android.R.layout.simple_list_item_1, data1)
-//        binding.gridMon.adapter = adapter1
-        //grid1.setOnItemClickListener(listener1)
-
-
-
-        // A
-        val dataList = ArrayList<HashMap<String, Any>>()
         for (i in 0 until  Global.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
-//            map["img"] = imgTouchStat[0]
-            if (i == Global.monitoring.DM_CH_IDX) {
-                map["chNum"] = "DM"
-                map["img"] = imgTouchStat[1]    // for test
-            }
-            else {
-                map["chNum"] = "CH${i+1}"
-                map["img"] = imgTouchStat[0]
-            }
+            map["chNum"] = chStr[i]
+            map["img"] = imgTouchStat[0]    // touch status
             map["chVal"] = "0.000 %"
-
-            dataList.add(map)
+            dataListMon.add(map)
         }
-
         val keys = arrayOf("img", "chNum", "chVal")
         val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
 
-//        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.list_monitoring, keysA, idsA)
-//        binding.listMon1.adapter = adapterA
-        val adapter = SimpleAdapter(view.context, dataList, R.layout.row_monitoring, keys, ids)
+        val adapter = SimpleAdapter(view.context, dataListMon, R.layout.row_monitoring, keys, ids)
         binding.gridMon.adapter = adapter
-//
-//        // B
-//        val dataListB = ArrayList<HashMap<String, Any>>()
-//        for (i in imgB.indices) {
-//            val map = HashMap<String, Any>()
-//            map["img"] = imgB[i]
-//            map["chNum"] = dataChB[i]
-//            map["chVal"] = dataValB[i]
-//            dataListB.add(map)
-//        }
-//
-//        val keysB = arrayOf("img", "chNum", "chVal")
-//        val idsB = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-//
-//        val adapterB = SimpleAdapter(view.context, dataListB, R.layout.list_monitoring, keysB, idsB)
-//        binding.listMon2.adapter = adapterB
-
     }
 
-//    private fun setListViewContents() {
-//        //
-//        val dataList = ArrayList<HashMap<String, Any>>()
-//        for (i in 5..5) {
-//            val map = HashMap<String, Any>()
-//            map["img"] = imgRes[1]
-//            map["data1"] = data1[i]
-//            map["data2"] = "2.5%"
-//            dataList.add(map)
-//        }
-//
-//        //
-//        val keys = arrayOf("img", "data1", "data2")
-//
-//        //
-//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-//
-//        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
-//        binding.list1.adapter = adapter1
-//
-//    }
-
     private fun setListViewContents() {
+        activity?.runOnUiThread {
+            dataListMon.clear()
 
-//        val dataList = ArrayList<HashMap<String, Any>>()
-//        for (i in 2..3) {
-//            val map = HashMap<String, Any>()
-//            map["img"] = imgB[1]
-//            map["data1"] = dataChA[i]
-//            map["data2"] = "2.5%"
-//            dataList.add(map)
-//        }
-//
-//        //
-//        val keys = arrayOf("img", "data1", "data2")
-//
-//        //
-//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-//
-//        val adapter1 = SimpleAdapter(viewMonitoring?.context, dataList, R.layout.list_monitoring, keys, ids)
-//        binding.listMon1.adapter = adapter1
-//
-//        //binding.listMon1.adapter.
-//
-//        for (i in 0 until Global.monitoring.MAX_CH_CNT){
-//            when(i){
-//                9 -> {
-//                    //var item = binding.listMon1.adapter.
-//
-//                } // Dummy channel
-//                in 0..3 ->{}    // CH1~4
-//                in 4..7 ->{}    // CH5~8
-//            }
-//        }
+            for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+                val map = HashMap<String, Any>()
+                map["chNum"] = chStr[i]
+                map["img"] =
+                    if (Global.monitoring.mmChData[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+                map["chVal"] = String.format("%.3f", Global.monitoring.mmChData[i].percent)
 
+                dataListMon.add(map)
+            }
+            val keys = arrayOf("img", "chNum", "chVal")
+            val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+            val adapter =
+                SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
+
+
+            binding.gridMon.adapter = adapter
+        }
+
+//
+//        synchronized(this) {
+//                        for (i in Global.monitoring.mmChData.indices) {
+//                            var touch = Global.monitoring.mmChData[i].touch
+//                            var percent = Global.monitoring.mmChData[i].percent
+//
+//                            if (i == Global.monitoring.DM_CH_IDX)
+//                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
+//                            else
+//                                str.append("CH ${i + 1} : $touch / ${
+//                                    String.format("%.3f",
+//                                        percent)
+//                                }\n")
+//                        }
     }
 
     override fun onResume() {
@@ -255,7 +188,7 @@ class MonitoringFragment : Fragment() {
                 binding.btnClearMon -> {
                     stopMonitoring()
                     Global.waitForStopMon = true
-                    setListViewContents()
+                    //setListViewContents()
                 }
             }
             binding.textView8.text = mask.toString()    // for debugging
@@ -286,23 +219,26 @@ class MonitoringFragment : Fragment() {
                     // -------------------------------------------------------------------------//
                     // Display Touch and Percent(임시)
                     // -------------------------------------------------------------------------//
-                    synchronized(this) {
-                        for (i in Global.monitoring.mmChData.indices) {
-                            var touch = Global.monitoring.mmChData[i].touch
-                            var percent = Global.monitoring.mmChData[i].percent
+                    //synchronized(this) {
+//                        for (i in Global.monitoring.mmChData.indices) {
+//                            var touch = Global.monitoring.mmChData[i].touch
+//                            var percent = Global.monitoring.mmChData[i].percent
+//
+//                            if (i == Global.monitoring.DM_CH_IDX)
+//                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
+//                            else
+//                                str.append("CH ${i + 1} : $touch / ${
+//                                    String.format("%.3f",
+//                                        percent)
+//                                }\n")
+//                        }
 
-                            if (i == Global.monitoring.DM_CH_IDX)
-                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
-                            else
-                                str.append("CH ${i + 1} : $touch / ${
-                                    String.format("%.3f",
-                                        percent)
-                                }\n")
-                        }
-                    }
+                        //setListViewContents()
+                    //}
 
                     activity?.runOnUiThread {
                         binding.tvStatusMonFrag.text = str.toString()
+                        setListViewContents()
                         if (Global.waitForStopMon) stopMonitoring()
                     }
                     // -------------------------------------------------------------------------//

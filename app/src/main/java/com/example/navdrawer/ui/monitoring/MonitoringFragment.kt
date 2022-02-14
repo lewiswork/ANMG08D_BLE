@@ -7,10 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.SimpleAdapter
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
@@ -45,26 +42,12 @@ class MonitoringFragment : Fragment() {
 //        R.drawable.img_white_dot,
 //        R.drawable.img_white_dot
 //    )
-//
-    val dataChA = arrayOf("CH1", "CH2", "CH3", "CH4", "DM")
-    val dataChB = arrayOf("CH5", "CH6", "CH7", "CH8")
-    val dataValA = arrayOf(0.0, 0.0, 0.0, 0.0, 0.0)
-    val dataValB = arrayOf(0.0, 0.0, 0.0, 0.0)
 
-    val imgA = intArrayOf(
-        R.drawable.img_white_dot,
-        R.drawable.img_white_dot,
-        R.drawable.img_white_dot,
-        R.drawable.img_white_dot,
-        R.drawable.img_white_dot
+    val imgTouchStat = intArrayOf(
+        R.drawable.img_white_dot,   // not touched
+        R.drawable.img_blue_dot     // touched
     )
 
-    val imgB = intArrayOf(
-        R.drawable.img_blue_dot,
-        R.drawable.img_blue_dot,
-        R.drawable.img_blue_dot,
-        R.drawable.img_blue_dot
-    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -101,22 +84,30 @@ class MonitoringFragment : Fragment() {
 
 
         // A
-        val dataListA = ArrayList<HashMap<String, Any>>()
-        for (i in imgA.indices) {
+        val dataList = ArrayList<HashMap<String, Any>>()
+        for (i in 0 until  Global.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
-            map["img"] = imgA[i]
-            map["chNum"] = dataChA[i]
-            map["chVal"] = dataValA[i]
-            dataListA.add(map)
+//            map["img"] = imgTouchStat[0]
+            if (i == Global.monitoring.DM_CH_IDX) {
+                map["chNum"] = "DM"
+                map["img"] = imgTouchStat[1]    // for test
+            }
+            else {
+                map["chNum"] = "CH${i+1}"
+                map["img"] = imgTouchStat[0]
+            }
+            map["chVal"] = "0.000 %"
+
+            dataList.add(map)
         }
 
-        val keysA = arrayOf("img", "chNum", "chVal")
-        val idsA = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+        val keys = arrayOf("img", "chNum", "chVal")
+        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
 
 //        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.list_monitoring, keysA, idsA)
 //        binding.listMon1.adapter = adapterA
-        val adapterA = SimpleAdapter(view.context, dataListA, R.layout.row_monitoring, keysA, idsA)
-        binding.gridMon.adapter = adapterA
+        val adapter = SimpleAdapter(view.context, dataList, R.layout.row_monitoring, keys, ids)
+        binding.gridMon.adapter = adapter
 //
 //        // B
 //        val dataListB = ArrayList<HashMap<String, Any>>()

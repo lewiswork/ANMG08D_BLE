@@ -14,6 +14,7 @@ import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 import com.example.navdrawer.packet.Packet
 import java.lang.Exception
+import java.text.DecimalFormat
 import kotlin.experimental.and
 import kotlin.experimental.or
 
@@ -79,7 +80,7 @@ class MonitoringFragment : Fragment() {
         binding.gridMon.adapter = adapter
     }
 
-    private fun setListViewContents() {
+    private fun updateMonData() {
         activity?.runOnUiThread {
             dataListMon.clear()
 
@@ -88,7 +89,18 @@ class MonitoringFragment : Fragment() {
                 map["chNum"] = chStr[i]
                 map["img"] =
                     if (Global.monitoring.mmChData[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
-                map["chVal"] = String.format("%.3f", Global.monitoring.mmChData[i].percent)
+
+                var percent = Global.monitoring.mmChData[i].percent
+                var df = DecimalFormat("0.000")
+                //map["chVal"] = df.format(percent)
+                var perStr = df.format(percent)
+
+//                var perStr = DecimalFormat("###.000", percent)
+                if (percent >= 0) map["chVal"] = " $perStr %"
+                else map["chVal"] = "$perStr %"
+
+
+                //map["chVal"] = String.format("%03.3f", Global.monitoring.mmChData[i].percent)
 
                 dataListMon.add(map)
             }
@@ -97,24 +109,8 @@ class MonitoringFragment : Fragment() {
             val adapter =
                 SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
 
-
             binding.gridMon.adapter = adapter
         }
-
-//
-//        synchronized(this) {
-//                        for (i in Global.monitoring.mmChData.indices) {
-//                            var touch = Global.monitoring.mmChData[i].touch
-//                            var percent = Global.monitoring.mmChData[i].percent
-//
-//                            if (i == Global.monitoring.DM_CH_IDX)
-//                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
-//                            else
-//                                str.append("CH ${i + 1} : $touch / ${
-//                                    String.format("%.3f",
-//                                        percent)
-//                                }\n")
-//                        }
     }
 
     override fun onResume() {
@@ -219,30 +215,11 @@ class MonitoringFragment : Fragment() {
                     // -------------------------------------------------------------------------//
                     // Display Touch and Percent(임시)
                     // -------------------------------------------------------------------------//
-                    //synchronized(this) {
-//                        for (i in Global.monitoring.mmChData.indices) {
-//                            var touch = Global.monitoring.mmChData[i].touch
-//                            var percent = Global.monitoring.mmChData[i].percent
-//
-//                            if (i == Global.monitoring.DM_CH_IDX)
-//                                str.append("CH DM : $touch / ${String.format("%.3f", percent)}\n")
-//                            else
-//                                str.append("CH ${i + 1} : $touch / ${
-//                                    String.format("%.3f",
-//                                        percent)
-//                                }\n")
-//                        }
-
-                        //setListViewContents()
-                    //}
-
                     activity?.runOnUiThread {
-                        binding.tvStatusMonFrag.text = str.toString()
-                        setListViewContents()
+                        updateMonData()
                         if (Global.waitForStopMon) stopMonitoring()
                     }
                     // -------------------------------------------------------------------------//
-
 
                     Global.monitoring.hasNewData = false
                 }

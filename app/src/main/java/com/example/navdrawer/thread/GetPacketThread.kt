@@ -1,19 +1,22 @@
 package com.example.navdrawer.thread
 
+import android.content.Context
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.packet.RPacket
 import com.example.navdrawer.packet.Packet
+import com.example.navdrawer.packet.RPacket
 import java.io.File
-import java.io.FileNotFoundException
-import java.lang.StringBuilder
-import kotlin.NoSuchElementException
+import java.io.FileOutputStream
+import java.io.IOException
+
 
 enum class ExtractMode{ Front, Rear }    // Front : STX~LEN, Rear : Data~ETX
 
-class GetPacketThread:Thread() {
+class GetPacketThread(context: Context):Thread() {
 
     val SZ_UNTIL_LEN = 6
     val IDX_DATA_START = 6
@@ -22,6 +25,8 @@ class GetPacketThread:Thread() {
     var mmRawByteList = mutableListOf<Byte>()
     var mmExtractMode  = ExtractMode.Front
     var mmLogStr = StringBuilder()
+
+    var mmContext = context
 
     override fun run() {
         super.run()
@@ -175,17 +180,6 @@ class GetPacketThread:Thread() {
         Log.d("[ADS] ", "Get packet thread finished. ID : ${this.id}")
     }
 
-//    private fun updateMonData(
-//        kind: PacketKind?,
-//        dataContents: ByteArray,
-//    ) {
-//        when (kind) {
-//            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
-//            PacketKind.MonTouch -> Global.monitoring.setTouch(dataContents[0])
-//        }
-//        Global.monitoring.updated = true
-//    }
-
     private fun logRawByteArray(rawByteArray: ByteArray) {
         //-----------------------------------------------------------------------//
         //  Logcat (DEBUG)
@@ -242,20 +236,51 @@ class GetPacketThread:Thread() {
         // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
         //------------------------------------------------------------------------------//
         // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
-        var pathname = System.getProperty("java.io.tmpdir")
-        var someFile = File("$pathname/some-file.txt")
+//        var pathname = System.getProperty("java.io.tmpdir")
+//        var someFile = File("$pathname/some-file.txt")
+
+        //val folder = Environment.getExternalStoragePublicDirectory(Environment.getDataDirectory().toString())
+        val folder =Environment.getExternalStorageDirectory().getAbsolutePath()
+
+        // Storing the data in file with name as geeksData.txt
+
+        // Storing the data in file with name as geeksData.txt
+        val file = File(folder, "geeksData.txt")
+        writeTextData(file, str)
+        Log.d("[ADS] ", "File saved at : $file")
 
         // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
         // 이미 파일이 존재할 경우 덮어쓰기로 저장
         // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
-        try {
-            someFile.appendText("가나다라마바사")
-            someFile.appendText(str)
-            //Log.d("[ADS] ", "File saved at : $someFile")
-        } catch (e: FileNotFoundException) {
-            Log.d("[ADS] ", "FileNotFound: $someFile")
-        }
+//        try {
+//            someFile.appendText("가나다라마바사")
+//            someFile.appendText(str)
+//            //Log.d("[ADS] ", "File saved at : $someFile")
+//        } catch (e: FileNotFoundException) {
+//            Log.d("[ADS] ", "FileNotFound: $someFile")
+//        }
         //------------------------------------------------------------------------------//
+    }
+
+    // writeTextData() method save the data into the file in byte format
+    // It also toast a message "Done/filepath_where_the_file_is_saved"
+    private fun writeTextData(file: File, data: String) {
+        var fileOutputStream: FileOutputStream? = null
+        try {
+            fileOutputStream = FileOutputStream(file)
+            fileOutputStream.write(data.toByteArray())
+            Toast.makeText(mmContext, "Done" + file.absolutePath, Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     private fun clearRawByteList() : Boolean {

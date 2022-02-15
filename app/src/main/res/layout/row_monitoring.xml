@@ -31,6 +31,7 @@
             android:layout_weight="1"
             android:text="0.000 %"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
     </LinearLayout>
 
 </LinearLayout>

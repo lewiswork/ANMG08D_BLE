@@ -107,7 +107,8 @@ class ConnectFragment : Fragment() {
                     Global.rxThread!!.start()
 
                     Global.rxPacketThreadOn =true
-                    Global.getPacketThread = GetPacketThread()
+                    //Global.getPacketThread = GetPacketThread()
+                    Global.getPacketThread = GetPacketThread(context!!)
                     Global.getPacketThread!!.start()
 
                 } catch (ex: Exception) {

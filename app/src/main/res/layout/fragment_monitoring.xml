@@ -92,29 +92,31 @@
             android:id="@+id/gridMon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="auto_fit" >
+            android:layout_weight="1"
+            android:numColumns="auto_fit">
 
         </GridView>
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_light"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:text="Percent"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView_Test"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/holo_blue_light"
-        android:paddingLeft="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:text="Percent"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView_Test"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 </LinearLayout>

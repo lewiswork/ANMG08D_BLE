@@ -32,20 +32,6 @@ class ConnectFragment : Fragment() {
     private val binding get() = mmBinding!!
     private val CONNECT_ACTIVYTY = 0
 
-//    private  var mmInStream: InputStream? = null
-//    private  var mmOutStream: OutputStream? = null
-//    private  var mmSocket: BluetoothSocket? = null
-
-//    private  var mmRxThread: ReceiveThread?  = null
-//    private  var mmDisplayThread: DisplayThread? = null
-
-    private var mmTxBuffer: ByteArray = ByteArray(2048)
-    //private var mmRxBuffer: ByteArray = ByteArray(8192)
-    private var mmRxBuffer: ByteArray = ByteArray(2048)
-
-//    private var mmRunRxThread = false
-//    private var mmRunDisplayThread = false
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -73,11 +59,8 @@ class ConnectFragment : Fragment() {
         //------------------------------------------------------------------//
         // 각 구성요소의 Listener 등록
         //------------------------------------------------------------------//
-        mmBinding?.btnConnect?.setOnClickListener(listenerConnect)               // Connect
+        mmBinding?.btnConnect?.setOnClickListener(listenerConnect)              // Connect
         mmBinding?.btnDisconnect?.setOnClickListener(listenerDisconnect)        // Disconnect
-//        btnSend.setOnClickListener(listenerSend)                    // Send
-//        btnSendHrCmd.setOnClickListener(listenerSendHrCmd)          // Send HrCmd
-//        btnClear.setOnClickListener { tvReceiveMsg.text = null }    // Clear(Received Message)
         //------------------------------------------------------------------//
 
         DisplayBtStatus()

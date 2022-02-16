@@ -10,7 +10,6 @@ import com.example.navdrawer.Global
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.ActivityConnectBinding
 
-//import com.example.navdrawer.databinding.ActivityConnectBinding
 
 class ConnectActivity : AppCompatActivity() {
 

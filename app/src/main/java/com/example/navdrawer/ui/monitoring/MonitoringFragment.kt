@@ -1,5 +1,7 @@
 package com.example.navdrawer.ui.monitoring
 
+import android.app.Activity
+import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +21,8 @@ import kotlin.experimental.and
 import kotlin.experimental.or
 
 class MonitoringFragment : Fragment() {
+
+    private val REGISTER_ACTIVYTY = 0
 
     private lateinit var monitoringViewModel: MonitoringViewModel
     private var _binding: FragmentMonitoringBinding? = null
@@ -55,10 +59,7 @@ class MonitoringFragment : Fragment() {
         initListView(view)
         viewMonitoring = view
 
-//        if ((Global.hwStat and 0x60) == 0x60.toByte())
-//            Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
-
-        binding.textView7.text = activity?.packageName
+        //binding.textView7.text = activity?.packageName
 
         Log.d("[ADS] ", "Monitoring Fragment > onViewCreated")
     }
@@ -164,6 +165,7 @@ class MonitoringFragment : Fragment() {
         binding.swTouch.setOnClickListener(listenerOnClick)
         binding.swPercent.setOnClickListener(listenerOnClick)
         binding.btnClearMon.setOnClickListener(listenerOnClick)
+        binding.btnRegister.setOnClickListener(listenerBtnRegClick)
     }
 
     private val listenerOnClick = View.OnClickListener {
@@ -189,6 +191,28 @@ class MonitoringFragment : Fragment() {
 
         } catch (ex: Exception) {
             Log.d("[ADS] ", "Making packet error! / ${ex.message}")
+        }
+    }
+
+    private val listenerBtnRegClick = View.OnClickListener {
+            val intent = Intent(this@MonitoringFragment.context, RegisterActivity::class.java)
+
+            try {
+                startActivityForResult(intent, REGISTER_ACTIVYTY)
+            } catch (ex: Exception) {
+
+            }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REGISTER_ACTIVYTY){
+            if (resultCode == Activity.RESULT_OK){
+
+            }else if (resultCode == Activity.RESULT_CANCELED) {
+
+            }
         }
     }
 

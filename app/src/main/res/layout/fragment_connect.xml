@@ -73,6 +73,7 @@
             android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="Connect"
+            android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <Button
@@ -84,6 +85,7 @@
             android:layout_weight="1"
             android:enabled="false"
             android:text="Disconnect"
+            android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     </LinearLayout>

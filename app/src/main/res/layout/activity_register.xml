@@ -35,5 +35,17 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Close"
+        android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+    <TextView
+        android:id="@+id/tvStatusReg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="15dp"
+        android:text="Status(Register Activity)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 </LinearLayout>

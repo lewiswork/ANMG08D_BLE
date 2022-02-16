@@ -158,7 +158,7 @@ class MonitoringFragment : Fragment() {
     private fun setBtnSwEnabled(flag: Boolean) {
         binding.swTouch.isEnabled = flag
         binding.swPercent.isEnabled = flag
-        //binding.btnClearMon.isEnabled = flag
+        binding.btnClearMon.isEnabled = flag
     }
 
     private fun setListeners() {

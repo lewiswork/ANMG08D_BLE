@@ -42,7 +42,6 @@ class JigFragment : Fragment() {
         _binding = FragmentJigBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //setControlEnabled()        // BT 연결상태 별 초기화 처리
         setListeners()          // Listener 등록
 
         Log.d("[ADS] ", "Jig Fragment > onCreateView")
@@ -63,10 +62,9 @@ class JigFragment : Fragment() {
 
         //timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
         //timer = kotlin.concurrent.timer(period = 1000 ) {
-        timer = kotlin.concurrent.timer(period = 1000 ) {
+        timer = kotlin.concurrent.timer(period = 1000) {
             tick = true
         }
-
         Log.d("[ADS] ", "Jig Fragment > onResume > Timer started : $timer")
     }
 
@@ -97,29 +95,6 @@ class JigFragment : Fragment() {
         binding.swI2c.setOnClickListener(listenerForRelays)
         binding.btnClearRelays.setOnClickListener(listenerForRelays)
     }
-//
-//    private val listenerOnClick = View.OnClickListener {
-//        var mask: Byte = 0x00
-//
-//        try {
-//            if (binding.swVdd.isChecked) mask = mask or 0x02
-//            if (binding.swI2c.isChecked) mask = mask or 0x04
-//            Global.hwStat = mask
-//            Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
-//
-//            binding.textView3.text = Global.hwStat.toString()    // for debugging
-//
-//        } catch (ex: Exception) {
-//            Log.d("[ADS]", "Sending packet error! / ${ex.message}}")
-//        }
-//    }
-//
-//    private val listenerBtnClear = View.OnClickListener {
-//        Global.hwStat = 0x00
-//        Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
-//
-//        binding.textView3.text = Global.hwStat.toString()    // for debugging
-//    }
 
     private val listenerForRelays = View.OnClickListener {
         var mask: Byte = 0x00
@@ -147,7 +122,7 @@ class JigFragment : Fragment() {
             Packet.send(Global.outStream, PacketKind.HwWrite, Global.hwStat) // Send packet
             Global.hwStatPrev = Global.hwStat
 
-            binding.textView3.text = Global.hwStat.toString()    // for debugging
+            //binding.textView3.text = Global.hwStat.toString()    // for debugging
         } catch (ex: Exception) {
             Log.d("[ADS]", "Sending packet error! / ${ex.message}}")
         }
@@ -174,15 +149,17 @@ class JigFragment : Fragment() {
                 }
 
                 // Packet 처리
-                synchronized(this) { qEmpty = Global.hwQueue.isEmpty() }
+                //synchronized(this) { qEmpty = Global.hwQueue.isEmpty() }
+                synchronized(Global.hwQueue) { qEmpty = Global.hwQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(this) { packet = Global.hwQueue.remove() }
+                        //synchronized(this) { packet = Global.hwQueue.remove() }
+                        synchronized(Global.hwQueue) { packet = Global.hwQueue.remove() }
 
                         when (packet.kind) {
                             PacketKind.HwRead -> {
-                                Global.hwStat = packet.dataList[0]
+                                //Global.hwStat = packet.dataList[0]
                                 activity?.runOnUiThread {
                                     displayRelayStatus()
                                 }

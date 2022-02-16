@@ -10,6 +10,7 @@ import com.example.navdrawer.PacketKind
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -46,10 +47,13 @@ class GetPacketThread(context: Context):Thread() {
                 //------------------------------------------------------------------------------//
                 // rawByteQueue 데이터 -> byteList 로 이동
                 //------------------------------------------------------------------------------//
-                synchronized(this) { qEmpty = Global.rawRxBytesQueue.isEmpty() }
+                //synchronized(this) { qEmpty = Global.rawRxBytesQueue.isEmpty() }
+                synchronized(Global.rawRxBytesQueue) { qEmpty = Global.rawRxBytesQueue.isEmpty() }
+
                 if (!qEmpty) {
                     try {
-                        synchronized(this) { rawByteArray = Global.rawRxBytesQueue.remove() }
+                        //synchronized(this) { rawByteArray = Global.rawRxBytesQueue.remove() }
+                        synchronized(Global.rawRxBytesQueue) { rawByteArray = Global.rawRxBytesQueue.remove() }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {
@@ -157,7 +161,13 @@ class GetPacketThread(context: Context):Thread() {
                             }
                             //-------------------------------------------------------------------//
 
-                            PacketCategory.Hardware -> Global.hwQueue.add(pk)
+                            PacketCategory.Hardware -> {
+                                if (kind == PacketKind.HwRead) {
+                                    Global.hwStat = dataContents[0]
+                                    //Log.d("[ADS] ", "Relay Value is: ${Global.hwStat}")
+                                }
+                                Global.hwQueue.add(pk)
+                            }
                             PacketCategory.Register -> Global.regQueue.add(pk)
                             PacketCategory.Test -> Global.testQueue.add(pk)
                         }
@@ -165,7 +175,7 @@ class GetPacketThread(context: Context):Thread() {
                         prepareLog()
                         //logToFile(mmLogStr.toString())
 
-                        clearRawByteList()  // Packet 저장 완료된 Raw Data 제거
+                        clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
                     //------------------------------------------------------------------------------//
                 }
@@ -236,29 +246,29 @@ class GetPacketThread(context: Context):Thread() {
         // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
         //------------------------------------------------------------------------------//
         // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
-//        var pathname = System.getProperty("java.io.tmpdir")
-//        var someFile = File("$pathname/some-file.txt")
+        var pathname = System.getProperty("java.io.tmpdir")
+        var someFile = File("$pathname/some-file.txt")
 
         //val folder = Environment.getExternalStoragePublicDirectory(Environment.getDataDirectory().toString())
-        val folder =Environment.getExternalStorageDirectory().getAbsolutePath()
-
-        // Storing the data in file with name as geeksData.txt
-
-        // Storing the data in file with name as geeksData.txt
-        val file = File(folder, "geeksData.txt")
-        writeTextData(file, str)
-        Log.d("[ADS] ", "File saved at : $file")
+//        val folder =Environment.getExternalStorageDirectory().getAbsolutePath()
+//
+//        // Storing the data in file with name as geeksData.txt
+//
+//        // Storing the data in file with name as geeksData.txt
+//        val file = File(folder, "geeksData.txt")
+//        writeTextData(file, str)
+//        Log.d("[ADS] ", "File saved at : $file")
 
         // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
         // 이미 파일이 존재할 경우 덮어쓰기로 저장
         // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
-//        try {
-//            someFile.appendText("가나다라마바사")
-//            someFile.appendText(str)
-//            //Log.d("[ADS] ", "File saved at : $someFile")
-//        } catch (e: FileNotFoundException) {
-//            Log.d("[ADS] ", "FileNotFound: $someFile")
-//        }
+        try {
+            someFile.appendText("가나다라마바사")
+            someFile.appendText(str)
+            //Log.d("[ADS] ", "File saved at : $someFile")
+        } catch (e: FileNotFoundException) {
+            Log.d("[ADS] ", "FileNotFound: $someFile")
+        }
         //------------------------------------------------------------------------------//
     }
 
@@ -285,11 +295,9 @@ class GetPacketThread(context: Context):Thread() {
 
     private fun clearRawByteList() : Boolean {
         for (i in 0 until mmCurIdx) {
-            //mmRawByteList.removeAt(i)
             mmRawByteList.removeAt(0)
         }
         mmCurIdx = 0
-        //mmDataList.clear()
         mmExtractMode = ExtractMode.Front
 
         mmLogStr.clear()

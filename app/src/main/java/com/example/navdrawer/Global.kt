@@ -38,16 +38,14 @@ class Global {
         var rxThread: RxThread? = null
         var getPacketThread: GetPacketThread? = null
 
-        var romQueue : Queue<RPacket> = LinkedList()
-        var monQueue : Queue<RPacket> = LinkedList()
-        var hwQueue : Queue<RPacket> = LinkedList()
-        var regQueue : Queue<RPacket> = LinkedList()
-        var testQueue : Queue<RPacket> = LinkedList()
+        var romQueue: Queue<RPacket> = LinkedList()
+        var monQueue: Queue<RPacket> = LinkedList()
+        var hwQueue: Queue<RPacket> = LinkedList()
+        var regQueue: Queue<RPacket> = LinkedList()
+        var testQueue: Queue<RPacket> = LinkedList()
 
         var hwStat: Byte = 0x00
         var hwStatPrev: Byte = 0x00
-
-         var waitForStopMon :Boolean = false
-
+        var waitForStopMon: Boolean = false
     }
 }

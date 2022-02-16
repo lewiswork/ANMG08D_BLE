@@ -20,21 +20,20 @@ import kotlin.experimental.or
 
 class MonitoringFragment : Fragment() {
 
-
     private lateinit var monitoringViewModel: MonitoringViewModel
     private var _binding: FragmentMonitoringBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mmDisplayThread: DisplayThread
-    private var mmDisplayThreadOn: Boolean = false
-    private  var viewMonitoring:View?=null
+    private lateinit var displayThread: DisplayThread
+    private var displayThreadOn: Boolean = false
+    private var viewMonitoring: View? = null
 
     private val imgTouchStat = intArrayOf(
         R.drawable.img_white_dot,   // not touched
         R.drawable.img_blue_dot     // touched
     )
 
-    val chStr = arrayOf("CH1", "CH2","CH3","CH4","CH5","CH6","CH7","CH8","DM")
+    private val chStr = arrayOf("CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8", "DM")
     private val dataListMon = ArrayList<HashMap<String, Any>>()
 
     override fun onCreateView(
@@ -42,13 +41,10 @@ class MonitoringFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View? {
         monitoringViewModel = ViewModelProvider(this)[MonitoringViewModel::class.java]
-
         _binding = FragmentMonitoringBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //setControlEnabled()        // BT 연결상태 별 초기화 처리
         setListeners()          // Listener 등록
-
         Log.d("[ADS] ", "Monitoring Fragment > onCreateView")
 
         return root
@@ -56,17 +52,48 @@ class MonitoringFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initListView(view)
         viewMonitoring = view
 
-        //setListViewContents()
+//        if ((Global.hwStat and 0x60) == 0x60.toByte())
+//            Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
+
+        binding.textView7.text = activity?.packageName
+
+        Log.d("[ADS] ", "Monitoring Fragment > onViewCreated")
     }
 
-    private fun initListView(view: View) {
-        //val dataList = ArrayList<HashMap<String, Any>>()
+    override fun onResume() {
+        super.onResume()
 
-        for (i in 0 until  Global.monitoring.MAX_CH_CNT) {
+        setControlEnabled()        // BT 연결상태 별 초기화 처리
+        Log.d("[ADS] ", "Monitoring Fragment > onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        displayThreadOn = false
+
+        if (binding.swTouch.isChecked || binding.swPercent.isChecked) {
+            stopMonitoring()
+        }
+
+        Global.waitForStopMon = true
+
+        Log.d("[ADS] ", "Monitoring Fragment > onPause")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+
+        Log.d("[ADS] ", "Monitoring Fragment > onDestroyView")
+    }
+
+
+    private fun initListView(view: View) {
+        for (i in 0 until Global.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]
             map["img"] = imgTouchStat[0]    // touch status
@@ -81,60 +108,32 @@ class MonitoringFragment : Fragment() {
     }
 
     private fun updateMonData() {
-        activity?.runOnUiThread {
-            dataListMon.clear()
+        dataListMon.clear()
+        var percent: Double
 
-            for (i in 0 until Global.monitoring.MAX_CH_CNT) {
-                val map = HashMap<String, Any>()
-                map["chNum"] = chStr[i]
+        for (i in 0 until Global.monitoring.MAX_CH_CNT) {
+            val map = HashMap<String, Any>()
+            map["chNum"] = chStr[i]
+            synchronized(Global.monitoring.mmChData) {
                 map["img"] =
                     if (Global.monitoring.mmChData[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
-
-                var percent = Global.monitoring.mmChData[i].percent
-                var df = DecimalFormat("0.000")
-                //map["chVal"] = df.format(percent)
-                var perStr = df.format(percent)
-
-//                var perStr = DecimalFormat("###.000", percent)
-                if (percent >= 0) map["chVal"] = " $perStr %"
-                else map["chVal"] = "$perStr %"
-
-
-                //map["chVal"] = String.format("%03.3f", Global.monitoring.mmChData[i].percent)
-
-                dataListMon.add(map)
+                //var percent = Global.monitoring.mmChData[i].percent
+                percent = Global.monitoring.mmChData[i].percent
             }
-            val keys = arrayOf("img", "chNum", "chVal")
-            val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-            val adapter =
-                SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
+            var df = DecimalFormat("0.000")
+            var perStr = df.format(percent)
 
-            binding.gridMon.adapter = adapter
+            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
+            else map["chVal"] = "$perStr %"
+
+            dataListMon.add(map)
         }
-    }
+        val keys = arrayOf("img", "chNum", "chVal")
+        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+        val adapter =
+            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
 
-    override fun onResume() {
-        super.onResume()
-
-        setControlEnabled()        // BT 연결상태 별 초기화 처리
-        Log.d("[ADS] ", "Monitoring Fragment > onResume")
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        mmDisplayThreadOn = false
-        stopMonitoring()
-        Global.waitForStopMon = true
-
-        Log.d("[ADS] ", "Monitoring Fragment > onPause")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-
-        Log.d("[ADS] ", "Monitoring Fragment > onDestroyView")
+        binding.gridMon.adapter = adapter
     }
 
     private fun setControlEnabled() {
@@ -144,9 +143,9 @@ class MonitoringFragment : Fragment() {
                 binding.tvStatusMonFrag.text = "Relays are off."
             } else {
                 setBtnSwEnabled(true)
-                mmDisplayThreadOn = true
-                mmDisplayThread = DisplayThread()
-                mmDisplayThread.start()
+                displayThreadOn = true
+                displayThread = DisplayThread()
+                displayThread.start()
                 binding.tvStatusMonFrag.text = "BT connected and relays are on."
             }
         } else {
@@ -155,7 +154,7 @@ class MonitoringFragment : Fragment() {
         }
     }
 
-    private fun setBtnSwEnabled(flag:Boolean) {
+    private fun setBtnSwEnabled(flag: Boolean) {
         binding.swTouch.isEnabled = flag
         binding.swPercent.isEnabled = flag
         //binding.btnClearMon.isEnabled = flag
@@ -184,10 +183,9 @@ class MonitoringFragment : Fragment() {
                 binding.btnClearMon -> {
                     stopMonitoring()
                     Global.waitForStopMon = true
-                    //setListViewContents()
                 }
             }
-            binding.textView8.text = mask.toString()    // for debugging
+            //binding.textView8.text = mask.toString()    // for debugging
 
         } catch (ex: Exception) {
             Log.d("[ADS] ", "Making packet error! / ${ex.message}")
@@ -208,10 +206,8 @@ class MonitoringFragment : Fragment() {
         override fun run() {
 
             Log.d("[ADS] ", "Display thread started. ID : ${this.id}")
-            while (mmDisplayThreadOn) {
+            while (displayThreadOn) {
                 if (Global.monitoring.hasNewData) {
-                    var str = java.lang.StringBuilder()
-
                     // -------------------------------------------------------------------------//
                     // Display Touch and Percent(임시)
                     // -------------------------------------------------------------------------//

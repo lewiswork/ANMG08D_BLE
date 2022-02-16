@@ -25,7 +25,7 @@ class Monitoring {
     val MAX_MFM_CNT = 13
 
     val BIT_RESOLUTION = 0.1
-    val SENSE_LOOP = 13 // 임시
+    val SENSE_LOOP = 13 // 임시, 강제값 사용
 
     var mmChData : ArrayList<ChannelData> = ArrayList()
     var hasNewData = false
@@ -41,6 +41,8 @@ class Monitoring {
         when (kind) {
             PacketKind.MonTouch -> setTouch(dataContents[0])
             PacketKind.MonPercent -> setPercent(dataContents)
+            else -> {   // Do nothing
+            }
         }
         Global.monitoring.hasNewData = true
     }
@@ -48,7 +50,8 @@ class Monitoring {
     fun setTouch(touch: Byte) {
         var booleanArray = Function.byteToBooleanArray(touch, TCH_CH_CNT)
 
-        synchronized(this) {
+        //synchronized(this) {
+        synchronized(mmChData) {
             for (i in booleanArray.indices) mmChData[i].touch = booleanArray[i]
         }
     }
@@ -56,7 +59,7 @@ class Monitoring {
     private fun setPercent(contents: ByteArray) {
         var chCodeStr = String.format("%02X%02X", contents[0], contents[1])
         var percentStr = String.format("%02X%02X%02X", contents[2], contents[3], contents[4])
-        var dPercent = 0.0
+        var dPercent: Double
 
         var ch = getChannel(chCodeStr)
 

@@ -15,7 +15,7 @@ enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
     HwRead, HwWrite,
     MonSet, MonTouch, MonPercent,
-    RegRead, RegWrite
+    RegSingleRead, RegSingleWrite
 }
 
 class Global {

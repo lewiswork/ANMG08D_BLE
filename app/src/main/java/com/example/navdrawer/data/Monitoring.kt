@@ -68,7 +68,10 @@ class Monitoring {
             if (iPercent > 8_388_608) iPercent -= 16_777_216 // 24-bit 2의 보수 처리
 
             dPercent = iPercent.toDouble() / SENSE_LOOP.toDouble() * BIT_RESOLUTION
-            mmChData[ch].percent = dPercent
+
+            synchronized(mmChData) {
+                mmChData[ch].percent = dPercent
+            }
         }
         //Log.d("[ADS] ", "Percent set : CH$ch / ${dPercent.toString()} %")
     }

@@ -165,13 +165,25 @@ class GetPacketThread(context: Context):Thread() {
 
                             PacketCategory.Hardware -> {
                                 if (kind == PacketKind.HwRead) {
-                                    Global.hwStat = dataContents[0]
+                                    synchronized(Global.hwStat) {
+                                        Global.hwStat = dataContents[0]
+                                    }
                                     //Log.d("[ADS] ", "Relay Value is: ${Global.hwStat}")
                                 }
-                                Global.hwQueue.add(pk)
+                                synchronized(Global.hwQueue) {
+                                    Global.hwQueue.add(pk)
+                                }
                             }
-                            PacketCategory.Register -> Global.regQueue.add(pk)
-                            PacketCategory.Test -> Global.testQueue.add(pk)
+                            PacketCategory.Register -> {
+                                synchronized(Global.regQueue) {
+                                    Global.regQueue.add(pk)
+                                }
+                            }
+                            PacketCategory.Test -> {
+                                synchronized(Global.testQueue) {
+                                    Global.testQueue.add(pk)
+                                }
+                            }
                         }
 
                         prepareLog()

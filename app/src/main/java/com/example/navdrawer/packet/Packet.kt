@@ -30,8 +30,8 @@ class Packet {
             "MT" to PacketKind.MonTouch,
             "MP" to PacketKind.MonPercent,
 
-            "RR" to PacketKind.RegRead,
-            "RW" to PacketKind.RegWrite
+            "RX" to PacketKind.RegSingleRead,
+            "RY" to PacketKind.RegSingleWrite
         )
 
         private val listTxPacket: ArrayList<Byte> = ArrayList()

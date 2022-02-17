@@ -151,8 +151,9 @@ class JigFragment : Fragment() {
                     tick = false
                 }
 
+                //------------------------------------------------------------------------------//
                 // Packet 처리
-                //synchronized(this) { qEmpty = Global.hwQueue.isEmpty() }
+                //------------------------------------------------------------------------------//
                 synchronized(Global.hwQueue) { qEmpty = Global.hwQueue.isEmpty() }
 
                 if (!qEmpty) {

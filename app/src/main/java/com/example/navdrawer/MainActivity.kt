@@ -12,7 +12,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.example.navdrawer.adlib.ADLog
 import com.example.navdrawer.databinding.ActivityMainBinding
+import com.example.navdrawer.thread.GetPacketThread
 
 class MainActivity : AppCompatActivity() {
 

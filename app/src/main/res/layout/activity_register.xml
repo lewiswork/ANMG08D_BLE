@@ -8,14 +8,72 @@
     tools:context=".ui.monitoring.RegisterActivity">
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvTitleSingleReg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_blue_light"
         android:paddingLeft="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Register"
+        android:selectAllOnFocus="false"
+        android:text="Single Register"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        tools:ignore="TextContrastCheck" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etSingleAddr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Address"
+            android:inputType="textPersonName"
+            android:maxLength="2"
+            android:selectAllOnFocus="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <EditText
+            android:id="@+id/etSingleVal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Value"
+            android:inputType="textPersonName"
+            android:maxLength="2"
+            android:selectAllOnFocus="true" />
+
+        <Button
+            android:id="@+id/btnReadSingle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:text="Read" />
+
+        <Button
+            android:id="@+id/btnWriteSingle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:text="Write" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTitleEntireReg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_light"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="All Registers"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/white"
         android:textSize="20sp" />
@@ -25,9 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1000"
-        android:orientation="vertical">
-
-    </LinearLayout>
+        android:orientation="vertical"/>
 
     <Button
         android:id="@+id/btnClose"
@@ -48,4 +104,5 @@
         android:paddingBottom="15dp"
         android:text="Status(Register Activity)"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
 </LinearLayout>

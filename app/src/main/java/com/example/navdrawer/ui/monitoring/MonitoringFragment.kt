@@ -59,15 +59,13 @@ class MonitoringFragment : Fragment() {
         initListView(view)
         viewMonitoring = view
 
-        //binding.textView7.text = activity?.packageName
-
         Log.d("[ADS] ", "Monitoring Fragment > onViewCreated")
     }
 
     override fun onResume() {
         super.onResume()
 
-        setControlEnabled()        // BT 연결상태 별 초기화 처리
+        checkConnections()        // BT 연결상태 별 초기화 처리
         Log.d("[ADS] ", "Monitoring Fragment > onResume")
     }
 
@@ -137,25 +135,25 @@ class MonitoringFragment : Fragment() {
         binding.gridMon.adapter = adapter
     }
 
-    private fun setControlEnabled() {
+    private fun checkConnections() {
         if (Global.isBtConnected) {
             if ((Global.hwStat and 0x06) != 0x06.toByte()) {
-                setBtnSwEnabled(false)
+                setControlEnabled(false)
                 binding.tvStatusMonFrag.text = "Relays are off."
             } else {
-                setBtnSwEnabled(true)
+                setControlEnabled(true)
                 displayThreadOn = true
                 displayThread = DisplayThread()
                 displayThread.start()
                 binding.tvStatusMonFrag.text = "BT connected and relays are on."
             }
         } else {
-            setBtnSwEnabled(false)
+            setControlEnabled(false)
             binding.tvStatusMonFrag.text = "BT disconnected."
         }
     }
 
-    private fun setBtnSwEnabled(flag: Boolean) {
+    private fun setControlEnabled(flag: Boolean) {
         binding.swTouch.isEnabled = flag
         binding.swPercent.isEnabled = flag
         binding.btnClearMon.isEnabled = flag
@@ -228,7 +226,8 @@ class MonitoringFragment : Fragment() {
     //---------------------------------------------------------------------------------------//
     inner class DisplayThread : Thread() {
         override fun run() {
-
+    //inner class DisplayThread : ADThread() { // AD Lib 사용 테스트 -> Compile Error, 추후 재 테스트 예정
+        //override fun doWork() {
             Log.d("[ADS] ", "Display thread started. ID : ${this.id}")
             while (displayThreadOn) {
                 if (Global.monitoring.hasNewData) {

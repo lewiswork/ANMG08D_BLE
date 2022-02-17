@@ -28,7 +28,10 @@ class Packet {
 
             "MS" to PacketKind.MonSet,
             "MT" to PacketKind.MonTouch,
-            "MP" to PacketKind.MonPercent
+            "MP" to PacketKind.MonPercent,
+
+            "RR" to PacketKind.RegRead,
+            "RW" to PacketKind.RegWrite
         )
 
         private val listTxPacket: ArrayList<Byte> = ArrayList()
@@ -114,28 +117,6 @@ class Packet {
             logTxPacket(ba)
         }
 
-        fun logTxPacket(ba: ByteArray) {
-            var logStr: StringBuilder = StringBuilder("")
-            for (i in ba.indices) {
-                if (i == 0) {
-                    // STX
-                    logStr.append("STX ")
-                } else if (i in 1 until IDX_DATA_START) {
-                    // Header, Length
-                    if (i == 3) logStr.append(" ")
-                    logStr.append(ba[i].toChar())
-                } else if (i >= IDX_DATA_START && i < ba.size - 1) {
-                    logStr.append(" ")
-                    // Data, Checksum
-                    logStr.append(String.format("%02X", ba[i]))
-                } else if (i == ba.size - 1) {
-                    // ETX
-                    logStr.append(" ETX")
-                }
-            }
-            Log.d("[ADS] ", "[PK TX] $logStr")
-        }
-
         //--------------------------------------------------------------------------------------//
         // 1-byte 데이터 Packet 생성/전송
         //--------------------------------------------------------------------------------------//
@@ -194,6 +175,28 @@ class Packet {
             os!!.write(ba)
 
             logTxPacket(ba)
+        }
+
+        fun logTxPacket(ba: ByteArray) {
+            var logStr: StringBuilder = StringBuilder("")
+            for (i in ba.indices) {
+                if (i == 0) {
+                    // STX
+                    logStr.append("STX ")
+                } else if (i in 1 until IDX_DATA_START) {
+                    // Header, Length
+                    if (i == 3) logStr.append(" ")
+                    logStr.append(ba[i].toChar())
+                } else if (i >= IDX_DATA_START && i < ba.size - 1) {
+                    logStr.append(" ")
+                    // Data, Checksum
+                    logStr.append(String.format("%02X", ba[i]))
+                } else if (i == ba.size - 1) {
+                    // ETX
+                    logStr.append(" ETX")
+                }
+            }
+            Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }
 }

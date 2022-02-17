@@ -58,7 +58,7 @@ class JigFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        setControlEnabled()        // BT 연결상태 별 초기화 처리
+        checkConnections()        // BT 연결상태 별 초기화 처리
 
         //timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
         //timer = kotlin.concurrent.timer(period = 1000 ) {
@@ -75,19 +75,22 @@ class JigFragment : Fragment() {
         Log.d("[ADS] ", "Jig Fragment > onDestroyView")
     }
 
-    private fun setControlEnabled() {
+    private fun checkConnections() {
         if (Global.isBtConnected) {
             mmJigThreadOn = true
             mmJigThread = JigThread()
             mmJigThread.start()
 
-            binding.swVdd.isEnabled = true
-            binding.swI2c.isEnabled = true
+            setControlEnabled(true)
 
         } else {
-            binding.swVdd.isEnabled = false
-            binding.swI2c.isEnabled = false
+            setControlEnabled(false)
         }
+    }
+
+    private fun setControlEnabled(flag:Boolean) {
+        binding.swVdd.isEnabled = flag
+        binding.swI2c.isEnabled = flag
     }
 
     private fun setListeners() {

@@ -14,7 +14,8 @@ import java.util.*
 enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
     HwRead, HwWrite,
-    MonSet, MonTouch, MonPercent
+    MonSet, MonTouch, MonPercent,
+    RegRead, RegWrite
 }
 
 class Global {

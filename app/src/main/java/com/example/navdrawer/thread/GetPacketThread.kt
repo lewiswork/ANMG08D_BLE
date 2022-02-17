@@ -7,6 +7,8 @@ import android.widget.Toast
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.adlib.ADLog
+import com.example.navdrawer.adlib.LogKind
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
 import java.io.File
@@ -173,7 +175,7 @@ class GetPacketThread(context: Context):Thread() {
                         }
 
                         prepareLog()
-                        //logToFile(mmLogStr.toString())
+                        logToFile(mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
@@ -249,16 +251,6 @@ class GetPacketThread(context: Context):Thread() {
         var pathname = System.getProperty("java.io.tmpdir")
         var someFile = File("$pathname/some-file.txt")
 
-        //val folder = Environment.getExternalStoragePublicDirectory(Environment.getDataDirectory().toString())
-//        val folder =Environment.getExternalStorageDirectory().getAbsolutePath()
-//
-//        // Storing the data in file with name as geeksData.txt
-//
-//        // Storing the data in file with name as geeksData.txt
-//        val file = File(folder, "geeksData.txt")
-//        writeTextData(file, str)
-//        Log.d("[ADS] ", "File saved at : $file")
-
         // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
         // 이미 파일이 존재할 경우 덮어쓰기로 저장
         // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
@@ -270,6 +262,13 @@ class GetPacketThread(context: Context):Thread() {
             Log.d("[ADS] ", "FileNotFound: $someFile")
         }
         //------------------------------------------------------------------------------//
+
+//        // Lib test
+//        var LOG = ADLog("${pathname}/Log", "FileControlTest",
+//            (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
+//        ADLog.print(LogKind.Log, "[${this.javaClass.name}] ")
+//        Log.d("[ADS] ", "File saved at : $pathname")
+
     }
 
     // writeTextData() method save the data into the file in byte format

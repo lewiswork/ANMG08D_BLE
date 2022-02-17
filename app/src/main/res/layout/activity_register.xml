@@ -33,10 +33,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Address"
+            android:hint="Addr"
             android:inputType="textPersonName"
             android:maxLength="2"
             android:selectAllOnFocus="true"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <EditText
@@ -49,6 +50,7 @@
             android:inputType="textPersonName"
             android:maxLength="2"
             android:selectAllOnFocus="true"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
         <Button
@@ -56,6 +58,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
             android:text="Read"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
@@ -65,6 +69,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
             android:text="Write"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
@@ -90,14 +96,23 @@
         android:layout_weight="1000"
         android:orientation="vertical"/>
 
-    <Button
-        android:id="@+id/btnClose"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Close"
-        android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingVertical="10dp"
+            android:text="Close"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="0dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/tvStatusReg"

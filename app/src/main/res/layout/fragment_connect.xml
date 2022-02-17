@@ -72,6 +72,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
+            android:paddingVertical="10dp"
             android:text="Connect"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
@@ -84,6 +85,7 @@
             android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:enabled="false"
+            android:paddingVertical="10dp"
             android:text="Disconnect"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />

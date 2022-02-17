@@ -55,6 +55,7 @@
         android:id="@+id/btnClearMon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingVertical="7dp"
         android:text="Clear"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />

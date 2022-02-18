@@ -1,4 +1,4 @@
-package com.example.navdrawer.data
+package com.example.navdrawer.monitor
 
 import android.util.Log
 import com.example.navdrawer.Global
@@ -41,13 +41,12 @@ class Monitoring {
         when (kind) {
             PacketKind.MonTouch -> setTouch(dataContents[0])
             PacketKind.MonPercent -> setPercent(dataContents)
-            else -> {   // Do nothing
-            }
+            else -> { }  // Do nothing
         }
         Global.monitoring.hasNewData = true
     }
 
-    fun setTouch(touch: Byte) {
+    private fun setTouch(touch: Byte) {
         var booleanArray = Function.byteToBooleanArray(touch, TCH_CH_CNT)
 
         //synchronized(this) {

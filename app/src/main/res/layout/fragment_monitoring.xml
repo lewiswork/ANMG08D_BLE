@@ -79,7 +79,7 @@
         android:textSize="20sp" />
 
     <LinearLayout
-        android:id="@+id/linearWrapper"
+        android:id="@+id/linearEmptyInReg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">

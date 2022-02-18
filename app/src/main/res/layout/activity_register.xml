@@ -76,8 +76,12 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </LinearLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
     <TextView
-        android:id="@+id/tvTitleEntireReg"
+        android:id="@+id/tvTitleAllReg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_blue_light"
@@ -89,12 +93,12 @@
         android:textColor="@color/white"
         android:textSize="20sp" />
 
-    <LinearLayout
-        android:id="@+id/linearWrapper"
+    <androidx.gridlayout.widget.GridLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1000"
-        android:orientation="vertical"/>
+        android:layout_height="match_parent"
+        android:layout_weight="1000">
+
+    </androidx.gridlayout.widget.GridLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

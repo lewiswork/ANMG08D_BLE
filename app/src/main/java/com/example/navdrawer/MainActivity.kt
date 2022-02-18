@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        //for (r in Global.regCon.registers) Log.d("[ADS] ", r.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -3,8 +3,9 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import com.example.navdrawer.data.Monitoring
+import com.example.navdrawer.monitor.Monitoring
 import com.example.navdrawer.packet.RPacket
+import com.example.navdrawer.register.RegisterController
 import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
 import java.io.InputStream
@@ -48,5 +49,7 @@ class Global {
         var hwStat: Byte = 0x00
         var hwStatPrev: Byte = 0x00
         var waitForStopMon: Boolean = false
+
+        var regCon: RegisterController = RegisterController()
     }
 }

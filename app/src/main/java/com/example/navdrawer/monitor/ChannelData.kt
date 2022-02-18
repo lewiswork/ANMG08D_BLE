@@ -1,4 +1,4 @@
-package com.example.navdrawer.data
+package com.example.navdrawer.monitor
 
 class ChannelData {
     var touch: Boolean = false

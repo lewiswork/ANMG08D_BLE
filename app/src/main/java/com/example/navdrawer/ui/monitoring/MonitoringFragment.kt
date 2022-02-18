@@ -56,7 +56,7 @@ class MonitoringFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initListView(view)
+        initGridView(view)
         viewMonitoring = view
 
         Log.d("[ADS] ", "Monitoring Fragment > onViewCreated")
@@ -91,7 +91,7 @@ class MonitoringFragment : Fragment() {
     }
 
 
-    private fun initListView(view: View) {
+    private fun initGridView(view: View) {
         for (i in 0 until Global.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]

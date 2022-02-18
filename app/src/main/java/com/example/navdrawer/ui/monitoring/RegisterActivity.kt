@@ -1,15 +1,11 @@
 package com.example.navdrawer.ui.monitoring
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
@@ -28,10 +24,14 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnWriteSingle:Button
     private lateinit var btnClose:Button
 
+    private lateinit var gridAllRegisters:GridView
+
     lateinit var tvStatus:TextView
 
     private var regThreadOn: Boolean = false
     private lateinit var regThread: RegisterThread
+
+    private val dataListRegisters = ArrayList<HashMap<String, Any>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +40,23 @@ class RegisterActivity : AppCompatActivity() {
         getControls()
         setListeners()
 
-        //checkConnections()        // BT 연결상태 별 초기화 처리
+        initGridView()
+
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onCreate")
+    }
+
+    private fun initGridView() {
+        for (r in Global.regCon.registers) {
+            val map = HashMap<String, Any>()
+            map["addr"] = String.format("%02X",r.addr.toByte())
+            map["value"] = String.format("%02X", r.value.toByte())
+            dataListRegisters.add(map)
+        }
+        val keys = arrayOf("addr", "value")
+        val ids = intArrayOf(R.id.tvRowSingleAddr, R.id.tvRowSingleVal)
+
+        val adapter = SimpleAdapter(this, dataListRegisters, R.layout.row_register, keys, ids)
+        gridAllRegisters.adapter = adapter
     }
 
     private fun getControls() {
@@ -51,6 +66,8 @@ class RegisterActivity : AppCompatActivity() {
         btnReadSingle = findViewById(R.id.btnReadSingle)
         btnWriteSingle = findViewById(R.id.btnWriteSingle)
         btnClose = findViewById(R.id.btnClose)
+
+        gridAllRegisters = findViewById(R.id.gridAllRegisters)
 
         tvStatus = findViewById(R.id.tvStatusReg)
     }
@@ -65,6 +82,9 @@ class RegisterActivity : AppCompatActivity() {
         super.onResume()
 
         checkConnections()        // BT 연결상태 별 초기화 처리
+
+        btnReadSingle.requestFocus()
+
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onResume")
     }
 
@@ -116,43 +136,11 @@ class RegisterActivity : AppCompatActivity() {
         var addr: Byte = 0
         var value: Byte = 0
 
-//        try {
-//            // Addr
-//            addrStr = etSingleAddr.text.toString()
-//            addr = addrStr.toInt(16).toByte()
-//
-//            // Value
-//            valStr = etSingleVal.text.toString()
-//            value = valStr.toInt(16).toByte()
-//
-//            val ba = ByteArray(2)
-//            ba[0] = addr
-//            ba[1] = value
-//            Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
-//        } catch (ex: Exception) {
-//            val errStr = "Please enter correct address or value(HEX Format)."
-//            Log.d("[ADS] ", errStr)
-//            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
-//            addr = 0
-//            value = 0
-//        } finally {
-//            etSingleAddr.setText(String.format("%02X", addr))
-//            etSingleVal.setText(String.format("%02X", value))
-//
-//            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-//            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
-//            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
-//            etSingleAddr.clearFocus()
-//            etSingleVal.clearFocus()
-//
-//            btnWriteSingle.requestFocus()
-//        }
-
-        var dataValid=true
+        var dataValid = true
 
         val ba = ByteArray(2)
 
-        // Addr
+        // Address
         try {
             addrStr = etSingleAddr.text.toString()
             addr = addrStr.toInt(16).toByte()
@@ -163,7 +151,7 @@ class RegisterActivity : AppCompatActivity() {
             Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
             addr = 0
             dataValid = false
-        }finally {
+        } finally {
             etSingleAddr.setText(String.format("%02X", addr))
         }
 
@@ -177,9 +165,8 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("[ADS] ", errStr)
             Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
             value = 0
-            dataValid=false
-        }
-        finally {
+            dataValid = false
+        } finally {
             etSingleVal.setText(String.format("%02X", value))
         }
 

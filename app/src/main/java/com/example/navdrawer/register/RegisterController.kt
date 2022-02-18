@@ -22,6 +22,7 @@ class RegisterController {
     val registers = ArrayList<SingleRegister>()
 
     constructor() {
-        for (ra in registerAddrs) registers.add(SingleRegister(ra, 0u))
+        //for (ra in registerAddrs) registers.add(SingleRegister(ra, 0u))
+        for (ra in registerAddrs) registers.add(SingleRegister(ra))
     }
 }

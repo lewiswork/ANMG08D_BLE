@@ -187,7 +187,7 @@ class GetPacketThread(context: Context):Thread() {
                         }
 
                         prepareLog()
-                        logToFile(mmLogStr.toString())
+                        //logToFile(mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }

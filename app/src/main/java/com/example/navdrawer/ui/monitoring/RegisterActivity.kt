@@ -76,14 +76,14 @@ class RegisterActivity : AppCompatActivity() {
         btnReadSingle.setOnClickListener(listenerReadSingle)
         btnWriteSingle.setOnClickListener(listenerWriteSingle)
         btnClose.setOnClickListener(listenerClose)
+
+        gridAllRegisters.setOnItemClickListener(listenerGridClick)
     }
 
     override fun onResume() {
         super.onResume()
 
-        checkConnections()        // BT 연결상태 별 초기화 처리
-
-        btnReadSingle.requestFocus()
+        //checkConnections()        // BT 연결상태 별 초기화 처리
 
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onResume")
     }
@@ -179,6 +179,18 @@ class RegisterActivity : AppCompatActivity() {
             etSingleVal.clearFocus()
 
             btnWriteSingle.requestFocus()
+        }
+    }
+
+    private val listenerGridClick = object :AdapterView.OnItemClickListener {
+        override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+            when (p0?.id) {
+                R.id.gridAllRegisters -> {
+                    //etSingleAddr.setText(gridAllRegisters.getItemAtPosition(p2).toString())
+                    val addr = Global.regCon.registers[p2].addr
+                    etSingleAddr.setText(String.format("%02X",addr.toByte()))
+                }
+            }
         }
     }
 

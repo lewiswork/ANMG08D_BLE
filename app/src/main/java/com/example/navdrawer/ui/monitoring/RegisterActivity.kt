@@ -11,6 +11,7 @@ import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
+import com.example.navdrawer.register.SingleRegister
 import kotlin.experimental.and
 
 class RegisterActivity : AppCompatActivity() {
@@ -47,10 +48,15 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun displayAllRegisters() {
+        dataListRegisters.clear()
+
         for (r in Global.regCon.registers) {
+        //for (r in Global.regCon.registers2) {
             val map = HashMap<String, Any>()
             map["addr"] = String.format("%02X",r.addr.toByte())
             map["value"] = String.format("%02X", r.value.toByte())
+//            map["addr"] = String.format("%02X",r.)
+//            map["value"] = String.format("%02X", r.value.toByte())
             dataListRegisters.add(map)
         }
 
@@ -315,9 +321,27 @@ class RegisterActivity : AppCompatActivity() {
 
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> {
+
+                                var uAddr =  packet.dataList[0].toUByte()
+                                var uVal = packet.dataList[1].toUByte()
+//
+//                                var addr= String.format("%02X", uAddr.toByte())
+//                                var value=String.format("%02X", uVal.toByte())
+//                                Log.d("[ADS] ", "Addr $addr / Val : $value .")
+//
+                                var register:SingleRegister = Global.regCon.registers.filter { it.addr == uAddr }.single()
+                                register.value = uVal
+
                                 if (rwAll) {
+
+                                    //Global.regCon.registers2[rwIndex][uAddr] = uVal
+
+
                                     if (++rwIndex == Global.regCon.registers.size) {
                                         rwAll = false
+                                        runOnUiThread {
+                                            displayAllRegisters()
+                                        }
                                     } else {
                                         Packet.send(Global.outStream,
                                             PacketKind.RegSingleRead,

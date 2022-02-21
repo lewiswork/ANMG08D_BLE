@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //Log.d("[ADS] ", Global.regCon.registers.toString())
-        Log.d("[ADS] ", Global.regCon.registers2.toString())
+        //Log.d("[ADS] ", Global.regCon.registers2.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

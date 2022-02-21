@@ -20,9 +20,17 @@ class RegisterController {
         0x8Du, 0x8Eu, 0x8Fu, 0x90u, 0xA9u, 0xAAu)
 
     val registers = ArrayList<SingleRegister>()
+    val registers2 = ArrayList<HashMap<UByte, UByte>>()
+
 
     constructor() {
         //for (ra in registerAddrs) registers.add(SingleRegister(ra, 0u))
-        for (ra in registerAddrs) registers.add(SingleRegister(ra))
+        for (ra in registerAddrs) {
+            registers.add(SingleRegister(ra))
+
+            val map = HashMap<UByte, UByte>()
+            map[ra] = 0u
+            registers2.add(map)
+        }
     }
 }

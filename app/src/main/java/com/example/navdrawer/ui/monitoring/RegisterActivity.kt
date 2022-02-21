@@ -35,7 +35,7 @@ class RegisterActivity : AppCompatActivity() {
     private var regThreadOn: Boolean = false
     private lateinit var regThread: RegisterThread
 
-    private val dataListRegisters = ArrayList<HashMap<String, Any>>()
+    private val dataListRegisters = ArrayList<HashMap<String, Any>>()   // -> Register Class 에 사용
 
     var rwIndex:Int=0
     var rwAll:Boolean=false

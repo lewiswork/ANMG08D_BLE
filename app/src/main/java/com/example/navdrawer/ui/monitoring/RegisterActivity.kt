@@ -1,6 +1,8 @@
 package com.example.navdrawer.ui.monitoring
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -34,6 +36,12 @@ class RegisterActivity : AppCompatActivity() {
 
     var rwIndex:Int=0
     var rwAll:Boolean=false
+
+    var singleRegAddrValid:Boolean=false
+    var singleRegValueValid:Boolean=false
+
+    var uSingleAddr:UByte=0u
+    var uSingleVal:UByte=0u
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +91,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setListeners() {
+
+        etSingleAddr.addTextChangedListener(listenerEtAddr)
+        etSingleVal.addTextChangedListener(listenerEtVal)
+
         btnReadSingle.setOnClickListener(listenerReadSingle)
         btnWriteSingle.setOnClickListener(listenerWriteSingle)
         btnReadAllReg.setOnClickListener(listenerReadAll)
@@ -112,86 +124,217 @@ class RegisterActivity : AppCompatActivity() {
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onDestroy")
     }
 
-    private val listenerReadSingle = View.OnClickListener {
-        val imm: InputMethodManager
-        var addrStr: String = ""
-        var addr: Byte = 0
+    val listenerEtAddr = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
 
-        try {
-            addrStr = etSingleAddr.text.toString()
-            addr = addrStr.toInt(16).toByte()
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
 
-            Packet.send(Global.outStream, PacketKind.RegSingleRead, addr) // Send packet
-        } catch (ex: Exception) {
-            val errStr = "Please enter correct address(HEX Format)."
-            Log.d("[ADS] ", errStr)
-            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
-            addr = 0
-        } finally {
-            etSingleAddr.setText(String.format("%02X", addr))
-
-            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
-            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
-            etSingleAddr.clearFocus()
-            etSingleVal.clearFocus()
-
-            btnReadSingle.requestFocus()
+        override fun afterTextChanged(p0: Editable?) {
+            // Address
+            var addr: Byte = 0
+            try {
+                var addrStr = etSingleAddr.text.toString()
+                addr = addrStr.toInt(16).toByte()
+                singleRegAddrValid = true
+            } catch (ex: Exception) {
+                val errStr = "Please enter correct address(HEX Format)."
+                Log.d("[ADS] ", errStr)
+                //Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+                addr = 0
+                singleRegAddrValid = false
+            } finally {
+                uSingleAddr = addr.toUByte()
+                //etSingleAddr.setText(String.format("%02X", addr))
+                Log.d("[ADS] ", "Single addr has set :${String.format("%02X", addr)}")
+                Log.d("[ADS] ", "Single addr valid :${singleRegAddrValid}")
+            }
         }
     }
 
-    private val listenerWriteSingle = View.OnClickListener {
+    val listenerEtVal = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            // Value
+            var value: Byte=0
+
+            try {
+                var valStr = etSingleVal.text.toString()
+                value = valStr.toInt(16).toByte()
+                uSingleVal = value.toUByte()
+                singleRegValueValid = true
+
+            } catch (ex: Exception) {
+                //val errStr = "Please enter correct value(HEX Format)."
+                //Log.d("[ADS] ", errStr)
+                //Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+                value = 0
+                singleRegValueValid = false
+            } finally {
+                uSingleVal = value.toUByte()
+                if (singleRegAddrValid){
+                    if (Global.regCon.hasRegister(uSingleAddr)){
+                        Global.regCon.setRegister(uSingleAddr, uSingleVal)
+                        displayAllRegisters()
+                    }
+                }
+                //etSingleVal.setText(String.format("%02X", value))
+                Log.d("[ADS] ", "Single val has set :${String.format("%02X", value)}")
+                Log.d("[ADS] ", "Single val valid :${singleRegValueValid}")
+            }
+        }
+    }
+
+    private val listenerReadSingle = View.OnClickListener {
         val imm: InputMethodManager
+//        var addrStr: String = ""
+//        var addr: Byte = 0
+//
+//        try {
+//            addrStr = etSingleAddr.text.toString()
+//            addr = addrStr.toInt(16).toByte()
+//
+//            Packet.send(Global.outStream, PacketKind.RegSingleRead, addr) // Send packet
+//        } catch (ex: Exception) {
+//            val errStr = "Please enter correct address(HEX Format)."
+//            Log.d("[ADS] ", errStr)
+//            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+//            addr = 0
+//        } finally {
+//            etSingleAddr.setText(String.format("%02X", addr))
+//
+//            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+//            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+//            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
+//            etSingleAddr.clearFocus()
+//            etSingleVal.clearFocus()
+//
+//            btnReadSingle.requestFocus()
+//        }
 
-        var addrStr: String = ""
-        var valStr: String = ""
-        var addr: Byte = 0
-        var value: Byte = 0
+        // Send Packet if all valid
+        //if (dataValid) {
+        var errStr = ""
 
-        var dataValid = true
+        if (!singleRegAddrValid) {
+            errStr = "Please enter correct value(HEX Format)."
+            Log.d("[ADS] ", errStr)
+            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+        }
+//        else if (!singleRegValueValid) {
+//            errStr = "Please enter correct value(HEX Format)."
+//            Log.d("[ADS] ", errStr)
+//            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+//        }
+        //else (singleRegAddrValid && singleRegValueValid) {
+        else {
+            Packet.send(Global.outStream, PacketKind.RegSingleRead, uSingleAddr.toByte()) // Send packet
+
+//            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+//            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+//            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
+//            etSingleAddr.clearFocus()
+//            etSingleVal.clearFocus()
+//
+//            btnWriteSingle.requestFocus()
+        }
+
+        imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+        //imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
+        etSingleAddr.clearFocus()
+        //etSingleVal.clearFocus()
+
+        btnReadSingle.requestFocus()
+    }
+
+    private val listenerWriteSingle = View.OnClickListener {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
+//        var addrStr: String = ""
+//        var valStr: String = ""
+//        var addr: Byte = 0
+//        var value: Byte = 0
+//
+//        var dataValid = true
 
         val ba = ByteArray(2)
 
-        // Address
-        try {
-            addrStr = etSingleAddr.text.toString()
-            addr = addrStr.toInt(16).toByte()
-            ba[0] = addr
-        } catch (ex: Exception) {
-            val errStr = "Please enter correct address(HEX Format)."
-            Log.d("[ADS] ", errStr)
-            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
-            addr = 0
-            dataValid = false
-        } finally {
-            etSingleAddr.setText(String.format("%02X", addr))
-        }
+//        // Address
+//        try {
+//            addrStr = etSingleAddr.text.toString()
+//            addr = addrStr.toInt(16).toByte()
+//            ba[0] = addr
+//        } catch (ex: Exception) {
+//            val errStr = "Please enter correct address(HEX Format)."
+//            Log.d("[ADS] ", errStr)
+//            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+//            addr = 0
+//            dataValid = false
+//        } finally {
+//            etSingleAddr.setText(String.format("%02X", addr))
+//        }
+//
+//        // Value
+//        try {
+//            valStr = etSingleVal.text.toString()
+//            value = valStr.toInt(16).toByte()
+//            ba[1] = value
+//        } catch (ex: Exception) {
+//            val errStr = "Please enter correct value(HEX Format)."
+//            Log.d("[ADS] ", errStr)
+//            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
+//            value = 0
+//            dataValid = false
+//        } finally {
+//            etSingleVal.setText(String.format("%02X", value))
+//        }
 
-        // Value
-        try {
-            valStr = etSingleVal.text.toString()
-            value = valStr.toInt(16).toByte()
-            ba[1] = value
-        } catch (ex: Exception) {
-            val errStr = "Please enter correct value(HEX Format)."
-            Log.d("[ADS] ", errStr)
-            Toast.makeText(this, errStr, Toast.LENGTH_SHORT).show()
-            value = 0
-            dataValid = false
-        } finally {
-            etSingleVal.setText(String.format("%02X", value))
-        }
 
-        if (dataValid) {
-            Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
-            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        // Send Packet if all valid
+        //if (dataValid) {
+        var errStr = ""
+
+        if (!singleRegAddrValid) {
+            errStr = "Please enter correct value(HEX Format)."
+            Log.d("[ADS] ", errStr)
+            Toast.makeText(this, errStr, Toast.LENGTH_LONG).show()
+
             imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
-            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
             etSingleAddr.clearFocus()
-            etSingleVal.clearFocus()
+        } else if (!singleRegValueValid) {
+            errStr = "Please enter correct value(HEX Format)."
+            Log.d("[ADS] ", errStr)
+            Toast.makeText(this, errStr, Toast.LENGTH_LONG).show()
 
-            btnWriteSingle.requestFocus()
+            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
+            etSingleVal.clearFocus()
         }
+        //else (singleRegAddrValid && singleRegValueValid) {
+        else {
+//            ba[0] = etSingleAddr.text.toString().toInt(16).toByte()
+//            ba[1] = etSingleVal.text.toString().toInt(16).toByte()
+            ba[0] = uSingleAddr.toByte()
+            ba[1] = uSingleVal.toByte()
+
+            Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
+
+//            imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+//            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+//            imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
+//            etSingleAddr.clearFocus()
+//            etSingleVal.clearFocus()
+//
+//            btnWriteSingle.requestFocus()
+        }
+
+        btnWriteSingle.requestFocus()
     }
 
     private val listenerReadAll = View.OnClickListener {
@@ -322,7 +465,10 @@ class RegisterActivity : AppCompatActivity() {
                                 val regSize = Global.regCon.registers.size
                                 val uAddr = packet.dataList[0].toUByte()
                                 val uVal = packet.dataList[1].toUByte()
-                                Global.regCon.setRegister(uAddr, uVal)
+
+                                if (Global.regCon.hasRegister(uAddr)) {
+                                    Global.regCon.setRegister(uAddr, uVal)
+                                }
 
                                 if (rwAll) {
                                     //if (++rwIndex == Global.regCon.registers.size) {
@@ -340,13 +486,14 @@ class RegisterActivity : AppCompatActivity() {
                                         pbRegister.progress =
                                             ((rwIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
                                     }
-                                }
-                                //else {
+                                } else {
                                     runOnUiThread {
                                         displaySingleRegVal(uAddr, uVal)
-                                        //displayAllRegisters()
+                                        if (Global.regCon.hasRegister(uAddr)) {
+                                            displayAllRegisters()
+                                        }
                                     }
-                                //}
+                                }
                             }
                             else -> {}    // Do nothing
                         }

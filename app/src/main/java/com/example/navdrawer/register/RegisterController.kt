@@ -1,5 +1,6 @@
 package com.example.navdrawer.register
 
+import android.util.Log
 import com.example.navdrawer.Global
 import java.util.*
 
@@ -40,5 +41,9 @@ class RegisterController {
     fun getValue(addr:UByte):UByte{
         val register = registers.single { it.addr == addr }
         return register.value
+    }
+
+    fun hasRegister(addr:UByte):Boolean{
+        return regAddrs.contains(addr)
     }
 }

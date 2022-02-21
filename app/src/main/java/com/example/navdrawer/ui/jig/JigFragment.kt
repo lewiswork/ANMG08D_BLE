@@ -158,12 +158,10 @@ class JigFragment : Fragment() {
 
                 if (!qEmpty) {
                     try {
-                        //synchronized(this) { packet = Global.hwQueue.remove() }
                         synchronized(Global.hwQueue) { packet = Global.hwQueue.remove() }
 
                         when (packet.kind) {
                             PacketKind.HwRead -> {
-                                //Global.hwStat = packet.dataList[0]
                                 activity?.runOnUiThread {
                                     displayRelayStatus()
                                 }

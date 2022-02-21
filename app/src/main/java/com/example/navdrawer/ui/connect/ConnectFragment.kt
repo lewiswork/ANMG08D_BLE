@@ -104,6 +104,9 @@ class ConnectFragment : Fragment() {
 
                 Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
                     .show()
+
+                Thread.sleep(100)
+                Packet.send(Global.outStream, PacketKind.HwRead) // Send packet
             }else if (resultCode == RESULT_CANCELED) {
                 //tvStatus.text = "Connection canceled."
             }

@@ -210,6 +210,8 @@ class RegisterActivity : AppCompatActivity() {
             btnReadSingle.requestFocus()
             val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+
+            //setControlEnabled(false)
         }
 
     }
@@ -245,6 +247,7 @@ class RegisterActivity : AppCompatActivity() {
             imm.hideSoftInputFromWindow(etSingleVal.windowToken, 0)
 
             displaySingleRegVal(uSingleAddr, uSingleVal)
+            //setControlEnabled(false)
         }
     }
 
@@ -252,6 +255,8 @@ class RegisterActivity : AppCompatActivity() {
         try {
             rwAll = true
             rwIndex = 0;
+
+            setControlEnabled(false)
 
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
@@ -344,10 +349,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setControlEnabled(flag:Boolean) {
-//        etSingleAddr.isEnabled = flag
-//        etSingleVal.isEnabled = flag
-//        btnReadSingle.isEnabled = flag
-//        btnWriteSingle.isEnabled = flag
+        etSingleAddr.isEnabled = flag
+        etSingleVal.isEnabled = flag
+        btnReadSingle.isEnabled = flag
+        btnWriteSingle.isEnabled = flag
+        btnReadAllReg.isEnabled = flag
+        btnWriteAllReg.isEnabled = flag
+       // btnClose.isEnabled=flag
     }
 
     private fun displaySingleRegVal(addr:UByte, value:UByte) {
@@ -385,11 +393,12 @@ class RegisterActivity : AppCompatActivity() {
                                 }
 
                                 if (rwAll) {
-                                    //if (++rwIndex == Global.regCon.registers.size) {
                                     if (++rwIndex == regSize) {
                                         rwAll = false
                                         runOnUiThread {
                                             displayAllRegisters()
+                                            pbRegister.progress =0
+                                            setControlEnabled(true)
                                         }
                                     } else {
                                         Packet.send(Global.outStream,
@@ -406,6 +415,7 @@ class RegisterActivity : AppCompatActivity() {
                                         if (Global.regCon.hasRegister(uAddr)) {
                                             displayAllRegisters()
                                         }
+                                        //setControlEnabled(true)
                                     }
                                 }
                             }

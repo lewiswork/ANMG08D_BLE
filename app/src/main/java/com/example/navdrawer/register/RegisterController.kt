@@ -5,7 +5,7 @@ import java.util.*
 
 class RegisterController {
 
-    // 108 registers
+    // 106 registers
     //private val registerAddrs = ubyteArrayOf( // <- This declaration is experimental and its usage should be marked with '@kotlin.ExperimentalUnsignedTypes' or '@OptIn(kotlin.ExperimentalUnsignedTypes::class)'
     val regAddrs: Array<UByte> = arrayOf(
         0x01u, 0x05u, 0x06u, 0x08u, 0x09u, 0x0Au, 0x0Bu, 0x0Cu, 0x0Du, 0x0Eu,

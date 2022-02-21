@@ -106,6 +106,16 @@
 
     </GridView>
 
+    <ProgressBar
+        android:id="@+id/pbRegister"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:max="100"
+        android:progress="50"
+        android:progressTint="@color/design_default_color_primary" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

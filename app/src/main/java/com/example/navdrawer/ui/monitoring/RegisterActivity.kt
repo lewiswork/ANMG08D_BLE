@@ -20,6 +20,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etSingleVal:EditText
     private lateinit var btnReadSingle:Button
     private lateinit var btnWriteSingle:Button
+    private lateinit var pbRegister:ProgressBar
     private lateinit var btnReadAllReg:Button
     private lateinit var btnWriteAllReg:Button
     private lateinit var btnClose:Button
@@ -30,7 +31,6 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var regThread: RegisterThread
 
     private val dataListRegisters = ArrayList<HashMap<String, Any>>()   // -> Register Class 에 사용
-    //private val dataListRegisters = ArrayList<HashMap<UByte, UByte>>()   // -> Register Class 에 사용
 
     var rwIndex:Int=0
     var rwAll:Boolean=false
@@ -55,8 +55,6 @@ class RegisterActivity : AppCompatActivity() {
             val map = HashMap<String, Any>()
             map["addr"] = String.format("%02X",r.addr.toByte())
             map["value"] = String.format("%02X", r.value.toByte())
-//            map["addr"] = String.format("%02X",r.)
-//            map["value"] = String.format("%02X", r.value.toByte())
             dataListRegisters.add(map)
         }
 
@@ -73,6 +71,8 @@ class RegisterActivity : AppCompatActivity() {
 
         btnReadSingle = findViewById(R.id.btnReadSingle)
         btnWriteSingle = findViewById(R.id.btnWriteSingle)
+        pbRegister = findViewById(R.id.pbRegister)
+        pbRegister.progress=0
         btnReadAllReg = findViewById(R.id.btnReadAllReg)
         btnWriteAllReg = findViewById(R.id.btnWriteAllReg)
         btnClose = findViewById(R.id.btnClose)
@@ -202,8 +202,8 @@ class RegisterActivity : AppCompatActivity() {
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
                 Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
+            pbRegister.progress = 0
         } catch (ex: Exception) {
-            //val errStr = "Please enter correct address(HEX Format)."
             Log.d("[ADS] ", ex.message!!)
             Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
 
@@ -293,7 +293,6 @@ class RegisterActivity : AppCompatActivity() {
 //        btnWriteSingle.isEnabled = flag
     }
 
-    //private fun displaySingleRegVal(value:ByteArray) {
     private fun displaySingleRegVal(addr:UByte, value:UByte) {
         etSingleAddr.setText(String.format("%02X", addr.toByte()))
         etSingleVal.setText(String.format("%02X", value.toByte()))
@@ -320,12 +319,14 @@ class RegisterActivity : AppCompatActivity() {
 
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> {
-                                var uAddr = packet.dataList[0].toUByte()
-                                var uVal = packet.dataList[1].toUByte()
+                                val regSize = Global.regCon.registers.size
+                                val uAddr = packet.dataList[0].toUByte()
+                                val uVal = packet.dataList[1].toUByte()
                                 Global.regCon.setRegister(uAddr, uVal)
 
                                 if (rwAll) {
-                                    if (++rwIndex == Global.regCon.registers.size) {
+                                    //if (++rwIndex == Global.regCon.registers.size) {
+                                    if (++rwIndex == regSize) {
                                         rwAll = false
                                         runOnUiThread {
                                             displayAllRegisters()
@@ -334,6 +335,10 @@ class RegisterActivity : AppCompatActivity() {
                                         Packet.send(Global.outStream,
                                             PacketKind.RegSingleRead,
                                             Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
+                                    }
+                                    runOnUiThread {
+                                        pbRegister.progress =
+                                            ((rwIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
                                     }
                                 }
                                 //else {

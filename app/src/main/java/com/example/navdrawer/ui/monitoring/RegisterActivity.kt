@@ -202,8 +202,6 @@ class RegisterActivity : AppCompatActivity() {
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
                 Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
-                //Global.regCon.regAddrs[rwIndex].toByte()) // Send packet
-
         } catch (ex: Exception) {
             //val errStr = "Please enter correct address(HEX Format)."
             Log.d("[ADS] ", ex.message!!)
@@ -295,9 +293,10 @@ class RegisterActivity : AppCompatActivity() {
 //        btnWriteSingle.isEnabled = flag
     }
 
-    private fun displaySingleRegVal(value:ByteArray) {
-        etSingleAddr.setText(String.format("%02X", value[0]))
-        etSingleVal.setText(String.format("%02X", value[1]))
+    //private fun displaySingleRegVal(value:ByteArray) {
+    private fun displaySingleRegVal(addr:UByte, value:UByte) {
+        etSingleAddr.setText(String.format("%02X", addr.toByte()))
+        etSingleVal.setText(String.format("%02X", value.toByte()))
     }
 
     //---------------------------------------------------------------------------------------//
@@ -305,8 +304,8 @@ class RegisterActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------//
     inner class RegisterThread : Thread() {
         override fun run() {
-            var qEmpty :Boolean
-            var packet : RPacket
+            var qEmpty: Boolean
+            var packet: RPacket
 
             Log.d("[ADS] ", "Register thread started. ID : ${this.id}")
             while (regThreadOn) {
@@ -321,22 +320,11 @@ class RegisterActivity : AppCompatActivity() {
 
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> {
-
-                                var uAddr =  packet.dataList[0].toUByte()
+                                var uAddr = packet.dataList[0].toUByte()
                                 var uVal = packet.dataList[1].toUByte()
-//
-//                                var addr= String.format("%02X", uAddr.toByte())
-//                                var value=String.format("%02X", uVal.toByte())
-//                                Log.d("[ADS] ", "Addr $addr / Val : $value .")
-//
-                                var register:SingleRegister = Global.regCon.registers.filter { it.addr == uAddr }.single()
-                                register.value = uVal
+                                Global.regCon.setRegister(uAddr, uVal)
 
                                 if (rwAll) {
-
-                                    //Global.regCon.registers2[rwIndex][uAddr] = uVal
-
-
                                     if (++rwIndex == Global.regCon.registers.size) {
                                         rwAll = false
                                         runOnUiThread {
@@ -348,9 +336,10 @@ class RegisterActivity : AppCompatActivity() {
                                             Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
                                     }
                                 }
-                               // else{
+                                //else {
                                     runOnUiThread {
-                                        displaySingleRegVal(packet.dataList)
+                                        displaySingleRegVal(uAddr, uVal)
+                                        //displayAllRegisters()
                                     }
                                 //}
                             }

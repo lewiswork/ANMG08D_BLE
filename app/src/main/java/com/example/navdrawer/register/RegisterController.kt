@@ -1,5 +1,6 @@
 package com.example.navdrawer.register
 
+import com.example.navdrawer.Global
 import java.util.*
 
 class RegisterController {
@@ -20,15 +21,24 @@ class RegisterController {
         0x8Du, 0x8Eu, 0x8Fu, 0x90u, 0xA9u, 0xAAu)
 
     val registers = ArrayList<SingleRegister>()
-    val registers2 = ArrayList<HashMap<UByte, UByte>>()
 
     constructor() {
         for (ra in regAddrs) {
             registers.add(SingleRegister(ra))
-
-            val map = HashMap<UByte, UByte>()
-            map[ra] = 0u
-            registers2.add(map)
         }
+    }
+
+    fun setRegister(addr:UByte, value:UByte) {
+        val register = registers.single { it.addr == addr }
+        register.value = value
+    }
+
+    fun getRegister(addr:UByte):SingleRegister{
+        return registers.single { it.addr == addr }
+    }
+
+    fun getValue(addr:UByte):UByte{
+        val register = registers.single { it.addr == addr }
+        return register.value
     }
 }

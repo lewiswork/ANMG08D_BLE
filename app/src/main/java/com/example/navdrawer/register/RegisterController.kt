@@ -1,12 +1,12 @@
 package com.example.navdrawer.register
 
-import android.util.Log
+import java.util.*
 
 class RegisterController {
 
     // 108 registers
     //private val registerAddrs = ubyteArrayOf( // <- This declaration is experimental and its usage should be marked with '@kotlin.ExperimentalUnsignedTypes' or '@OptIn(kotlin.ExperimentalUnsignedTypes::class)'
-    private val registerAddrs: Array<UByte> = arrayOf(
+    val regAddrs: Array<UByte> = arrayOf(
         0x01u, 0x05u, 0x06u, 0x08u, 0x09u, 0x0Au, 0x0Bu, 0x0Cu, 0x0Du, 0x0Eu,
         0x0Fu, 0x10u, 0x11u, 0x12u, 0x13u, 0x14u, 0x15u, 0x16u, 0x17u, 0x18u,
         0x19u, 0x1Au, 0x1Bu, 0x21u, 0x34u, 0x35u, 0x36u, 0x37u, 0x38u, 0x39u,
@@ -22,10 +22,8 @@ class RegisterController {
     val registers = ArrayList<SingleRegister>()
     val registers2 = ArrayList<HashMap<UByte, UByte>>()
 
-
     constructor() {
-        //for (ra in registerAddrs) registers.add(SingleRegister(ra, 0u))
-        for (ra in registerAddrs) {
+        for (ra in regAddrs) {
             registers.add(SingleRegister(ra))
 
             val map = HashMap<UByte, UByte>()

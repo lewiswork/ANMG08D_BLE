@@ -1,41 +1,35 @@
 package com.example.navdrawer.ui.monitoring
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
-import java.lang.Exception
-import java.util.NoSuchElementException
 import kotlin.experimental.and
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var etSingleAddr:EditText
     private lateinit var etSingleVal:EditText
-
     private lateinit var btnReadSingle:Button
     private lateinit var btnWriteSingle:Button
     private lateinit var btnReadAllReg:Button
     private lateinit var btnWriteAllReg:Button
-
-
     private lateinit var btnClose:Button
-
     private lateinit var gridAllRegisters:GridView
-
     lateinit var tvStatus:TextView
 
     private var regThreadOn: Boolean = false
     private lateinit var regThread: RegisterThread
 
     private val dataListRegisters = ArrayList<HashMap<String, Any>>()   // -> Register Class 에 사용
+    //private val dataListRegisters = ArrayList<HashMap<UByte, UByte>>()   // -> Register Class 에 사용
 
     var rwIndex:Int=0
     var rwAll:Boolean=false
@@ -59,6 +53,7 @@ class RegisterActivity : AppCompatActivity() {
             map["value"] = String.format("%02X", r.value.toByte())
             dataListRegisters.add(map)
         }
+
         val keys = arrayOf("addr", "value")
         val ids = intArrayOf(R.id.tvRowSingleAddr, R.id.tvRowSingleVal)
 
@@ -201,6 +196,7 @@ class RegisterActivity : AppCompatActivity() {
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
                 Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
+                //Global.regCon.regAddrs[rwIndex].toByte()) // Send packet
 
         } catch (ex: Exception) {
             //val errStr = "Please enter correct address(HEX Format)."
@@ -320,7 +316,6 @@ class RegisterActivity : AppCompatActivity() {
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> {
                                 if (rwAll) {
-
                                     if (++rwIndex == Global.regCon.registers.size) {
                                         rwAll = false
                                     } else {

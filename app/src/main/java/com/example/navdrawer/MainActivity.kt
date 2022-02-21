@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        //for (r in Global.regCon.registers) Log.d("[ADS] ", r.toString())
-        for (r in Global.regCon.registers2) Log.d("[ADS] ", r.toString())
+        //Log.d("[ADS] ", Global.regCon.registers.toString())
+        Log.d("[ADS] ", Global.regCon.registers2.toString())
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

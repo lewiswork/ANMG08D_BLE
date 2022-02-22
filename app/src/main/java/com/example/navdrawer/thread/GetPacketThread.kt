@@ -2,6 +2,7 @@ package com.example.navdrawer.thread
 
 import android.content.Context
 import android.os.Environment
+import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
 import com.example.navdrawer.Global
@@ -9,6 +10,7 @@ import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.adlib.ADLog
 import com.example.navdrawer.adlib.LogKind
+import com.example.navdrawer.function.SystemLog
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
 import java.io.File
@@ -31,6 +33,16 @@ class GetPacketThread(context: Context):Thread() {
 
     var mmContext = context
 
+    // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
+//    val pathName = System.getProperty("java.io.tmpdir")
+//    lateinit var fileName:File
+
+// 향 후 적요 예정
+//    val log = ADLog("${pathname}/Log", "rx_packet",
+//        (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
+
+    lateinit var log : ADLog
+
     override fun run() {
         super.run()
 
@@ -41,6 +53,18 @@ class GetPacketThread(context: Context):Thread() {
         var dataLength : Int = 0
         var dataContents : ByteArray
         var checksum : Byte
+
+        var rxLog = SystemLog("system_log", "rx_packet.txt")
+
+//         var dir = File("$pathName/system_log")
+//        if(!dir.exists()){
+//            dir.mkdirs()
+//            Log.d("[ADS] ", "Folder created at $dir")
+//        }
+//        fileName = File("$dir/rx_packet.txt")
+
+//        log = ADLog("${pathName}/system_log", "rx_packet",
+//            (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
 
         Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
@@ -190,9 +214,9 @@ class GetPacketThread(context: Context):Thread() {
                                 }
                             }
                         }
-
                         prepareLog()
                         //logToFile(mmLogStr.toString())
+                        rxLog.print(mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
@@ -259,34 +283,34 @@ class GetPacketThread(context: Context):Thread() {
         //------------------------------------------------------------------------------//
     }
 
-    private fun logToFile(str:String) {
-        //------------------------------------------------------------------------------//
-        // 발췌 Packet Log 파일 저장
-        // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
-        //------------------------------------------------------------------------------//
-        // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
-        var pathname = System.getProperty("java.io.tmpdir")
-        var someFile = File("$pathname/some-file.txt")
-
-        // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
-        // 이미 파일이 존재할 경우 덮어쓰기로 저장
-        // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
-        try {
-            someFile.appendText("가나다라마바사")
-            someFile.appendText(str)
-            //Log.d("[ADS] ", "File saved at : $someFile")
-        } catch (e: FileNotFoundException) {
-            Log.d("[ADS] ", "FileNotFound: $someFile")
-        }
-        //------------------------------------------------------------------------------//
-
-//        // Lib test
-//        var LOG = ADLog("${pathname}/Log", "FileControlTest",
-//            (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
-//        ADLog.print(LogKind.Log, "[${this.javaClass.name}] ")
-//        Log.d("[ADS] ", "File saved at : $pathname")
-
-    }
+//    private fun logToFile(str:String) {
+//        //------------------------------------------------------------------------------//
+//        // 발췌 Packet Log 파일 저장
+//        // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
+//        //------------------------------------------------------------------------------//
+//        // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
+////        var pathname = System.getProperty("java.io.tmpdir")
+////        var someFile = File("$pathname/rx_packet.txt")
+////
+//        // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
+//        // 이미 파일이 존재할 경우 덮어쓰기로 저장
+//        // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
+//        try {
+//            //someFile.appendText("가나다라마바사")
+//            fileName.appendText("$str\n")
+//            Log.d("[ADS] ", "File saved at : $fileName")
+//        } catch (e: FileNotFoundException) {
+//            Log.d("[ADS] ", "FileNotFound: $fileName")
+//        }
+//        //------------------------------------------------------------------------------//
+//
+////        //------------------------------------------------------------------------------//
+////        // Lib test (향 후 적용 예정)
+////        //------------------------------------------------------------------------------//
+////        ADLog.print(LogKind.Log, str)
+////        Log.d("[ADS] ", "File saved at : $fileName")
+////        //------------------------------------------------------------------------------//
+//    }
 
     // writeTextData() method save the data into the file in byte format
     // It also toast a message "Done/filepath_where_the_file_is_saved"

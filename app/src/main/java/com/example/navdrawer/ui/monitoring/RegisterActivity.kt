@@ -17,6 +17,7 @@ import kotlin.experimental.and
 
 class RegisterActivity : AppCompatActivity() {
 
+    private lateinit var linearRegisterActivity: LinearLayout
     private lateinit var etSingleAddr: EditText
     private lateinit var etSingleVal: EditText
     private lateinit var btnReadSingle: Button
@@ -54,54 +55,6 @@ class RegisterActivity : AppCompatActivity() {
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onCreate")
     }
 
-    private fun displayAllRegisters() {
-        dataListRegisters.clear()
-
-        for (r in Global.regCon.registers) {
-            val map = HashMap<String, Any>()
-            map["addr"] = String.format("%02X", r.addr.toByte())
-            map["value"] = String.format("%02X", r.value.toByte())
-            dataListRegisters.add(map)
-        }
-
-        val keys = arrayOf("addr", "value")
-        val ids = intArrayOf(R.id.tvRowSingleAddr, R.id.tvRowSingleVal)
-
-        val adapter = SimpleAdapter(this, dataListRegisters, R.layout.row_register, keys, ids)
-        gridAllRegisters.adapter = adapter
-    }
-
-    private fun getControls() {
-        etSingleAddr = findViewById(R.id.etSingleAddr)
-        etSingleVal = findViewById(R.id.etSingleVal)
-
-        btnReadSingle = findViewById(R.id.btnReadSingle)
-        btnWriteSingle = findViewById(R.id.btnWriteSingle)
-        pbRegister = findViewById(R.id.pbRegister)
-        pbRegister.progress = 0
-        btnReadAllReg = findViewById(R.id.btnReadAllReg)
-        btnWriteAllReg = findViewById(R.id.btnWriteAllReg)
-        btnClose = findViewById(R.id.btnClose)
-
-        gridAllRegisters = findViewById(R.id.gridAllRegisters)
-
-        tvStatus = findViewById(R.id.tvStatusReg)
-    }
-
-    private fun setListeners() {
-
-        etSingleAddr.addTextChangedListener(listenerEtAddr)
-        etSingleVal.addTextChangedListener(listenerEtVal)
-
-        btnReadSingle.setOnClickListener(listenerReadSingle)
-        btnWriteSingle.setOnClickListener(listenerWriteSingle)
-        btnReadAllReg.setOnClickListener(listenerReadAll)
-        btnWriteAllReg.setOnClickListener(listenerWriteAll)
-        btnClose.setOnClickListener(listenerClose)
-
-        gridAllRegisters.setOnItemClickListener(listenerGridClick)
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -122,7 +75,67 @@ class RegisterActivity : AppCompatActivity() {
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onDestroy")
     }
 
-    val listenerEtAddr = object : TextWatcher {
+    private fun displayAllRegisters() {
+        dataListRegisters.clear()
+
+        for (r in Global.regCon.registers) {
+            val map = HashMap<String, Any>()
+            map["addr"] = String.format("%02X", r.addr.toByte())
+            map["value"] = String.format("%02X", r.value.toByte())
+            dataListRegisters.add(map)
+        }
+
+        val keys = arrayOf("addr", "value")
+        val ids = intArrayOf(R.id.tvRowSingleAddr, R.id.tvRowSingleVal)
+
+        val adapter = SimpleAdapter(this, dataListRegisters, R.layout.row_register, keys, ids)
+        gridAllRegisters.adapter = adapter
+    }
+
+    private fun getControls() {
+        linearRegisterActivity = findViewById(R.id.linearRegisterActivity)
+
+        etSingleAddr = findViewById(R.id.etSingleAddr)
+        etSingleVal = findViewById(R.id.etSingleVal)
+
+        btnReadSingle = findViewById(R.id.btnReadSingle)
+        btnWriteSingle = findViewById(R.id.btnWriteSingle)
+        pbRegister = findViewById(R.id.pbRegister)
+        pbRegister.progress = 0
+        btnReadAllReg = findViewById(R.id.btnReadAllReg)
+        btnWriteAllReg = findViewById(R.id.btnWriteAllReg)
+        btnClose = findViewById(R.id.btnClose)
+
+        gridAllRegisters = findViewById(R.id.gridAllRegisters)
+
+        tvStatus = findViewById(R.id.tvStatusReg)
+    }
+
+    private fun setListeners() {
+        linearRegisterActivity.setOnClickListener(listenerLinearRegOnClick)
+
+        etSingleAddr.addTextChangedListener(listenerEtAddr)
+        etSingleVal.addTextChangedListener(listenerEtVal)
+
+        btnReadSingle.setOnClickListener(listenerReadSingle)
+        btnWriteSingle.setOnClickListener(listenerWriteSingle)
+        btnReadAllReg.setOnClickListener(listenerReadAll)
+        btnWriteAllReg.setOnClickListener(listenerWriteAll)
+        btnClose.setOnClickListener(listenerClose)
+
+        gridAllRegisters.setOnItemClickListener(listenerGridClick)
+    }
+
+    private fun hideKeyboard(view:View) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private val listenerLinearRegOnClick = View.OnClickListener {
+        hideKeyboard(linearRegisterActivity)
+    }
+
+    private val listenerEtAddr = object : TextWatcher {
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         }
 
@@ -143,13 +156,11 @@ class RegisterActivity : AppCompatActivity() {
                 singleRegAddrValid = false
             } finally {
                 uSingleAddr = addr.toUByte()
-//                Log.d("[ADS] ", "Single addr has set :${String.format("%02X", addr)}")
-//                Log.d("[ADS] ", "Single addr valid :${singleRegAddrValid}")
             }
         }
     }
 
-    val listenerEtVal = object : TextWatcher {
+    private val listenerEtVal = object : TextWatcher {
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         }
 
@@ -177,8 +188,6 @@ class RegisterActivity : AppCompatActivity() {
                         displayAllRegisters()
                     }
                 }
-//                Log.d("[ADS] ", "Single val has set :${String.format("%02X", value)}")
-//                Log.d("[ADS] ", "Single val valid :${singleRegValueValid}")
             }
         }
     }
@@ -199,8 +208,7 @@ class RegisterActivity : AppCompatActivity() {
                 uSingleAddr.toByte()) // Send packet
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
+            hideKeyboard(etSingleAddr)
         }
     }
 
@@ -231,9 +239,8 @@ class RegisterActivity : AppCompatActivity() {
             btnReadSingle.requestFocus()
             btnWriteSingle.requestFocus()
 
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(etSingleAddr.windowToken, 0)
             displaySingleRegVal(uSingleAddr, uSingleVal)
+            hideKeyboard(etSingleAddr)
         }
     }
 
@@ -284,6 +291,7 @@ class RegisterActivity : AppCompatActivity() {
 
                     etSingleAddr.requestFocus()
                     etSingleVal.requestFocus()
+                    hideKeyboard(p0!!)
                 }
             }
         }
@@ -321,7 +329,7 @@ class RegisterActivity : AppCompatActivity() {
         btnWriteSingle.isEnabled = flag
         btnReadAllReg.isEnabled = flag
         btnWriteAllReg.isEnabled = flag
-        btnClose.isEnabled = flag
+        //btnClose.isEnabled = flag
     }
 
     private fun displaySingleRegVal(address: UByte, value: UByte) {
@@ -350,7 +358,10 @@ class RegisterActivity : AppCompatActivity() {
 
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> packetProcRegRead(packet)
-                            PacketKind.RegSingleWrite -> packetProcRegWrite()
+                            PacketKind.RegSingleWrite ->{
+                                packetProcRegWrite()
+                                //Thread.sleep(1)
+                            }
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
@@ -386,17 +397,17 @@ class RegisterActivity : AppCompatActivity() {
                     Packet.send(Global.outStream,
                         PacketKind.RegSingleRead,
                         Global.regCon.registers[regIndex].addr.toByte()) // Send packet
-                }
-                runOnUiThread {
-                    pbRegister.progress =
-                        ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+                    runOnUiThread {
+                        pbRegister.progress =
+                            ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+                    }
                 }
             } else {
                 runOnUiThread {
-                    displaySingleRegVal(uAddr, uVal)
                     if (Global.regCon.hasRegister(uAddr)) {
                         displayAllRegisters()
                     }
+                    displaySingleRegVal(uAddr, uVal)
                 }
             }
         }
@@ -417,10 +428,12 @@ class RegisterActivity : AppCompatActivity() {
                     ba[0] = Global.regCon.registers[regIndex].addr.toByte()
                     ba[1] = Global.regCon.registers[regIndex].value.toByte()
                     Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
-                }
-                runOnUiThread {
-                    pbRegister.progress =
-                        ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+
+                    runOnUiThread {
+                        pbRegister.progress =
+                            ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+                    }
+
                 }
             } else {
              //   runOnUiThread { }

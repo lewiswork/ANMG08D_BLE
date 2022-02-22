@@ -358,15 +358,21 @@ class RegisterActivity : AppCompatActivity() {
 
                         when (packet.kind) {
                             PacketKind.RegSingleRead -> packetProcRegRead(packet)
-                            PacketKind.RegSingleWrite ->{
+                            PacketKind.RegSingleWrite -> {
                                 packetProcRegWrite()
                                 //Thread.sleep(1)
                             }
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
+                        Global.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
+                    } catch (ex: java.lang.Exception) {
+                        Global.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", ex.message.toString())
+                        Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
+                        break
                     }
                 } else {
                     Thread.sleep(10)

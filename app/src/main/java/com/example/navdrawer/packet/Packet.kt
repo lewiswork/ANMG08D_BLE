@@ -1,8 +1,10 @@
 package com.example.navdrawer.packet
 
 import android.util.Log
+import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.function.SystemLog
 import java.io.OutputStream
 import java.lang.Exception
 import java.lang.StringBuilder
@@ -13,6 +15,8 @@ class Packet {
         const val STX: Byte = 0x02
         const val ETX: Byte = 0x03
         const val IDX_DATA_START : Int = 6
+
+
 
         val packetCategory = mapOf(
             "E" to PacketCategory.Rom,
@@ -178,8 +182,9 @@ class Packet {
             logTxPacket(ba)
         }
 
-        fun logTxPacket(ba: ByteArray) {
+        private fun logTxPacket(ba: ByteArray) {
             var logStr: StringBuilder = StringBuilder("")
+
             for (i in ba.indices) {
                 if (i == 0) {
                     // STX
@@ -197,6 +202,8 @@ class Packet {
                     logStr.append(" ETX")
                 }
             }
+
+            Global.txLog.print(logStr.toString())  // 임시, 향 후 Library 적용 예정
             Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }

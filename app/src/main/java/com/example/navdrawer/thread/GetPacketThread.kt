@@ -33,16 +33,6 @@ class GetPacketThread(context: Context):Thread() {
 
     var mmContext = context
 
-    // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
-//    val pathName = System.getProperty("java.io.tmpdir")
-//    lateinit var fileName:File
-
-// 향 후 적요 예정
-//    val log = ADLog("${pathname}/Log", "rx_packet",
-//        (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
-
-    lateinit var log : ADLog
-
     override fun run() {
         super.run()
 
@@ -53,18 +43,6 @@ class GetPacketThread(context: Context):Thread() {
         var dataLength : Int = 0
         var dataContents : ByteArray
         var checksum : Byte
-
-        var rxLog = SystemLog("system_log", "rx_packet.txt")
-
-//         var dir = File("$pathName/system_log")
-//        if(!dir.exists()){
-//            dir.mkdirs()
-//            Log.d("[ADS] ", "Folder created at $dir")
-//        }
-//        fileName = File("$dir/rx_packet.txt")
-
-//        log = ADLog("${pathName}/system_log", "rx_packet",
-//            (ADLog.LOGOUT_FLAG_LOG or ADLog.LOGOUT_FLAG_PKLOG))
 
         Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
@@ -86,11 +64,17 @@ class GetPacketThread(context: Context):Thread() {
                             mmRawByteList.add(rawByteArray[i])
                         }
                         //logRawByteArray(rawByteArray)
+                        //throw Exception("test exception")
                     } catch (ex: NoSuchElementException) {
+                        Global.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", Global.rawRxBytesQueue.count().toString())
                         Global.rawRxBytesQueue.clear()
                         continue
-                        //break
+                    } catch (ex: Exception) {
+                        Global.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", ex.message.toString())
+                        Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
+                        break
                     }
                 }
                 //------------------------------------------------------------------------------//
@@ -215,17 +199,17 @@ class GetPacketThread(context: Context):Thread() {
                             }
                         }
                         prepareLog()
-                        //logToFile(mmLogStr.toString())
-                        rxLog.print(mmLogStr.toString())
+                        Global.rxLog.print(mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
                     //------------------------------------------------------------------------------//
                 }
 
-            } catch (e: java.io.IOException) {
-                Log.d("[ADS/ERR] ", e.message.toString())
-                e.printStackTrace()
+            } catch (ex: java.io.IOException) {
+                Global.errLog.printError(ex)
+                Log.d("[ADS/ERR] ", ex.message.toString())
+                ex.printStackTrace()
                 break
                 //continue
             }

@@ -168,8 +168,14 @@ class JigFragment : Fragment() {
                             }
                         }
                     } catch (ex: NoSuchElementException) {
+                        Global.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
+                    } catch (ex: Exception) {
+                        Global.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", ex.message.toString())
+                        Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
+                        break
                     }
                 }
                 //------------------------------------------------------------------------------//

@@ -256,15 +256,20 @@ class MonitoringFragment : Fragment() {
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
+                        Global.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
+                    }catch (ex: Exception) {
+                        Global.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", ex.message.toString())
+                        Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
+                        break
                     }
                 } else {
                     Thread.sleep(10)
                 }
                 //------------------------------------------------------------------------------//
-
-                Thread.sleep(10)
+                //Thread.sleep(10)
             }
             Log.d("[ADS] ", "Display thread finished. ID : ${this.id}")
         }

@@ -3,6 +3,7 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import com.example.navdrawer.function.SystemLog
 import com.example.navdrawer.monitor.Monitoring
 import com.example.navdrawer.packet.RPacket
 import com.example.navdrawer.register.RegisterController
@@ -53,5 +54,9 @@ class Global {
         var waitForSwReset: Boolean = false // Jig 로부터 응답이 없을 시 Packet 재전송 목적
 
         var regCon: RegisterController = RegisterController()
+
+        var rxLog = SystemLog("system_log", "rx_packet.txt", "RX")
+        var txLog = SystemLog("system_log", "tx_packet.txt", "TX")
+        var errLog = SystemLog("system_log", "error.txt", "ERR", true)
     }
 }

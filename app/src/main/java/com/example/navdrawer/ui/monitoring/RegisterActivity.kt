@@ -34,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
     // Gridview 에 Register Display 시 사용
     private val dataListRegisters = ArrayList<HashMap<String, Any>>()   
 
-    var rwIndex: Int = 0
+    var regIndex: Int = 0
     var rwAll: Boolean = false
 
     var singleRegAddrValid: Boolean = false
@@ -184,7 +184,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private val listenerReadSingle = View.OnClickListener {
-        var errStr = ""
+        var errStr:String
 
         // Send Packet if all valid
         if (!singleRegAddrValid) {
@@ -205,7 +205,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private val listenerWriteSingle = View.OnClickListener {
-        var errStr = ""
+        var errStr :String
         val ba = ByteArray(2)
 
         // Send Packet if all valid
@@ -240,13 +240,13 @@ class RegisterActivity : AppCompatActivity() {
     private val listenerReadAll = View.OnClickListener {
         try {
             rwAll = true
-            rwIndex = 0
+            regIndex = 0
 
             setControlEnabled(false)
 
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
-                Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
+                Global.regCon.registers[regIndex].addr.toByte()) // Send packet
             pbRegister.progress = 0
         } catch (ex: Exception) {
             Log.d("[ADS] ", ex.message!!)
@@ -257,13 +257,13 @@ class RegisterActivity : AppCompatActivity() {
     private val listenerWriteAll = View.OnClickListener {
         try {
             rwAll = true
-            rwIndex = 0
+            regIndex = 0
 
             setControlEnabled(false)
 
             var ba = ByteArray(2)
-            ba[0] = Global.regCon.registers[rwIndex].addr.toByte()  // Address
-            ba[1] = Global.regCon.registers[rwIndex].value.toByte()  // Value
+            ba[0] = Global.regCon.registers[regIndex].addr.toByte()  // Address
+            ba[1] = Global.regCon.registers[regIndex].value.toByte()  // Value
 
             Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
             pbRegister.progress = 0
@@ -349,12 +349,8 @@ class RegisterActivity : AppCompatActivity() {
                         synchronized(Global.regQueue) { packet = Global.regQueue.remove() }
 
                         when (packet.kind) {
-                            PacketKind.RegSingleRead -> {
-                                packetProcRegSingleRead(packet)
-                            }
-                            PacketKind.RegSingleWrite -> {
-                                packetProcRegSingleWrite(packet)
-                            }
+                            PacketKind.RegSingleRead -> packetProcRegRead(packet)
+                            PacketKind.RegSingleWrite -> packetProcRegWrite()
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
@@ -369,7 +365,7 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("[ADS] ", "Register thread finished. ID : ${this.id}")
         }
 
-        private fun packetProcRegSingleRead(packet: RPacket) {
+        private fun packetProcRegRead(packet: RPacket) {
             val regSize = Global.regCon.registers.size
             val uAddr = packet.dataList[0].toUByte()
             val uVal = packet.dataList[1].toUByte()
@@ -379,7 +375,7 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             if (rwAll) {
-                if (++rwIndex == regSize) {
+                if (++regIndex == regSize) {
                     rwAll = false
                     runOnUiThread {
                         displayAllRegisters()
@@ -389,11 +385,11 @@ class RegisterActivity : AppCompatActivity() {
                 } else {
                     Packet.send(Global.outStream,
                         PacketKind.RegSingleRead,
-                        Global.regCon.registers[rwIndex].addr.toByte()) // Send packet
+                        Global.regCon.registers[regIndex].addr.toByte()) // Send packet
                 }
                 runOnUiThread {
                     pbRegister.progress =
-                        ((rwIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+                        ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
                 }
             } else {
                 runOnUiThread {
@@ -405,12 +401,12 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        private fun packetProcRegSingleWrite(packet: RPacket) {
+        private fun packetProcRegWrite() {
             val regSize = Global.regCon.registers.size
             val ba = ByteArray(2)
 
             if (rwAll) {
-                if (++rwIndex == regSize) {
+                if (++regIndex == regSize) {
                     rwAll = false
                     runOnUiThread {
                         displayAllRegisters()
@@ -418,13 +414,13 @@ class RegisterActivity : AppCompatActivity() {
                         setControlEnabled(true)
                     }
                 } else {
-                    ba[0] = Global.regCon.registers[rwIndex].addr.toByte()
-                    ba[1] = Global.regCon.registers[rwIndex].value.toByte()
+                    ba[0] = Global.regCon.registers[regIndex].addr.toByte()
+                    ba[1] = Global.regCon.registers[regIndex].value.toByte()
                     Packet.send(Global.outStream, PacketKind.RegSingleWrite, ba) // Send packet
                 }
                 runOnUiThread {
                     pbRegister.progress =
-                        ((rwIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
+                        ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
                 }
             } else {
              //   runOnUiThread { }

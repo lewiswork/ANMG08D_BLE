@@ -15,6 +15,7 @@ import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentMonitoringBinding
 import com.example.navdrawer.packet.Packet
+import com.example.navdrawer.packet.RPacket
 import java.lang.Exception
 import java.text.DecimalFormat
 import kotlin.experimental.and
@@ -157,6 +158,7 @@ class MonitoringFragment : Fragment() {
         binding.swTouch.isEnabled = flag
         binding.swPercent.isEnabled = flag
         binding.btnClearMon.isEnabled = flag
+        binding.btnSwReset.isEnabled = flag
     }
 
     private fun setListeners() {
@@ -164,6 +166,7 @@ class MonitoringFragment : Fragment() {
         binding.swPercent.setOnClickListener(listenerOnClick)
         binding.btnClearMon.setOnClickListener(listenerOnClick)
         binding.btnRegister.setOnClickListener(listenerBtnRegClick)
+        binding.btnSwReset.setOnClickListener(listenerSwReset)
     }
 
     private val listenerOnClick = View.OnClickListener {
@@ -185,8 +188,6 @@ class MonitoringFragment : Fragment() {
                     Global.waitForStopMon = true
                 }
             }
-            //binding.textView8.text = mask.toString()    // for debugging
-
         } catch (ex: Exception) {
             Log.d("[ADS] ", "Making packet error! / ${ex.message}")
         }
@@ -202,14 +203,17 @@ class MonitoringFragment : Fragment() {
             }
     }
 
+    private val listenerSwReset = View.OnClickListener {
+        Packet.send(Global.outStream, PacketKind.RegSwReset) // Send packet
+        Global.waitForSwReset=true
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == REGISTER_ACTIVYTY){
-            if (resultCode == Activity.RESULT_OK){
-
-            }else if (resultCode == Activity.RESULT_CANCELED) {
-
+        if (requestCode == REGISTER_ACTIVYTY) {
+            if (resultCode == Activity.RESULT_OK) {
+            } else if (resultCode == Activity.RESULT_CANCELED) {
             }
         }
     }
@@ -228,23 +232,56 @@ class MonitoringFragment : Fragment() {
         override fun run() {
     //inner class DisplayThread : ADThread() { // AD Lib 사용 테스트 -> Compile Error, 추후 재 테스트 예정
         //override fun doWork() {
+            var qEmpty:Boolean
+            var packet: RPacket
+
             Log.d("[ADS] ", "Display thread started. ID : ${this.id}")
             while (displayThreadOn) {
-                if (Global.monitoring.hasNewData) {
-                    // -------------------------------------------------------------------------//
-                    // Display Touch and Percent(임시)
-                    // -------------------------------------------------------------------------//
-                    activity?.runOnUiThread {
-                        updateMonData()
-                        if (Global.waitForStopMon) stopMonitoring()
-                    }
-                    // -------------------------------------------------------------------------//
+                monitoring()
 
-                    Global.monitoring.hasNewData = false
+                // SW Reset Packet 미응답 시, 재 전송
+                if (Global.waitForSwReset) Packet.send(Global.outStream, PacketKind.RegSwReset) // Send packet
+
+                //------------------------------------------------------------------------------//
+                // Packet 처리
+                //------------------------------------------------------------------------------//
+                synchronized(Global.regQueue) { qEmpty = Global.regQueue.isEmpty() }
+
+                if (!qEmpty) {
+                    try {
+                        synchronized(Global.regQueue) { packet = Global.regQueue.remove() }
+
+                        when (packet.kind) {
+                            PacketKind.RegSwReset ->Log.d("[ADS] ", "SW reset done.")
+                            else -> {}    // Do nothing
+                        }
+                    } catch (ex: NoSuchElementException) {
+                        Log.d("[ADS/ERR] ", ex.toString())
+                        continue
+                    }
+                } else {
+                    Thread.sleep(10)
                 }
+                //------------------------------------------------------------------------------//
+
                 Thread.sleep(10)
             }
             Log.d("[ADS] ", "Display thread finished. ID : ${this.id}")
+        }
+
+        private fun monitoring() {
+            if (Global.monitoring.hasNewData) {
+                // -------------------------------------------------------------------------//
+                // Display Touch and Percent(임시)
+                // -------------------------------------------------------------------------//
+                activity?.runOnUiThread {
+                    updateMonData()
+                    if (Global.waitForStopMon) stopMonitoring()
+                }
+                // -------------------------------------------------------------------------//
+
+                Global.monitoring.hasNewData = false
+            }
         }
     }
 }

@@ -178,6 +178,11 @@ class GetPacketThread(context: Context):Thread() {
                                 synchronized(Global.regQueue) {
                                     Global.regQueue.add(pk)
                                 }
+
+                                if (kind == PacketKind.RegSwReset && Global.waitForSwReset) {
+                                    Global.waitForSwReset = false
+                                    Log.d("[ADS] ", "RI response")
+                                }
                             }
                             PacketCategory.Test -> {
                                 synchronized(Global.testQueue) {

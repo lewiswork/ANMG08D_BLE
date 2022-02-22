@@ -105,6 +105,17 @@
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
+        <Button
+            android:id="@+id/btnSwReset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:layout_weight="1"
+            android:paddingVertical="10dp"
+            android:text="SW Reset"
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
         <TextView
             android:id="@+id/tvStatusMonFrag"
             android:layout_width="match_parent"

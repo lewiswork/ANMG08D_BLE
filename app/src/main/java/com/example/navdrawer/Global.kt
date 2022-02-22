@@ -16,7 +16,7 @@ enum class PacketCategory{ Rom, Monitoring, Register, Hardware, Test }
 enum class PacketKind{
     HwRead, HwWrite,
     MonSet, MonTouch, MonPercent,
-    RegSingleRead, RegSingleWrite
+    RegSingleRead, RegSingleWrite, RegSwReset
 }
 
 class Global {
@@ -48,7 +48,9 @@ class Global {
 
         var hwStat: Byte = 0x00
         var hwStatPrev: Byte = 0x00
-        var waitForStopMon: Boolean = false
+
+        var waitForStopMon: Boolean = false // Jig 로부터 응답이 없을 시 Packet 재전송 목적
+        var waitForSwReset: Boolean = false // Jig 로부터 응답이 없을 시 Packet 재전송 목적
 
         var regCon: RegisterController = RegisterController()
     }

@@ -106,77 +106,84 @@
 
     </GridView>
 
-    <ProgressBar
-        android:id="@+id/pbRegister"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:max="100"
-        android:progress="50"
-        android:progressTint="@color/design_default_color_primary" />
-
     <LinearLayout
+        android:id="@+id/linearWrapperBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+<!--        android:windowSoftInputMode="stateHidden|adjustPan">-->
 
-        <Button
-            android:id="@+id/btnReadAllReg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:layout_weight="1"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp"
-            android:text="Read All"
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-        <Button
-            android:id="@+id/btnWriteAllReg"
-            android:layout_width="wrap_content"
+        <ProgressBar
+            android:id="@+id/pbRegister"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:layout_weight="1"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="10dp"
-            android:text="Write All"
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:max="100"
+            android:progress="50"
+            android:progressTint="@color/design_default_color_primary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnReadAllReg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_weight="1"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="Read All"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+            <Button
+                android:id="@+id/btnWriteAllReg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_weight="1"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="Write All"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnClose"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_weight="1"
+                android:paddingVertical="10dp"
+                android:text="Close"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:layout_editor_absoluteY="0dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/tvStatusReg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="15dp"
+            android:text="Status(Register Activity)"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
     </LinearLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1">
-
-        <Button
-            android:id="@+id/btnClose"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:layout_weight="1"
-            android:paddingVertical="10dp"
-            android:text="Close"
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="0dp" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/tvStatusReg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="15dp"
-        android:text="Status(Register Activity)"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
 </LinearLayout>

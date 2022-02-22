@@ -23,10 +23,18 @@
         android:label="@string/menu_jig"
         tools:layout="@layout/fragment_jig" />
 
+<!--    Fragment 추가 시 아래 <fragment/> 추가 필요-->
+
     <fragment
         android:id="@+id/nav_monitoring"
         android:name="com.example.navdrawer.ui.monitoring.MonitoringFragment"
         android:label="@string/menu_monitoring"
         tools:layout="@layout/fragment_monitoring" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.example.navdrawer.ui.settings.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
 
 </navigation>

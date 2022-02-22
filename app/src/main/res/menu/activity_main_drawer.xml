@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,11 +16,11 @@
             android:id="@+id/nav_jig"
             android:title="@string/menu_jig" />
         <item
-            android:id="@+id/nav_register"
-            android:title="@string/menu_register" />
-        <item
             android:id="@+id/nav_monitoring"
             android:title="@string/menu_monitoring" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="@string/settings" />
         <item
             android:id="@+id/nav_help"
             android:title="@string/menu_help" />

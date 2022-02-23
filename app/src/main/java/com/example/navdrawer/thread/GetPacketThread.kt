@@ -1,20 +1,15 @@
 package com.example.navdrawer.thread
 
 import android.content.Context
-import android.os.Environment
-import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.adlib.ADLog
-import com.example.navdrawer.adlib.LogKind
-import com.example.navdrawer.function.SystemLog
+import com.example.navdrawer.function.PacketType
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -56,7 +51,6 @@ class GetPacketThread(context: Context):Thread() {
 
                 if (!qEmpty) {
                     try {
-                        //synchronized(this) { rawByteArray = Global.rawRxBytesQueue.remove() }
                         synchronized(Global.rawRxBytesQueue) { rawByteArray = Global.rawRxBytesQueue.remove() }
 
                         var len = rawByteArray.count()
@@ -64,7 +58,6 @@ class GetPacketThread(context: Context):Thread() {
                             mmRawByteList.add(rawByteArray[i])
                         }
                         //logRawByteArray(rawByteArray)
-                        //throw Exception("test exception")
                     } catch (ex: NoSuchElementException) {
                         Global.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", Global.rawRxBytesQueue.count().toString())
@@ -176,7 +169,6 @@ class GetPacketThread(context: Context):Thread() {
                                     synchronized(Global.hwStat) {
                                         Global.hwStat = dataContents[0]
                                     }
-                                    //Log.d("[ADS] ", "Relay Value is: ${Global.hwStat}")
                                 }
                                 synchronized(Global.hwQueue) {
                                     Global.hwQueue.add(pk)
@@ -199,7 +191,9 @@ class GetPacketThread(context: Context):Thread() {
                             }
                         }
                         prepareLog()
-                        Global.rxLog.print(mmLogStr.toString())
+
+                        // 임시, 향 후 Library 적용 예정
+                        Global.packetLog.printPacket(PacketType.RX, mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }

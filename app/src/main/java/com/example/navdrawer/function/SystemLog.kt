@@ -11,6 +11,8 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+enum class PacketType{RX, TX}
+
 class SystemLog {
     private val basePath: String = System.getProperty("java.io.tmpdir")
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
@@ -22,8 +24,8 @@ class SystemLog {
     
     var isEnabled:Boolean=false
 
-    constructor(pathName: String, fileName: String) {
-        var dir = File("${basePath}/$pathName")
+    constructor(folderName: String, fileName: String) {
+        var dir = File("${basePath}/$folderName")
         if (!dir.exists()) {
             dir.mkdirs()
             Log.d("[ADS] ", "Folder created at $dir")
@@ -31,8 +33,18 @@ class SystemLog {
         file = File("$dir/$fileName")
     }
 
-    constructor(pathName: String, fileName: String, prefix: String) {
-        var dir = File("${basePath}/$pathName")
+    constructor(folderName: String, fileName: String, enabled: Boolean) {
+        var dir = File("${basePath}/$folderName")
+        if (!dir.exists()) {
+            dir.mkdirs()
+            Log.d("[ADS] ", "Folder created at $dir")
+        }
+        file = File("$dir/$fileName")
+        this.isEnabled = enabled
+    }
+
+    constructor(folderName: String, fileName: String, prefix: String) {
+        var dir = File("${basePath}/$folderName")
         if (!dir.exists()) {
             dir.mkdirs()
             Log.d("[ADS] ", "Folder created at $dir")
@@ -41,8 +53,8 @@ class SystemLog {
         this.prefix = "[$prefix]"
     }
 
-    constructor(pathName: String, fileName: String, prefix: String, enabled:Boolean) {
-        var dir = File("${basePath}/$pathName")
+    constructor(folderName: String, fileName: String, prefix: String, enabled:Boolean) {
+        var dir = File("${basePath}/$folderName")
         if (!dir.exists()) {
             dir.mkdirs()
             Log.d("[ADS] ", "Folder created at $dir")
@@ -55,13 +67,29 @@ class SystemLog {
     fun print(str: String) {
         if (isEnabled) {
             val current = LocalDateTime.now()
-            //val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-            val formatted = current.format(formatter)
+            val formatted = current.format(formatter)   //"yyyy-MM-dd HH:mm:ss.SSS"
 
             // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
             // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
             try {
                 file.appendText("[$formatted] $prefix $str\n")
+                Log.d("[ADS] ", "Log saved at $file")
+            } catch (e: FileNotFoundException) {
+                Log.d("[ADS] ", "FileNotFound: $file")
+            }
+        }
+    }
+
+    fun printPacket(type:PacketType, str: String) {
+        if (isEnabled) {
+            val current = LocalDateTime.now()
+            val formatted = current.format(formatter)   //"yyyy-MM-dd HH:mm:ss.SSS"
+
+            // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
+            // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
+            try {
+                file.appendText("[$formatted] [$type] $str\n")
+                Log.d("[ADS] ", "Log saved at $file")
             } catch (e: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
             }
@@ -69,16 +97,15 @@ class SystemLog {
     }
 
     fun printError(ex: Exception) {
-        var now = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-            .withZone(ZoneOffset.UTC)
-            .format(Instant.now())
+        val current = LocalDateTime.now()
+        val formatted = current.format(formatter)   //"yyyy-MM-dd HH:mm:ss.SSS"
 
         // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
         // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
         try {
-            file.appendText("[$now] $prefix ${ex.message}\n")
-            file.appendText("[$now] $prefix ${ex.printStackTrace().toString()}\n")
+            file.appendText("[$formatted] $prefix ${ex.message}\n")
+            file.appendText("[$formatted] $prefix ${ex.printStackTrace()}\n")
+            Log.d("[ADS] ", "Log saved at $file")
         } catch (e: FileNotFoundException) {
             Log.d("[ADS] ", "FileNotFound: $file")
         }

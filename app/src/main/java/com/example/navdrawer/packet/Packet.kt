@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.function.PacketType
 import com.example.navdrawer.function.SystemLog
 import java.io.OutputStream
 import java.lang.Exception
@@ -203,7 +204,7 @@ class Packet {
                 }
             }
 
-            Global.txLog.print(logStr.toString())  // 임시, 향 후 Library 적용 예정
+            Global.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
             Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }

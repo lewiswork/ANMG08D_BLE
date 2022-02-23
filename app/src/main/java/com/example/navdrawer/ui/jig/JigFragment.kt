@@ -52,16 +52,13 @@ class JigFragment : Fragment() {
         super.onPause()
         timer!!.cancel()
 
-        Log.d("[ADS] ", "Jig Fragment > onPause > Timer canceled : $timer")
+        Log.d("[ADS] ", "Jig Fragment > onPause > Timer stopped : $timer")
     }
 
     override fun onResume() {
         super.onResume()
 
         checkConnections()        // BT 연결상태 별 초기화 처리
-
-        //timer = kotlin.concurrent.timer(initialDelay = 1000, period = 1000 ) {
-        //timer = kotlin.concurrent.timer(period = 1000 ) {
         timer = kotlin.concurrent.timer(period = 1000) {
             tick = true
         }

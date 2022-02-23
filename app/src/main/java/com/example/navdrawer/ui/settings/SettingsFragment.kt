@@ -6,8 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
+import com.example.navdrawer.R
 import com.example.navdrawer.databinding.FragmentSettingsBinding
 import com.example.navdrawer.packet.Packet
 import java.lang.Exception
@@ -34,6 +37,7 @@ class SettingsFragment : Fragment() {
         setControlStatus()
 
         Log.d("[ADS] ", "SettingsFragment > onCreateView")
+
         return root
     }
 
@@ -69,4 +73,5 @@ class SettingsFragment : Fragment() {
             Log.d("[ADS]", "${ex.message}")
         }
     }
+
 }

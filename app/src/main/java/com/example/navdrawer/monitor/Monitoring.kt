@@ -1,6 +1,5 @@
 package com.example.navdrawer.monitor
 
-import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.function.Function
@@ -27,11 +26,22 @@ class Monitoring {
     val BIT_RESOLUTION = 0.1
     val SENSE_LOOP = 13 // 임시, 강제값 사용
 
-    var mmChData : ArrayList<ChannelData> = ArrayList()
+    var channels : ArrayList<ChannelData> = ArrayList()
     var hasNewData = false
 
     constructor() {
-        for (i in 0 until MAX_CH_CNT) mmChData.add(ChannelData())
+        //for (i in 0 until TCH_CH_CNT) {
+        for (i in 0 until MAX_CH_CNT) {
+            channels.add(ChannelData())
+
+            if (Global.touchLog != null)
+                Global.touchLog.headerText += " CH${i+1}"
+//            if (i == DM_CH_IDX) {
+//                Global.touchLog.headerText += " DM"
+//            } else {
+//                Global.touchLog.headerText += " CH$i"
+//            }
+        }
     }
 
     fun updateMonData(
@@ -47,11 +57,20 @@ class Monitoring {
     }
 
     private fun setTouch(touch: Byte) {
-        var booleanArray = Function.byteToBooleanArray(touch, TCH_CH_CNT)
+        var boolArray = Function.byteToBooleanArray(touch, TCH_CH_CNT)
 
-        //synchronized(this) {
-        synchronized(mmChData) {
-            for (i in booleanArray.indices) mmChData[i].touch = booleanArray[i]
+        synchronized(channels) {
+            for (i in boolArray.indices) channels[i].touch = boolArray[i]
+        }
+
+        if (Global.touchLog.isEnabled) {
+            var str = ""
+            for (i in 0 until MAX_CH_CNT) {
+                synchronized(channels) {
+                    str += if (channels[i].touch) " 1" else " 0"
+                }
+            }
+            Global.touchLog.printMonData(str)
         }
     }
 
@@ -68,8 +87,8 @@ class Monitoring {
 
             dPercent = iPercent.toDouble() / SENSE_LOOP.toDouble() * BIT_RESOLUTION
 
-            synchronized(mmChData) {
-                mmChData[ch].percent = dPercent
+            synchronized(channels) {
+                channels[ch].percent = dPercent
             }
         }
         //Log.d("[ADS] ", "Percent set : CH$ch / ${dPercent.toString()} %")

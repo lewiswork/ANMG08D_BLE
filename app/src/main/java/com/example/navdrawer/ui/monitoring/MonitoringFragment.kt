@@ -114,11 +114,11 @@ class MonitoringFragment : Fragment() {
         for (i in 0 until Global.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]
-            synchronized(Global.monitoring.mmChData) {
+            synchronized(Global.monitoring.channels) {
                 map["img"] =
-                    if (Global.monitoring.mmChData[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+                    if (Global.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
                 //var percent = Global.monitoring.mmChData[i].percent
-                percent = Global.monitoring.mmChData[i].percent
+                percent = Global.monitoring.channels[i].percent
             }
             var df = DecimalFormat("0.000")
             var perStr = df.format(percent)

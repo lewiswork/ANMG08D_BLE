@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import com.example.navdrawer.function.LogParent
+import com.example.navdrawer.function.log.MonitoringLog
 import com.example.navdrawer.function.log.SystemLog
 import com.example.navdrawer.monitor.Monitoring
 import com.example.navdrawer.packet.RPacket
@@ -24,7 +25,7 @@ enum class PacketKind{
 class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
-        val monitoring = Monitoring()
+
 
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
@@ -56,11 +57,13 @@ class Global {
 
         var regCon: RegisterController = RegisterController()
 
-        //var packetLog = SystemLog("system_log", "packet.txt", true)
-
         //        var packetLog = LogParent("system_log", "packet.txt")
 //        var errLog = LogParent("system_log", "error.txt", "ERR", true)
-        var packetLog = SystemLog("system_log", "packet.txt")
-        var errLog = SystemLog("system_log", "error.txt", "ERR", true)
+        var packetLog = SystemLog("system", "packet.txt")
+        var errLog = SystemLog("system", "error.txt", "ERR", true)
+
+        //var touchLog = MonitoringLog("monitoring", "touch.txt")
+        var touchLog = MonitoringLog("monitoring", "touch.txt", true)
+        val monitoring = Monitoring()   // Touch Log 객체 생성 이후에 생성
     }
 }

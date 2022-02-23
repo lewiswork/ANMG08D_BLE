@@ -6,7 +6,7 @@ import android.widget.Toast
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.function.PacketType
+import com.example.navdrawer.function.log.PacketType
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
 import java.io.File

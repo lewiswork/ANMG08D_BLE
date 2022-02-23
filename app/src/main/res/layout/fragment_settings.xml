@@ -25,7 +25,7 @@
         android:paddingLeft="5dp" />
 
     <Switch
-        android:id="@+id/swSystemLog"
+        android:id="@+id/swSysLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"
@@ -37,7 +37,7 @@
         android:textSize="24sp" />
 
     <Switch
-        android:id="@+id/swMonitoringLog"
+        android:id="@+id/swMonLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"

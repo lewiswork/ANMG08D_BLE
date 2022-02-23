@@ -3,7 +3,8 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import com.example.navdrawer.function.SystemLog
+import com.example.navdrawer.function.LogParent
+import com.example.navdrawer.function.log.SystemLog
 import com.example.navdrawer.monitor.Monitoring
 import com.example.navdrawer.packet.RPacket
 import com.example.navdrawer.register.RegisterController
@@ -56,6 +57,9 @@ class Global {
         var regCon: RegisterController = RegisterController()
 
         //var packetLog = SystemLog("system_log", "packet.txt", true)
+
+        //        var packetLog = LogParent("system_log", "packet.txt")
+//        var errLog = LogParent("system_log", "error.txt", "ERR", true)
         var packetLog = SystemLog("system_log", "packet.txt")
         var errLog = SystemLog("system_log", "error.txt", "ERR", true)
     }

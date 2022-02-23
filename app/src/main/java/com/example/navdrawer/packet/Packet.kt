@@ -4,8 +4,7 @@ import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketCategory
 import com.example.navdrawer.PacketKind
-import com.example.navdrawer.function.PacketType
-import com.example.navdrawer.function.SystemLog
+import com.example.navdrawer.function.log.PacketType
 import java.io.OutputStream
 import java.lang.Exception
 import java.lang.StringBuilder

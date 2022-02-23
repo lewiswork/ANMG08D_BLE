@@ -55,8 +55,8 @@ class Global {
 
         var regCon: RegisterController = RegisterController()
 
-        var packetLog = SystemLog("system_log", "packet.txt", true)
-        //var txLog = SystemLog("system_log", "tx_packet.txt", "TX", true)
+        //var packetLog = SystemLog("system_log", "packet.txt", true)
+        var packetLog = SystemLog("system_log", "packet.txt")
         var errLog = SystemLog("system_log", "error.txt", "ERR", true)
     }
 }

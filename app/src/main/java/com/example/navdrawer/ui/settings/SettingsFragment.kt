@@ -29,7 +29,10 @@ class SettingsFragment : Fragment() {
     ): View? {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
         setListeners()          // Listener 등록
+        setControlStatus()
+
         Log.d("[ADS] ", "SettingsFragment > onCreateView")
         return root
     }
@@ -46,15 +49,17 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setControlStatus() {
-        binding.swMonitoringLog.setOnClickListener(listenerSwitches)
+        binding.swSystemLog.isChecked = Global.packetLog.isEnabled
     }
 
     private val listenerSwitches = View.OnClickListener {
-
         try {
             when (it) {
                 binding.swSystemLog -> {
-                    Log.d("[ADS] ", "Sw status : ${binding.swSystemLog.isChecked}")
+                    Global.packetLog.isEnabled = binding.swSystemLog.isChecked
+                    val str = if (binding.swSystemLog.isChecked) "enabled" else "disabled"
+                    Log.d("[ADS] ", "System log $str")
+                    binding.tvStatusSettingsFrag.text ="System log $str."
                 }
                 binding.swMonitoringLog -> {
                     Log.d("[ADS] ", "Sw status : ${binding.swMonitoringLog.isChecked}")

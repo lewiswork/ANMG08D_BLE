@@ -20,8 +20,6 @@ class SystemLog {
     lateinit var dir: File
     lateinit var file: File
     var prefix: String = ""
-
-    
     var isEnabled:Boolean=false
 
     constructor(folderName: String, fileName: String) {

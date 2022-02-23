@@ -34,13 +34,9 @@ class Monitoring {
         for (i in 0 until MAX_CH_CNT) {
             channels.add(ChannelData())
 
-            if (Global.touchLog != null)
+            if (Global.touchLog != null && i < TCH_CH_CNT){
                 Global.touchLog.headerText += " CH${i+1}"
-//            if (i == DM_CH_IDX) {
-//                Global.touchLog.headerText += " DM"
-//            } else {
-//                Global.touchLog.headerText += " CH$i"
-//            }
+            }
         }
     }
 
@@ -65,7 +61,8 @@ class Monitoring {
 
         if (Global.touchLog.isEnabled) {
             var str = ""
-            for (i in 0 until MAX_CH_CNT) {
+            //for (i in 0 until MAX_CH_CNT) {
+            for (i in 0 until TCH_CH_CNT) {
                 synchronized(channels) {
                     str += if (channels[i].touch) " 1" else " 0"
                 }

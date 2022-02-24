@@ -58,16 +58,22 @@ class SettingsFragment : Fragment() {
 
     private val listenerSwitches = View.OnClickListener {
         try {
+            val str:String
             when (it) {
                 binding.swSysLog -> {
                     Global.packetLog.isEnabled = binding.swSysLog.isChecked
-                    val str = if (binding.swSysLog.isChecked) "enabled" else "disabled"
+                     str = if (binding.swSysLog.isChecked) "enabled" else "disabled"
                     Log.d("[ADS] ", "System log $str")
                     binding.tvStatusSettingsFrag.text ="System log $str." 
                 }
                 binding.swMonLog -> {
-                    Log.d("[ADS] ", "Sw status : ${binding.swMonLog.isChecked}")
+                    Global.touchLog.isEnabled = binding.swMonLog.isChecked
+                    Global.percentLog.isEnabled = binding.swMonLog.isChecked
+                     str = if (binding.swMonLog.isChecked) "enabled" else "disabled"
+                    Log.d("[ADS] ", "Monitoring log $str")
+                    binding.tvStatusSettingsFrag.text ="Monitoring log $str."
                 }
+                else->{}
             }
         } catch (ex: Exception) {
             Log.d("[ADS]", "${ex.message}")

@@ -73,11 +73,10 @@ class Monitoring {
         logMonData()
     }
 
-    private fun logMonData(logStr: String) {
+    private fun logMonData() {
         var logStr :String
 
         // Touch Log
-        var logStr = logStr
         if (Global.touchLog.isEnabled) {
             logStr = ""
             for (i in 0 until TCH_CH_CNT) {

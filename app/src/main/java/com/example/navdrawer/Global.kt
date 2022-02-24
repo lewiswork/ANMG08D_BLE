@@ -57,14 +57,14 @@ class Global {
 
         var regCon: RegisterController = RegisterController()
 
-        //        var packetLog = LogParent("system_log", "packet.txt")
-//        var errLog = LogParent("system_log", "error.txt", "ERR", true)
+        // System Logs
         var packetLog = SystemLog("system", "packet.txt")
         var errLog = SystemLog("system", "error.txt", "ERR", true)
 
-        //var touchLog = MonitoringLog("monitoring", "touch.txt")
-        var touchLog = MonitoringLog("monitoring", "touch.txt", true)
-        var percentLog = MonitoringLog("monitoring", "percent.txt", true)
+        // Monitoring Logs
+        var touchLog = MonitoringLog("monitoring", "touch.txt")
+        var percentLog = MonitoringLog("monitoring", "percent.txt")
+
         val monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
     }
 }

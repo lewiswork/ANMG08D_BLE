@@ -14,48 +14,42 @@ import java.util.*
 open class LogParent {
     private val basePath: String = System.getProperty("java.io.tmpdir")
     open val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    open var file: File
+    open lateinit var file: File
     var prefix: String = ""
     var isEnabled:Boolean=false
 
+    open var folderName:String=""
+    open var fileName:String=""
+
     constructor(folderName: String, fileName: String) {
-        var dir = File("${basePath}/$folderName")
-        if (!dir.exists()) {
-            dir.mkdirs()
-            Log.d("[ADS] ", "Folder created at $dir")
-        }
-        file = File("$dir/$fileName")
+        createFile(folderName, fileName)
     }
 
     constructor(folderName: String, fileName: String, enabled: Boolean) {
-        var dir = File("${basePath}/$folderName")
-        if (!dir.exists()) {
-            dir.mkdirs()
-            Log.d("[ADS] ", "Folder created at $dir")
-        }
-        file = File("$dir/$fileName")
+        createFile(folderName, fileName)
         this.isEnabled = enabled
     }
 
     constructor(folderName: String, fileName: String, prefix: String) {
-        var dir = File("${basePath}/$folderName")
-        if (!dir.exists()) {
-            dir.mkdirs()
-            Log.d("[ADS] ", "Folder created at $dir")
-        }
-        this.file = File("$dir/$fileName")
+        createFile(folderName, fileName)
         this.prefix = "[$prefix]"
     }
 
     constructor(folderName: String, fileName: String, prefix: String, enabled:Boolean) {
+        createFile(folderName, fileName)
+        this.prefix = "[$prefix]"
+        this.isEnabled = enabled
+    }
+
+    fun createFile(folderName: String, fileName: String) {
+        this.folderName=folderName
+        this.fileName=fileName
         var dir = File("${basePath}/$folderName")
         if (!dir.exists()) {
             dir.mkdirs()
             Log.d("[ADS] ", "Folder created at $dir")
         }
-        this.file = File("$dir/$fileName")
-        this.prefix = "[$prefix]"
-        this.isEnabled = enabled
+        file = File("$dir/$fileName")
     }
 
     fun print(str: String) {

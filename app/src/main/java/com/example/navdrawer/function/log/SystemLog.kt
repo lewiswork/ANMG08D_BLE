@@ -1,6 +1,7 @@
 package com.example.navdrawer.function.log
 
 import android.util.Log
+import com.example.navdrawer.Global
 import com.example.navdrawer.function.LogParent
 import java.io.FileNotFoundException
 import java.time.LocalDateTime
@@ -27,6 +28,10 @@ class SystemLog : LogParent {
                 Log.d("[ADS] ", "Log saved at $file")
             } catch (e: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
+                createFile(this.folderName, this.fileName)
+            }
+            catch (ex: java.lang.Exception){
+                Log.d("[ADS] ", ex.toString())
             }
         }
     }
@@ -43,6 +48,10 @@ class SystemLog : LogParent {
             Log.d("[ADS] ", "Log saved at $file")
         } catch (e: FileNotFoundException) {
             Log.d("[ADS] ", "FileNotFound: $file")
+            createFile(this.folderName, this.fileName)
+        }
+        catch (ex: java.lang.Exception){
+            Log.d("[ADS] ", ex.toString())
         }
     }
 }

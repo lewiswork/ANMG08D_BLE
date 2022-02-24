@@ -3,6 +3,7 @@ package com.example.navdrawer.monitor
 import com.example.navdrawer.Global
 import com.example.navdrawer.PacketKind
 import com.example.navdrawer.function.Function
+import java.text.DecimalFormat
 
 
 class Monitoring {
@@ -34,8 +35,18 @@ class Monitoring {
         for (i in 0 until MAX_CH_CNT) {
             channels.add(ChannelData())
 
-            if (Global.touchLog != null && i < TCH_CH_CNT){
-                Global.touchLog.headerText += " CH${i+1}"
+            if (i == DM_CH_IDX){
+                if (Global.percentLog != null) {
+                    Global.percentLog.headerText += " CH_DM(%)"
+                }
+            }else {
+                //if (Global.touchLog != null && i < TCH_CH_CNT) {
+                if (Global.touchLog != null) {
+                    Global.touchLog.headerText += " CH${i + 1}"
+                }
+                if (Global.percentLog != null) {
+                    Global.percentLog.headerText += " CH${i + 1}(%)"
+                }
             }
         }
     }
@@ -59,15 +70,35 @@ class Monitoring {
             for (i in boolArray.indices) channels[i].touch = boolArray[i]
         }
 
+        logMonData()
+    }
+
+    private fun logMonData(logStr: String) {
+        var logStr :String
+
+        // Touch Log
+        var logStr = logStr
         if (Global.touchLog.isEnabled) {
-            var str = ""
-            //for (i in 0 until MAX_CH_CNT) {
+            logStr = ""
             for (i in 0 until TCH_CH_CNT) {
                 synchronized(channels) {
-                    str += if (channels[i].touch) " 1" else " 0"
+                    logStr += if (channels[i].touch) " 1" else " 0"
                 }
             }
-            Global.touchLog.printMonData(str)
+            Global.touchLog.printMonData(logStr)
+        }
+
+        // Percent Log(Touch Log 와 데이터 저장 시점 일치 목적)
+        if (Global.percentLog.isEnabled) {
+            logStr = ""
+            for (i in 0 until MAX_CH_CNT) {
+                synchronized(channels) {
+                    var percent = channels[i].percent
+                    var df = DecimalFormat("0.000")
+                    logStr += " ${df.format(percent)}"
+                }
+            }
+            Global.percentLog.printMonData(logStr)
         }
     }
 
@@ -79,8 +110,8 @@ class Monitoring {
         var ch = getChannel(chCodeStr)
 
         if (ch != null) {
-            var iPercent = percentStr.toInt(16)     // 16진수 String -> Int 변환
-            if (iPercent > 8_388_608) iPercent -= 16_777_216 // 24-bit 2의 보수 처리
+            var iPercent = percentStr.toInt(16)            // 16진수 String -> Int 변환
+            if (iPercent > 8_388_608) iPercent -= 16_777_216    // 24-bit 2의 보수 처리
 
             dPercent = iPercent.toDouble() / SENSE_LOOP.toDouble() * BIT_RESOLUTION
 

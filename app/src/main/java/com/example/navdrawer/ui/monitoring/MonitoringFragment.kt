@@ -117,7 +117,7 @@ class MonitoringFragment : Fragment() {
             synchronized(Global.monitoring.channels) {
                 map["img"] =
                     if (Global.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
-                //var percent = Global.monitoring.mmChData[i].percent
+
                 percent = Global.monitoring.channels[i].percent
             }
             var df = DecimalFormat("0.000")

@@ -64,6 +64,7 @@ class Global {
 
         //var touchLog = MonitoringLog("monitoring", "touch.txt")
         var touchLog = MonitoringLog("monitoring", "touch.txt", true)
-        val monitoring = Monitoring()   // Touch Log 객체 생성 이후에 생성
+        var percentLog = MonitoringLog("monitoring", "percent.txt", true)
+        val monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
     }
 }

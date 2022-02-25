@@ -29,7 +29,6 @@ class Global {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
 
-
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
@@ -83,6 +82,8 @@ class Global {
         // External Storage 사용을 위해
         // MainActivity 의 applicationContext 필요 -> late init
         //------------------------------------------------------------------//
+        lateinit var contextMain: Context
+
         // System Logs
         lateinit var packetLog: SystemLog
         lateinit var errLog: SystemLog
@@ -91,7 +92,24 @@ class Global {
         lateinit var touchLog: MonitoringLog
         lateinit var percentLog: MonitoringLog
 
+        // Monitoring
         lateinit var monitoring: Monitoring   // Touch/Percent Log 객체 생성 이후에 생성
         //------------------------------------------------------------------//
+
+        fun initLogAndMonitoring(context: Context){
+            // Context
+            contextMain = context
+
+            // System Logs
+            packetLog = SystemLog(context, "system", "packet.txt")
+            errLog = SystemLog(context, "system", "error.txt", "ERR", true)
+
+            // Monitoring Logs
+            touchLog = MonitoringLog(context, "monitoring", "touch.txt")
+            percentLog = MonitoringLog(context, "monitoring", "percent.txt")
+
+            // Monitoring
+            monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+        }
     }
 }

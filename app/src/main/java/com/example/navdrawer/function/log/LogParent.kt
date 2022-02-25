@@ -21,7 +21,6 @@ open class LogParent {
     //private val basePath: String = System.getProperty("java.io.tmpdir")
     lateinit var basePath :File
 
-
     open val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
     open lateinit var file: File
     var prefix: String = ""
@@ -34,28 +33,8 @@ open class LogParent {
         createFile(context, folderName, fileName)
     }
 
-    constructor(folderName: String, fileName: String) {
-        createFile(folderName, fileName)
-    }
-
     constructor(context: Context, folderName: String, fileName: String, enabled: Boolean) {
         createFile(context, folderName, fileName)
-        this.isEnabled = enabled
-    }
-
-    constructor(folderName: String, fileName: String, enabled: Boolean) {
-        createFile(folderName, fileName)
-        this.isEnabled = enabled
-    }
-
-    constructor(folderName: String, fileName: String, prefix: String) {
-        createFile(folderName, fileName)
-        this.prefix = "[$prefix]"
-    }
-
-    constructor(folderName: String, fileName: String, prefix: String, enabled:Boolean) {
-        createFile(folderName, fileName)
-        this.prefix = "[$prefix]"
         this.isEnabled = enabled
     }
 
@@ -65,19 +44,7 @@ open class LogParent {
         this.isEnabled = enabled
     }
 
-    fun createFile(folderName: String, fileName: String) {
-        this.folderName=folderName
-        this.fileName=fileName
-        var dir = File("${basePath}/$folderName")
-        if (!dir.exists()) {
-            dir.mkdirs()
-            Log.d("[ADS] ", "Folder created at $dir")
-        }
-        file = File("$dir/$fileName")
-    }
-
-    private fun createFile(context:Context, folderName: String, fileName: String) {
-
+    fun createFile(context:Context, folderName: String, fileName: String) {
         val externalStorageVolumes: Array<out File> =
             ContextCompat.getExternalFilesDirs(context, null)
         basePath = externalStorageVolumes[0]

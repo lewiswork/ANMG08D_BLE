@@ -57,25 +57,25 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //Log.d("[ADS] ", Global.regCon.registers.toString())
-        //Log.d("[ADS] ", Global.touchLog.str)
-//        Log.d("[ADS] ", "path : ${Global.packetLog.file}")
 
-        // Log 및 Monitoring 객체 생성
-//        val externalStorageVolumes: Array<out File> =
-//            ContextCompat.getExternalFilesDirs(applicationContext, null)
-//        Global.basePath = externalStorageVolumes[0]
+        //------------------------------------------------------------------//
+        // External Storage 사용을 위해
+        // MainActivity 의 applicationContext 필요 -> late init
+        //------------------------------------------------------------------//
+//        // Context
+//        Global.contextMain = applicationContext
 //
-
-        Global.packetLog = SystemLog(applicationContext, "system", "packet.txt")
-        Global.errLog = SystemLog(applicationContext, "system", "error.txt", "ERR", true)
-
-        // Monitoring Logs
-        Global.touchLog = MonitoringLog(applicationContext,"monitoring", "touch.txt")
-        Global.percentLog = MonitoringLog(applicationContext,"monitoring", "percent.txt")
-        Global.monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
-
-        Log.d("[ADS] ", "path : ${Global.packetLog.file}")
-
+//        // System Logs
+//        Global.packetLog = SystemLog(applicationContext, "system", "packet.txt")
+//        Global.errLog = SystemLog(applicationContext, "system", "error.txt", "ERR", true)
+//
+//        // Monitoring Logs
+//        Global.touchLog = MonitoringLog(applicationContext, "monitoring", "touch.txt")
+//        Global.percentLog = MonitoringLog(applicationContext, "monitoring", "percent.txt")
+//
+//        // Monitoring
+//        Global.monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+        Global.initLogAndMonitoring(applicationContext)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

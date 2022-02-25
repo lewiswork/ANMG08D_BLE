@@ -2,6 +2,7 @@ package com.example.navdrawer.function.log
 
 import android.content.Context
 import android.util.Log
+import com.example.navdrawer.Global
 import com.example.navdrawer.function.LogParent
 import java.io.FileNotFoundException
 import java.lang.Exception
@@ -11,11 +12,12 @@ class MonitoringLog:LogParent {
 
     var headerText: String = ""
 
-    constructor(context: Context, folderName: String, fileName: String) : super(context, folderName, fileName)
+    constructor(context: Context, folderName: String, fileName: String) : super(context,
+        folderName,
+        fileName)
 
-    constructor(folderName: String, fileName: String) : super(folderName, fileName)
-
-    constructor(folderName: String, fileName: String, enabled: Boolean) : super(
+    constructor(context: Context, folderName: String, fileName: String, enabled: Boolean) : super(
+        context,
         folderName,
         fileName,
         enabled)
@@ -29,7 +31,7 @@ class MonitoringLog:LogParent {
             // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
             try {
                 // Write Header Text
-                if (!file.exists()){
+                if (!file.exists()) {
                     file.appendText("$headerText\n")
                 }
 
@@ -37,9 +39,8 @@ class MonitoringLog:LogParent {
                 Log.d("[ADS] ", "Log saved at $file")
             } catch (ex: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
-                createFile(this.folderName, this.fileName)
-            }
-            catch (ex:Exception){
+                createFile(Global.contextMain, this.folderName, this.fileName)
+            } catch (ex: Exception) {
                 Log.d("[ADS] ", ex.toString())
             }
         }

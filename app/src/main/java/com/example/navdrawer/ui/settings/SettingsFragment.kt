@@ -54,6 +54,7 @@ class SettingsFragment : Fragment() {
 
     private fun setControlStatus() {
         binding.swSysLog.isChecked = Global.packetLog.isEnabled
+        binding.swMonLog.isChecked = Global.touchLog.isEnabled && Global.percentLog.isEnabled
     }
 
     private val listenerSwitches = View.OnClickListener {

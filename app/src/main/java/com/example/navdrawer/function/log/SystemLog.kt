@@ -10,16 +10,24 @@ import java.time.LocalDateTime
 enum class PacketType{RX, TX}
 
 class SystemLog : LogParent {
-    constructor(context: Context, folderName: String, fileName: String) : super(context, folderName, fileName)
-    //constructor(folderName: String, fileName: String) : super(folderName, fileName)
-    constructor(context: Context, folderName: String, fileName: String, prefix: String, enabled: Boolean) : super(
+    constructor(context: Context, folderName: String, fileName: String) : super(context,
+        folderName,
+        fileName)
+
+    constructor(
+        context: Context,
+        folderName: String,
+        fileName: String,
+        prefix: String,
+        enabled: Boolean
+    ) : super(
         context,
         folderName,
         fileName,
         prefix,
         enabled)
 
-    fun printPacket(type:PacketType, str: String) {
+    fun printPacket(type: PacketType, str: String) {
         if (isEnabled) {
             val current = LocalDateTime.now()
             val formatted = current.format(formatter)   //"yyyy-MM-dd HH:mm:ss.SSS"
@@ -31,9 +39,8 @@ class SystemLog : LogParent {
                 Log.d("[ADS] ", "Log saved at $file")
             } catch (e: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
-                createFile(this.folderName, this.fileName)
-            }
-            catch (ex: java.lang.Exception){
+                createFile(Global.contextMain, this.folderName, this.fileName)
+            } catch (ex: java.lang.Exception) {
                 Log.d("[ADS] ", ex.toString())
             }
         }
@@ -51,9 +58,8 @@ class SystemLog : LogParent {
             Log.d("[ADS] ", "Log saved at $file")
         } catch (e: FileNotFoundException) {
             Log.d("[ADS] ", "FileNotFound: $file")
-            createFile(this.folderName, this.fileName)
-        }
-        catch (ex: java.lang.Exception){
+            createFile(Global.contextMain, this.folderName, this.fileName)
+        } catch (ex: java.lang.Exception) {
             Log.d("[ADS] ", ex.toString())
         }
     }

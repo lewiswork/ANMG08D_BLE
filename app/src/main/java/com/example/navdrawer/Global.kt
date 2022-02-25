@@ -3,6 +3,8 @@ package com.example.navdrawer
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.content.Context
+import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 import com.example.navdrawer.function.LogParent
 import com.example.navdrawer.function.log.MonitoringLog
 import com.example.navdrawer.function.log.SystemLog
@@ -11,6 +13,7 @@ import com.example.navdrawer.packet.RPacket
 import com.example.navdrawer.register.RegisterController
 import com.example.navdrawer.thread.GetPacketThread
 import com.example.navdrawer.thread.RxThread
+import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
@@ -57,14 +60,38 @@ class Global {
 
         var regCon: RegisterController = RegisterController()
 
+//        var instance: MainActivity? =MainActivity()
+//        fun applicationContext() : Context {
+//            return instance!!.applicationContext
+//        }
+//        var path = instance!!.applicationContext
+
+        //lateinit var basePath: File
+
         // System Logs
-        var packetLog = SystemLog("system", "packet.txt")
-        var errLog = SystemLog("system", "error.txt", "ERR", true)
+//        var packetLog = SystemLog("system", "packet.txt")
+//        //var packetLog = SystemLog("system", "packet.txt")
+//        var errLog = SystemLog("system", "error.txt", "ERR", true)
+//
+//        // Monitoring Logs
+//        var touchLog = MonitoringLog("monitoring", "touch.txt")
+//        var percentLog = MonitoringLog("monitoring", "percent.txt")
+//
+//        val monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+
+        //------------------------------------------------------------------//
+        // External Storage 사용을 위해
+        // MainActivity 의 applicationContext 필요 -> late init
+        //------------------------------------------------------------------//
+        // System Logs
+        lateinit var packetLog: SystemLog
+        lateinit var errLog: SystemLog
 
         // Monitoring Logs
-        var touchLog = MonitoringLog("monitoring", "touch.txt")
-        var percentLog = MonitoringLog("monitoring", "percent.txt")
+        lateinit var touchLog: MonitoringLog
+        lateinit var percentLog: MonitoringLog
 
-        val monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+        lateinit var monitoring: Monitoring   // Touch/Percent Log 객체 생성 이후에 생성
+        //------------------------------------------------------------------//
     }
 }

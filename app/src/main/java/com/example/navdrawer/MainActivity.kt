@@ -1,6 +1,7 @@
 package com.example.navdrawer
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import com.google.android.material.snackbar.Snackbar
@@ -12,9 +13,14 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.navdrawer.adlib.ADLog
 import com.example.navdrawer.databinding.ActivityMainBinding
+import com.example.navdrawer.function.log.MonitoringLog
+import com.example.navdrawer.function.log.SystemLog
+import com.example.navdrawer.monitor.Monitoring
 import com.example.navdrawer.thread.GetPacketThread
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,6 +58,24 @@ class MainActivity : AppCompatActivity() {
 
         //Log.d("[ADS] ", Global.regCon.registers.toString())
         //Log.d("[ADS] ", Global.touchLog.str)
+//        Log.d("[ADS] ", "path : ${Global.packetLog.file}")
+
+        // Log 및 Monitoring 객체 생성
+//        val externalStorageVolumes: Array<out File> =
+//            ContextCompat.getExternalFilesDirs(applicationContext, null)
+//        Global.basePath = externalStorageVolumes[0]
+//
+
+        Global.packetLog = SystemLog(applicationContext, "system", "packet.txt")
+        Global.errLog = SystemLog(applicationContext, "system", "error.txt", "ERR", true)
+
+        // Monitoring Logs
+        Global.touchLog = MonitoringLog(applicationContext,"monitoring", "touch.txt")
+        Global.percentLog = MonitoringLog(applicationContext,"monitoring", "percent.txt")
+        Global.monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+
+        Log.d("[ADS] ", "path : ${Global.packetLog.file}")
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

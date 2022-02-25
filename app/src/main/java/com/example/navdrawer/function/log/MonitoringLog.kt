@@ -1,5 +1,6 @@
 package com.example.navdrawer.function.log
 
+import android.content.Context
 import android.util.Log
 import com.example.navdrawer.function.LogParent
 import java.io.FileNotFoundException
@@ -9,6 +10,8 @@ import java.time.LocalDateTime
 class MonitoringLog:LogParent {
 
     var headerText: String = ""
+
+    constructor(context: Context, folderName: String, fileName: String) : super(context, folderName, fileName)
 
     constructor(folderName: String, fileName: String) : super(folderName, fileName)
 

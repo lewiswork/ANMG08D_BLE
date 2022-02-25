@@ -1,5 +1,6 @@
 package com.example.navdrawer.function.log
 
+import android.content.Context
 import android.util.Log
 import com.example.navdrawer.Global
 import com.example.navdrawer.function.LogParent
@@ -9,8 +10,10 @@ import java.time.LocalDateTime
 enum class PacketType{RX, TX}
 
 class SystemLog : LogParent {
-    constructor(folderName: String, fileName: String) : super(folderName, fileName)
-    constructor(folderName: String, fileName: String, prefix: String, enabled: Boolean) : super(
+    constructor(context: Context, folderName: String, fileName: String) : super(context, folderName, fileName)
+    //constructor(folderName: String, fileName: String) : super(folderName, fileName)
+    constructor(context: Context, folderName: String, fileName: String, prefix: String, enabled: Boolean) : super(
+        context,
         folderName,
         fileName,
         prefix,

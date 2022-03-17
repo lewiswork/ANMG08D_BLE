@@ -22,7 +22,8 @@
         android:theme="@style/Theme.NavDrawer">
         <activity
             android:name=".ui.monitoring.RegisterActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <activity
             android:name=".ui.connect.ConnectActivity"

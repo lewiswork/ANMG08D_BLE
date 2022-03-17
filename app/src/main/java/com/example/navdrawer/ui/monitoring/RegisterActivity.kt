@@ -71,15 +71,6 @@ class RegisterActivity : AppCompatActivity() {
 
         checkConnections()        // BT 연결상태 별 초기화 처리
 
-        //hideKeyboard(currentFocus ?: View(this))
-        //btnReadSingle.requestFocus()
-//        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 100) {
-//        //timer = kotlin.concurrent.timer(period = 100) {
-//            hideKeyboard(linearRegisterActivity)
-//            Log.d("[ADS] ", "Timer tick")
-//            timer?.cancel()
-//            //tick = true
-//        }
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onResume")
     }
 
@@ -333,8 +324,8 @@ class RegisterActivity : AppCompatActivity() {
         if (Global.isBtConnected) {
             if ((Global.hwStat and 0x06) != 0x06.toByte()) {
                 tvStatus.text = "Relays are off."
-                //setControlEnabled(false)
-                setControlEnabled(true) // for debugging, 임시
+                setControlEnabled(false)
+                //setControlEnabled(true) // for debugging, 임시
             } else {
                 tvStatus.text = "BT connected and relays are on."
 
@@ -346,8 +337,8 @@ class RegisterActivity : AppCompatActivity() {
             }
         } else {
             tvStatus.text = "BT disconnected."
-            //setControlEnabled(false)
-            setControlEnabled(true) // for debugging, 임시
+            setControlEnabled(false)
+            //setControlEnabled(true) // for debugging, 임시
         }
     }
 

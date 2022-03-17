@@ -23,7 +23,7 @@
         <activity
             android:name=".ui.monitoring.RegisterActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
         <activity
             android:name=".ui.connect.ConnectActivity"

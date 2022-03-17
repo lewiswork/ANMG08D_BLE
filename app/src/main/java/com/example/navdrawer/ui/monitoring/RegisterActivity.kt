@@ -50,8 +50,8 @@ class RegisterActivity : AppCompatActivity() {
     var uSingleAddr: UByte = 0u
     var uSingleVal: UByte = 0u
 
-    var tick=false
-    var timer : Timer? = null
+//    var tick=false
+//    var timer : Timer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +60,8 @@ class RegisterActivity : AppCompatActivity() {
         getControls()
         setListeners()
         displayAllRegisters()
+
+        //getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onCreate")
     }
@@ -83,7 +85,7 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        timer!!.cancel()
+        //timer!!.cancel()
         regThreadOn = false
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onPause")
     }

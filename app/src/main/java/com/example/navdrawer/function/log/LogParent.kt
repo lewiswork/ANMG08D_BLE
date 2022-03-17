@@ -19,15 +19,15 @@ import java.util.*
 
 open class LogParent {
     //private val basePath: String = System.getProperty("java.io.tmpdir")
-    lateinit var basePath :File
+    lateinit var basePath: File
 
     open val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
     open lateinit var file: File
     var prefix: String = ""
-    var isEnabled:Boolean=false
+    var isEnabled: Boolean = false
 
-    open var folderName:String=""
-    open var fileName:String=""
+    open var folderName: String = ""
+    open var fileName: String = ""
 
     constructor(context: Context, folderName: String, fileName: String) {
         createFile(context, folderName, fileName)
@@ -38,13 +38,19 @@ open class LogParent {
         this.isEnabled = enabled
     }
 
-    constructor(context: Context, folderName: String, fileName: String, prefix: String, enabled:Boolean) {
+    constructor(
+        context: Context,
+        folderName: String,
+        fileName: String,
+        prefix: String,
+        enabled: Boolean
+    ) {
         createFile(context, folderName, fileName)
         this.prefix = "[$prefix]"
         this.isEnabled = enabled
     }
 
-    fun createFile(context:Context, folderName: String, fileName: String) {
+    fun createFile(context: Context, folderName: String, fileName: String) {
         val externalStorageVolumes: Array<out File> =
             ContextCompat.getExternalFilesDirs(context, null)
         basePath = externalStorageVolumes[0]

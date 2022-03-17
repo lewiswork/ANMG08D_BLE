@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
 
-
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -61,20 +60,7 @@ class MainActivity : AppCompatActivity() {
         //------------------------------------------------------------------//
         // External Storage 사용을 위해
         // MainActivity 의 applicationContext 필요 -> late init
-        //------------------------------------------------------------------//
-//        // Context
-//        Global.contextMain = applicationContext
-//
-//        // System Logs
-//        Global.packetLog = SystemLog(applicationContext, "system", "packet.txt")
-//        Global.errLog = SystemLog(applicationContext, "system", "error.txt", "ERR", true)
-//
-//        // Monitoring Logs
-//        Global.touchLog = MonitoringLog(applicationContext, "monitoring", "touch.txt")
-//        Global.percentLog = MonitoringLog(applicationContext, "monitoring", "percent.txt")
-//
-//        // Monitoring
-//        Global.monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+        //------------------------------------------------------------------////
         Global.initLogAndMonitoring(applicationContext)
     }
 

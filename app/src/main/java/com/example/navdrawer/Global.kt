@@ -96,7 +96,7 @@ class Global {
         lateinit var monitoring: Monitoring   // Touch/Percent Log 객체 생성 이후에 생성
         //------------------------------------------------------------------//
 
-        fun initLogAndMonitoring(context: Context){
+        fun initLogAndMonitoring(context: Context) {
             // Context
             contextMain = context
 

@@ -1,5 +1,7 @@
 package com.example.navdrawer.ui.monitoring
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +15,10 @@ import com.example.navdrawer.PacketKind
 import com.example.navdrawer.R
 import com.example.navdrawer.packet.Packet
 import com.example.navdrawer.packet.RPacket
+import java.util.*
+import kotlin.NoSuchElementException
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.experimental.and
 
 class RegisterActivity : AppCompatActivity() {
@@ -44,6 +50,9 @@ class RegisterActivity : AppCompatActivity() {
     var uSingleAddr: UByte = 0u
     var uSingleVal: UByte = 0u
 
+    var tick=false
+    var timer : Timer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -60,12 +69,21 @@ class RegisterActivity : AppCompatActivity() {
 
         checkConnections()        // BT 연결상태 별 초기화 처리
 
+        //hideKeyboard(currentFocus ?: View(this))
+        //btnReadSingle.requestFocus()
+        timer = kotlin.concurrent.timer(initialDelay = 1000, period = 100) {
+        //timer = kotlin.concurrent.timer(period = 100) {
+            hideKeyboard(linearRegisterActivity)
+            Log.d("[ADS] ", "Timer tick")
+            timer?.cancel()
+            //tick = true
+        }
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onResume")
     }
 
     override fun onPause() {
         super.onPause()
-
+        timer!!.cancel()
         regThreadOn = false
         Log.d("[ADS] ", "MonitoringFragment > RegisterActivity > onPause")
     }
@@ -202,12 +220,15 @@ class RegisterActivity : AppCompatActivity() {
             Toast.makeText(this, errStr, Toast.LENGTH_LONG).show()
             etSingleVal.requestFocus()
             etSingleAddr.requestFocus()
+            Log.d("[ADS] ", "B")
         } else {
             Packet.send(Global.outStream,
                 PacketKind.RegSingleRead,
                 uSingleAddr.toByte()) // Send packet
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
+            Log.d("[ADS] ", "C")
+
             hideKeyboard(etSingleAddr)
         }
     }
@@ -224,6 +245,7 @@ class RegisterActivity : AppCompatActivity() {
 
             etSingleVal.requestFocus()
             etSingleAddr.requestFocus()
+            Log.d("[ADS] ", "D")
         } else if (!singleRegValueValid) {
             errStr = "Please enter correct value(HEX Format)."
             Log.d("[ADS] ", errStr)
@@ -231,6 +253,7 @@ class RegisterActivity : AppCompatActivity() {
 
             etSingleAddr.requestFocus()
             etSingleVal.requestFocus()
+            Log.d("[ADS] ", "E")
         } else {
             ba[0] = uSingleAddr.toByte()
             ba[1] = uSingleVal.toByte()
@@ -238,6 +261,7 @@ class RegisterActivity : AppCompatActivity() {
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
             btnWriteSingle.requestFocus()
+            Log.d("[ADS] ", "F")
 
             displaySingleRegVal(uSingleAddr, uSingleVal)
             hideKeyboard(etSingleAddr)
@@ -291,7 +315,8 @@ class RegisterActivity : AppCompatActivity() {
 
                     etSingleAddr.requestFocus()
                     etSingleVal.requestFocus()
-                    hideKeyboard(p0!!)
+                    Log.d("[ADS] ", "A")
+                    hideKeyboard(p0)
                 }
             }
         }
@@ -347,6 +372,14 @@ class RegisterActivity : AppCompatActivity() {
 
             Log.d("[ADS] ", "Register thread started. ID : ${this.id}")
             while (regThreadOn) {
+
+//                if (tick){
+//                    hideKeyboard(linearRegisterActivity)
+////                    Log.d("[ADS] ", "Timer tick")
+//                    timer?.cancel()
+//                    tick=false
+//                }
+
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//

@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">NavigationDrawer</string>
+<!--    <string name="app_name">NavigationDrawer</string>-->
+    <string name="app_name">ANMG08D</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">ANMG08D</string>
@@ -10,13 +11,13 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Connect</string>
     <string name="menu_jig">Jig</string>
-    <!--    <string name="menu_register">Register</string>-->
     <string name="menu_monitoring">Monitoring</string>
     <string name="settings">Settings</string>
     <string name="menu_help">Help</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_register">RegisterActivity</string>
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

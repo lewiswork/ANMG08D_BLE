@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.navdrawer.ui.home.HomeFragment"
+        android:name="com.adsemicon.navdrawer.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/nav_connect"
-        android:name="com.example.navdrawer.ui.connect.ConnectFragment"
+        android:name="com.adsemicon.navdrawer.ui.connect.ConnectFragment"
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_connect" />
 
     <fragment
         android:id="@+id/nav_jig"
-        android:name="com.example.navdrawer.ui.jig.JigFragment"
+        android:name="com.adsemicon.navdrawer.ui.jig.JigFragment"
         android:label="@string/menu_jig"
         tools:layout="@layout/fragment_jig" />
 
@@ -27,13 +27,13 @@
 
     <fragment
         android:id="@+id/nav_monitoring"
-        android:name="com.example.navdrawer.ui.monitoring.MonitoringFragment"
+        android:name="com.adsemicon.navdrawer.ui.monitoring.MonitoringFragment"
         android:label="@string/menu_monitoring"
         tools:layout="@layout/fragment_monitoring" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.navdrawer.ui.settings.SettingsFragment"
+        android:name="com.adsemicon.navdrawer.ui.settings.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
 

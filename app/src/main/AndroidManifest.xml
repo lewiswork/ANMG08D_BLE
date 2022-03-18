@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.navdrawer">
+    package="com.adsemicon.navdrawer">
     <!-- 김양규 추가 -->
     <!-- Bluetooth 권한 -->
     <!-- Permissions Required for accessing Bluetooth services -->
@@ -22,7 +22,7 @@
         android:theme="@style/Theme.NavDrawer">
 
         <activity
-            android:name=".IntroActivity"
+            android:name="com.adsemicon.navdrawer.IntroActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,16 +32,16 @@
         </activity>
 
         <activity
-            android:name=".ui.monitoring.RegisterActivity"
+            android:name="com.adsemicon.navdrawer.ui.monitoring.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="stateHidden|adjustNothing" />
         <!-- stateHidden : Acitivty 실행 시 키보드가 자동으로 올라오지 않는다. -->
         <!-- adjustNothing : Layout 에 어떤 영향도 주지 않고 소프트 키보드가 올라온다. -->
         <activity
-            android:name=".ui.connect.ConnectActivity"
+            android:name="com.adsemicon.navdrawer.ui.connect.ConnectActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.adsemicon.navdrawer.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.NavDrawer.NoActionBar">

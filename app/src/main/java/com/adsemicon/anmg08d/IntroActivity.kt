@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.Window
+import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.content.ContentProviderCompat.requireContext
 
@@ -15,13 +17,14 @@ class IntroActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.adsemicon.anmg08d.R.layout.activity_intro)
+
+        setContentView(R.layout.activity_intro)
 
         var handler = Handler()
         handler.postDelayed({
             var intent = Intent(this, com.adsemicon.anmg08d.MainActivity::class.java)
             startActivity(intent)
-        }, 2000)
+        }, 2500)
 
         tvAppInfo = findViewById(R.id.tvAppInfoIntro)
 

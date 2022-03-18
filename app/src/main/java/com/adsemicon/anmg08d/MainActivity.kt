@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_connect,       // 기본 생성(3개 중 1) 후 명칭 변경
             R.id.nav_jig,           // 기본 생성(3개 중 1) 후 명칭 변경
             R.id.nav_monitoring,    // 추가
-            R.id.nav_settings       // 추가
+            R.id.nav_settings,       // 추가
+            R.id.nav_about       // 추가
         ), drawerLayout)
         //-------------------------------------------------------------------------------------//
 

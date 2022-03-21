@@ -22,7 +22,7 @@ class IntroActivity : AppCompatActivity() {
 
         var handler = Handler()
         handler.postDelayed({
-            var intent = Intent(this, com.adsemicon.anmg08d.MainActivity::class.java)
+            var intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }, 2500)
 

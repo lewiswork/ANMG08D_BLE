@@ -46,13 +46,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        //Log.d("[ADS] ", Global.regCon.registers.toString())
-
         //------------------------------------------------------------------//
         // External Storage 사용을 위해
         // MainActivity 의 applicationContext 필요 -> late init
         //------------------------------------------------------------------////
-        com.adsemicon.anmg08d.Global.initLogAndMonitoring(applicationContext)
+        Global.initLogAndMonitoring(applicationContext)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,14 +74,14 @@ class MainActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------//
     private fun disconnectBt() {
 
-        if (com.adsemicon.anmg08d.Global.inStream != null) com.adsemicon.anmg08d.Global.inStream!!.close()
-        if (com.adsemicon.anmg08d.Global.outStream != null) com.adsemicon.anmg08d.Global.outStream!!.close()
-        if (com.adsemicon.anmg08d.Global.socket != null) com.adsemicon.anmg08d.Global.socket!!.close()
+        if (Global.inStream != null) Global.inStream!!.close()
+        if (Global.outStream != null) Global.outStream!!.close()
+        if (Global.socket != null) Global.socket!!.close()
 
-        com.adsemicon.anmg08d.Global.rxThreadOn = false
-        com.adsemicon.anmg08d.Global.rxPacketThreadOn = false
+        Global.rxThreadOn = false
+        Global.rxPacketThreadOn = false
 
-        com.adsemicon.anmg08d.Global.rawRxBytesQueue.clear()
-        com.adsemicon.anmg08d.Global.isBtConnected = false
+        Global.rawRxBytesQueue.clear()
+        Global.isBtConnected = false
     }
 }

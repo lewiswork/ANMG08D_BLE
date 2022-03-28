@@ -6,6 +6,9 @@ import android.widget.Toast
 import com.adsemicon.anmg08d.function.log.PacketType
 import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.packet.RPacket
+import com.adsemicon.anmg08d.Global
+import com.adsemicon.anmg08d.PacketCategory
+import com.adsemicon.anmg08d.PacketKind
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -30,8 +33,8 @@ class GetPacketThread(context: Context):Thread() {
 
         var qEmpty :Boolean
         var rawByteArray: ByteArray
-        var category : com.adsemicon.anmg08d.PacketCategory? = null
-        var kind : com.adsemicon.anmg08d.PacketKind? = null
+        var category : PacketCategory? = null
+        var kind : PacketKind? = null
         var dataLength : Int = 0
         var dataContents : ByteArray
         var checksum : Byte
@@ -44,11 +47,11 @@ class GetPacketThread(context: Context):Thread() {
                 // rawByteQueue 데이터 -> byteList 로 이동
                 //------------------------------------------------------------------------------//
                 //synchronized(this) { qEmpty = Global.rawRxBytesQueue.isEmpty() }
-                synchronized(com.adsemicon.anmg08d.Global.rawRxBytesQueue) { qEmpty = com.adsemicon.anmg08d.Global.rawRxBytesQueue.isEmpty() }
+                synchronized(Global.rxRawBytesQueue) { qEmpty = Global.rxRawBytesQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.Global.rawRxBytesQueue) { rawByteArray = com.adsemicon.anmg08d.Global.rawRxBytesQueue.remove() }
+                        synchronized(Global.rxRawBytesQueue) { rawByteArray = Global.rxRawBytesQueue.remove() }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {
@@ -56,9 +59,9 @@ class GetPacketThread(context: Context):Thread() {
                         }
                         //logRawByteArray(rawByteArray)
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
-                        Log.d("[ADS/ERR] ", com.adsemicon.anmg08d.Global.rawRxBytesQueue.count().toString())
-                        com.adsemicon.anmg08d.Global.rawRxBytesQueue.clear()
+                        Global.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", Global.rxRawBytesQueue.count().toString())
+                        Global.rxRawBytesQueue.clear()
                         continue
                     } catch (ex: Exception) {
                         com.adsemicon.anmg08d.Global.errLog.printError(ex)

@@ -24,7 +24,7 @@ class IntroActivity : AppCompatActivity() {
         handler.postDelayed({
             var intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-        }, 2500)
+        }, 2000)
 
         tvAppInfo = findViewById(R.id.tvAppInfoIntro)
 

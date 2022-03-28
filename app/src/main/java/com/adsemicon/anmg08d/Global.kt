@@ -29,7 +29,7 @@ class Global {
         // Bluetooth 관련
         lateinit var adapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
-        var rawRxBytesQueue: Queue<ByteArray> = LinkedList()
+        var rxRawBytesQueue: Queue<ByteArray> = LinkedList()
         var isBtConnected: Boolean = false           // BT 연결 상태
 
         var inStream: InputStream? = null

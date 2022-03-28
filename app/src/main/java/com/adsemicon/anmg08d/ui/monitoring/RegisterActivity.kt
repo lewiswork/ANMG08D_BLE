@@ -1,5 +1,6 @@
 package com.adsemicon.anmg08d.ui.monitoring
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,10 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.adsemicon.anmg08d.R
 import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.packet.RPacket
-import kotlin.NoSuchElementException
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import com.google.android.material.snackbar.Snackbar
 import kotlin.experimental.and
+
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -156,7 +156,7 @@ class RegisterActivity : AppCompatActivity() {
                 addr = addrStr.toInt(16).toByte()
                 singleRegAddrValid = true
             } catch (ex: Exception) {
-                val errStr = "Please enter correct address(HEX Format)."
+                val errStr = "Please enter correct address(HEX format)."
                 Log.d("[ADS] ", errStr)
                 addr = 0
                 singleRegAddrValid = false
@@ -208,14 +208,14 @@ class RegisterActivity : AppCompatActivity() {
             Toast.makeText(this, errStr, Toast.LENGTH_LONG).show()
             etSingleVal.requestFocus()
             etSingleAddr.requestFocus()
-            Log.d("[ADS] ", "B")
+
         } else {
             Packet.send(com.adsemicon.anmg08d.Global.outStream,
                 com.adsemicon.anmg08d.PacketKind.RegSingleRead,
                 uSingleAddr.toByte()) // Send packet
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
-            Log.d("[ADS] ", "C")
+
 
             hideKeyboard(etSingleAddr)
         }
@@ -233,7 +233,7 @@ class RegisterActivity : AppCompatActivity() {
 
             etSingleVal.requestFocus()
             etSingleAddr.requestFocus()
-            Log.d("[ADS] ", "D")
+
         } else if (!singleRegValueValid) {
             errStr = "Please enter correct value(HEX Format)."
             Log.d("[ADS] ", errStr)
@@ -241,7 +241,7 @@ class RegisterActivity : AppCompatActivity() {
 
             etSingleAddr.requestFocus()
             etSingleVal.requestFocus()
-            Log.d("[ADS] ", "E")
+
         } else {
             ba[0] = uSingleAddr.toByte()
             ba[1] = uSingleVal.toByte()
@@ -249,7 +249,7 @@ class RegisterActivity : AppCompatActivity() {
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
             btnWriteSingle.requestFocus()
-            Log.d("[ADS] ", "F")
+
 
             displaySingleRegVal(uSingleAddr, uSingleVal)
             hideKeyboard(etSingleAddr)
@@ -303,7 +303,7 @@ class RegisterActivity : AppCompatActivity() {
 
                     etSingleAddr.requestFocus()
                     etSingleVal.requestFocus()
-                    Log.d("[ADS] ", "A")
+
                     hideKeyboard(p0)
                 }
             }

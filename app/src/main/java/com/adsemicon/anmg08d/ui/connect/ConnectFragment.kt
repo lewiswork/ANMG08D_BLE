@@ -157,7 +157,7 @@ class ConnectFragment : Fragment() {
 
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        com.adsemicon.anmg08d.Global.rawRxBytesQueue.clear()
+        com.adsemicon.anmg08d.Global.rxRawBytesQueue.clear()
         com.adsemicon.anmg08d.Global.isBtConnected = false
 
         com.adsemicon.anmg08d.Global.hwStat = 0

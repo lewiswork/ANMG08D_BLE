@@ -18,9 +18,9 @@ class RxThread : Thread() {
 
                     if (bytes > 0) {
                         //synchronized(this) {
-                        synchronized(com.adsemicon.anmg08d.Global.rawRxBytesQueue) {
+                        synchronized(com.adsemicon.anmg08d.Global.rxRawBytesQueue) {
                             arrayCopy = rxBuffer.copyOf(bytes)
-                            com.adsemicon.anmg08d.Global.rawRxBytesQueue.add(arrayCopy)
+                            com.adsemicon.anmg08d.Global.rxRawBytesQueue.add(arrayCopy)
                         }
                     }
                 }

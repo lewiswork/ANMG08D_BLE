@@ -6,14 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.adsemicon.anmg08d.R
 import com.adsemicon.anmg08d.databinding.FragmentHomeBinding
 import com.adsemicon.anmg08d.ui.connect.ConnectFragment
+import java.lang.Exception
 
 
 class HomeFragment : Fragment() {
@@ -41,10 +40,10 @@ class HomeFragment : Fragment() {
             textView.text = it
         })
 
-        binding.btnConnectFrag.setOnClickListener {
-            val intent = Intent(context, ConnectFragment::class.java)
-            startActivity(intent)
-        }
+//        binding.btnConnectFrag.setOnClickListener {
+//            val intent = Intent(context, ConnectFragment::class.java)
+//            startActivity(intent)
+//        }
 
         return root
     }
@@ -52,14 +51,18 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnConnectFrag.setOnClickListener {
-//            val fragment: Fragment = ConnectFragment()
-//            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-//            val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-//            fragmentTransaction.replace(R.id.activity_chooser_view_content, fragment)
-//            fragmentTransaction.addToBackStack(null)
-//            fragmentTransaction.commit()
-        }
+//        binding.btnConnectFrag.setOnClickListener {
+//            val nextFrag = ConnectFragment()
+//try {
+//    requireActivity().supportFragmentManager.beginTransaction()
+//        .remove(this@HomeFragment)
+//        .replace((requireView().parent as ViewGroup).id, nextFrag, "findThisFragment")
+//        .addToBackStack(null)
+//        .commit()
+//}catch (ex:Exception){
+//
+//}
+//        }
 //
 //        btn_goToFragment2.setOnClickListener {
 //            var fr = getFragmentManager()?.beginTransaction()

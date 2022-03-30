@@ -71,7 +71,7 @@ class JigFragment : Fragment() {
     }
 
     private fun checkConnections() {
-        if (com.adsemicon.anmg08d.Global.isBtConnected) {
+        if (com.adsemicon.anmg08d.GlobalVariables.isBtConnected) {
             mmJigThreadOn = true
             mmJigThread = JigThread()
             mmJigThread.start()
@@ -102,23 +102,23 @@ class JigFragment : Fragment() {
                 binding.swVdd, binding.swI2c -> {
                     if (binding.swVdd.isChecked) mask = mask or 0x02
                     if (binding.swI2c.isChecked) mask = mask or 0x04
-                    com.adsemicon.anmg08d.Global.hwStat = mask
+                    com.adsemicon.anmg08d.GlobalVariables.hwStat = mask
                 }
                 binding.btnClearRelays -> {
-                    com.adsemicon.anmg08d.Global.hwStat = 0x00
+                    com.adsemicon.anmg08d.GlobalVariables.hwStat = 0x00
                     binding.swVdd.isChecked = false
                     binding.swI2c.isChecked = false
                 }
             }
 
-            if (com.adsemicon.anmg08d.Global.hwStatPrev == 0x06.toByte() && com.adsemicon.anmg08d.Global.hwStat != 0x06.toByte()) {
-                Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
+            if (com.adsemicon.anmg08d.GlobalVariables.hwStatPrev == 0x06.toByte() && com.adsemicon.anmg08d.GlobalVariables.hwStat != 0x06.toByte()) {
+                Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
                 Log.d("[ADS]", "Monitoring stopped.")
                 //Thread.sleep(100) // ok
                 Thread.sleep(10) // ok
             }
-            Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, com.adsemicon.anmg08d.Global.hwStat) // Send packet
-            com.adsemicon.anmg08d.Global.hwStatPrev = com.adsemicon.anmg08d.Global.hwStat
+            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, com.adsemicon.anmg08d.GlobalVariables.hwStat) // Send packet
+            com.adsemicon.anmg08d.GlobalVariables.hwStatPrev = com.adsemicon.anmg08d.GlobalVariables.hwStat
 
             //binding.textView3.text = Global.hwStat.toString()    // for debugging
         } catch (ex: Exception) {
@@ -142,18 +142,18 @@ class JigFragment : Fragment() {
                 // Timer 처리
                 //------------------------------------------------------------------------------//
                 if (tick){
-                    Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
+                    Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
                     tick = false
                 }
 
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.Global.hwQueue) { qEmpty = com.adsemicon.anmg08d.Global.hwQueue.isEmpty() }
+                synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.hwQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.Global.hwQueue) { packet = com.adsemicon.anmg08d.Global.hwQueue.remove() }
+                        synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.hwQueue.remove() }
 
                         when (packet.kind) {
                             com.adsemicon.anmg08d.PacketKind.HwRead -> {
@@ -163,11 +163,11 @@ class JigFragment : Fragment() {
                             }
                         }
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
                     } catch (ex: Exception) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -182,7 +182,7 @@ class JigFragment : Fragment() {
     }
 
     private fun displayRelayStatus() {
-        binding.swVdd.isChecked = (com.adsemicon.anmg08d.Global.hwStat and 0x02) == 0x02.toByte()
-        binding.swI2c.isChecked = (com.adsemicon.anmg08d.Global.hwStat and 0x04) == 0x04.toByte()
+        binding.swVdd.isChecked = (com.adsemicon.anmg08d.GlobalVariables.hwStat and 0x02) == 0x02.toByte()
+        binding.swI2c.isChecked = (com.adsemicon.anmg08d.GlobalVariables.hwStat and 0x04) == 0x04.toByte()
     }
 }

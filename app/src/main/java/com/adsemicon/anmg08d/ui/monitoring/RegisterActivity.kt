@@ -1,6 +1,5 @@
 package com.adsemicon.anmg08d.ui.monitoring
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.adsemicon.anmg08d.R
 import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.packet.RPacket
-import com.google.android.material.snackbar.Snackbar
 import kotlin.experimental.and
 
 
@@ -84,7 +82,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun displayAllRegisters() {
         dataListRegisters.clear()
 
-        for (r in com.adsemicon.anmg08d.Global.regCon.registers) {
+        for (r in com.adsemicon.anmg08d.GlobalVariables.regCon.registers) {
             val map = HashMap<String, Any>()
             map["addr"] = String.format("%02X", r.addr.toByte())
             map["value"] = String.format("%02X", r.value.toByte())
@@ -189,8 +187,8 @@ class RegisterActivity : AppCompatActivity() {
             } finally {
                 uSingleVal = value.toUByte()
                 if (singleRegAddrValid) {
-                    if (com.adsemicon.anmg08d.Global.regCon.hasRegister(uSingleAddr)) {
-                        com.adsemicon.anmg08d.Global.regCon.setRegister(uSingleAddr, uSingleVal)
+                    if (com.adsemicon.anmg08d.GlobalVariables.regCon.hasRegister(uSingleAddr)) {
+                        com.adsemicon.anmg08d.GlobalVariables.regCon.setRegister(uSingleAddr, uSingleVal)
                         displayAllRegisters()
                     }
                 }
@@ -210,7 +208,7 @@ class RegisterActivity : AppCompatActivity() {
             etSingleAddr.requestFocus()
 
         } else {
-            Packet.send(com.adsemicon.anmg08d.Global.outStream,
+            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream,
                 com.adsemicon.anmg08d.PacketKind.RegSingleRead,
                 uSingleAddr.toByte()) // Send packet
             etSingleAddr.clearFocus()
@@ -245,7 +243,7 @@ class RegisterActivity : AppCompatActivity() {
         } else {
             ba[0] = uSingleAddr.toByte()
             ba[1] = uSingleVal.toByte()
-            Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
+            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
             etSingleAddr.clearFocus()
             btnReadSingle.requestFocus()
             btnWriteSingle.requestFocus()
@@ -263,9 +261,9 @@ class RegisterActivity : AppCompatActivity() {
 
             setControlEnabled(false)
 
-            Packet.send(com.adsemicon.anmg08d.Global.outStream,
+            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream,
                 com.adsemicon.anmg08d.PacketKind.RegSingleRead,
-                com.adsemicon.anmg08d.Global.regCon.registers[regIndex].addr.toByte()) // Send packet
+                com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].addr.toByte()) // Send packet
             pbRegister.progress = 0
         } catch (ex: Exception) {
             Log.d("[ADS] ", ex.message!!)
@@ -281,10 +279,10 @@ class RegisterActivity : AppCompatActivity() {
             setControlEnabled(false)
 
             var ba = ByteArray(2)
-            ba[0] = com.adsemicon.anmg08d.Global.regCon.registers[regIndex].addr.toByte()  // Address
-            ba[1] = com.adsemicon.anmg08d.Global.regCon.registers[regIndex].value.toByte()  // Value
+            ba[0] = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].addr.toByte()  // Address
+            ba[1] = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].value.toByte()  // Value
 
-            Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
+            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
             pbRegister.progress = 0
         } catch (ex: Exception) {
             Log.d("[ADS] ", ex.message!!)
@@ -296,8 +294,8 @@ class RegisterActivity : AppCompatActivity() {
         override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
             when (p0?.id) {
                 R.id.gridAllRegisters -> {
-                    val addr = com.adsemicon.anmg08d.Global.regCon.registers[p2].addr
-                    val value = com.adsemicon.anmg08d.Global.regCon.registers[p2].value
+                    val addr = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[p2].addr
+                    val value = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[p2].value
                     etSingleAddr.setText(String.format("%02X", addr.toByte()))
                     etSingleVal.setText(String.format("%02X", value.toByte()))
 
@@ -316,8 +314,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkConnections() {
-        if (com.adsemicon.anmg08d.Global.isBtConnected) {
-            if ((com.adsemicon.anmg08d.Global.hwStat and 0x06) != 0x06.toByte()) {
+        if (com.adsemicon.anmg08d.GlobalVariables.isBtConnected) {
+            if ((com.adsemicon.anmg08d.GlobalVariables.hwStat and 0x06) != 0x06.toByte()) {
                 tvStatus.text = "Relays are off."
                 setControlEnabled(false)
                 //setControlEnabled(true) // for debugging, 임시
@@ -373,11 +371,11 @@ class RegisterActivity : AppCompatActivity() {
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.Global.regQueue) { qEmpty = com.adsemicon.anmg08d.Global.regQueue.isEmpty() }
+                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.regQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.Global.regQueue) { packet = com.adsemicon.anmg08d.Global.regQueue.remove() }
+                        synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.regQueue.remove() }
 
                         when (packet.kind) {
                             com.adsemicon.anmg08d.PacketKind.RegSingleRead -> packetProcRegRead(packet)
@@ -388,11 +386,11 @@ class RegisterActivity : AppCompatActivity() {
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
                     } catch (ex: java.lang.Exception) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -406,12 +404,12 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         private fun packetProcRegRead(packet: RPacket) {
-            val regSize = com.adsemicon.anmg08d.Global.regCon.registers.size
+            val regSize = com.adsemicon.anmg08d.GlobalVariables.regCon.registers.size
             val uAddr = packet.dataList[0].toUByte()
             val uVal = packet.dataList[1].toUByte()
 
-            if (com.adsemicon.anmg08d.Global.regCon.hasRegister(uAddr)) {
-                com.adsemicon.anmg08d.Global.regCon.setRegister(uAddr, uVal)
+            if (com.adsemicon.anmg08d.GlobalVariables.regCon.hasRegister(uAddr)) {
+                com.adsemicon.anmg08d.GlobalVariables.regCon.setRegister(uAddr, uVal)
             }
 
             if (rwAll) {
@@ -423,9 +421,9 @@ class RegisterActivity : AppCompatActivity() {
                         setControlEnabled(true)
                     }
                 } else {
-                    Packet.send(com.adsemicon.anmg08d.Global.outStream,
+                    Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream,
                         com.adsemicon.anmg08d.PacketKind.RegSingleRead,
-                        com.adsemicon.anmg08d.Global.regCon.registers[regIndex].addr.toByte()) // Send packet
+                        com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].addr.toByte()) // Send packet
                     runOnUiThread {
                         pbRegister.progress =
                             ((regIndex.toDouble() / regSize.toDouble()) * 100.0).toInt()
@@ -433,7 +431,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             } else {
                 runOnUiThread {
-                    if (com.adsemicon.anmg08d.Global.regCon.hasRegister(uAddr)) {
+                    if (com.adsemicon.anmg08d.GlobalVariables.regCon.hasRegister(uAddr)) {
                         displayAllRegisters()
                     }
                     displaySingleRegVal(uAddr, uVal)
@@ -442,7 +440,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         private fun packetProcRegWrite() {
-            val regSize = com.adsemicon.anmg08d.Global.regCon.registers.size
+            val regSize = com.adsemicon.anmg08d.GlobalVariables.regCon.registers.size
             val ba = ByteArray(2)
 
             if (rwAll) {
@@ -454,9 +452,9 @@ class RegisterActivity : AppCompatActivity() {
                         setControlEnabled(true)
                     }
                 } else {
-                    ba[0] = com.adsemicon.anmg08d.Global.regCon.registers[regIndex].addr.toByte()
-                    ba[1] = com.adsemicon.anmg08d.Global.regCon.registers[regIndex].value.toByte()
-                    Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
+                    ba[0] = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].addr.toByte()
+                    ba[1] = com.adsemicon.anmg08d.GlobalVariables.regCon.registers[regIndex].value.toByte()
+                    Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSingleWrite, ba) // Send packet
 
                     runOnUiThread {
                         pbRegister.progress =

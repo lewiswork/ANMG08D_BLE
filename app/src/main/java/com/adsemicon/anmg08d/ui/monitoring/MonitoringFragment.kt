@@ -77,7 +77,7 @@ class MonitoringFragment : Fragment() {
             stopMonitoring()
         }
 
-        com.adsemicon.anmg08d.Global.waitForStopMon = true
+        com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
 
         Log.d("[ADS] ", "Monitoring Fragment > onPause")
     }
@@ -91,7 +91,7 @@ class MonitoringFragment : Fragment() {
 
 
     private fun initGridView(view: View) {
-        for (i in 0 until com.adsemicon.anmg08d.Global.monitoring.MAX_CH_CNT) {
+        for (i in 0 until com.adsemicon.anmg08d.GlobalVariables.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]
             map["img"] = imgTouchStat[0]    // touch status
@@ -109,14 +109,14 @@ class MonitoringFragment : Fragment() {
         dataListMon.clear()
         var percent: Double
 
-        for (i in 0 until com.adsemicon.anmg08d.Global.monitoring.MAX_CH_CNT) {
+        for (i in 0 until com.adsemicon.anmg08d.GlobalVariables.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]
-            synchronized(com.adsemicon.anmg08d.Global.monitoring.channels) {
+            synchronized(com.adsemicon.anmg08d.GlobalVariables.monitoring.channels) {
                 map["img"] =
-                    if (com.adsemicon.anmg08d.Global.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+                    if (com.adsemicon.anmg08d.GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
 
-                percent = com.adsemicon.anmg08d.Global.monitoring.channels[i].percent
+                percent = com.adsemicon.anmg08d.GlobalVariables.monitoring.channels[i].percent
             }
             var df = DecimalFormat("0.000")
             var perStr = df.format(percent)
@@ -135,8 +135,8 @@ class MonitoringFragment : Fragment() {
     }
 
     private fun checkConnections() {
-        if (com.adsemicon.anmg08d.Global.isBtConnected) {
-            if ((com.adsemicon.anmg08d.Global.hwStat and 0x06) != 0x06.toByte()) {
+        if (com.adsemicon.anmg08d.GlobalVariables.isBtConnected) {
+            if ((com.adsemicon.anmg08d.GlobalVariables.hwStat and 0x06) != 0x06.toByte()) {
                 setControlEnabled(false)
                 binding.tvStatusMonFrag.text = "Relays are off."
             } else {
@@ -178,12 +178,12 @@ class MonitoringFragment : Fragment() {
 
                     if (mask == 0x00.toByte()) {
                         stopMonitoring()
-                        com.adsemicon.anmg08d.Global.waitForStopMon = true
-                    } else Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, mask) // Send packet
+                        com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
+                    } else Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, mask) // Send packet
                 }
                 binding.btnClearMon -> {
                     stopMonitoring()
-                    com.adsemicon.anmg08d.Global.waitForStopMon = true
+                    com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
                 }
             }
         } catch (ex: Exception) {
@@ -202,8 +202,8 @@ class MonitoringFragment : Fragment() {
     }
 
     private val listenerSwReset = View.OnClickListener {
-        Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
-        com.adsemicon.anmg08d.Global.waitForSwReset=true
+        Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
+        com.adsemicon.anmg08d.GlobalVariables.waitForSwReset=true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -220,7 +220,7 @@ class MonitoringFragment : Fragment() {
         binding.swTouch.isChecked = false
         binding.swPercent.isChecked = false
 
-        Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)
+        Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)
     }
 
     //---------------------------------------------------------------------------------------//
@@ -238,27 +238,27 @@ class MonitoringFragment : Fragment() {
                 monitoring()
 
                 // SW Reset Packet 미응답 시, 재 전송
-                if (com.adsemicon.anmg08d.Global.waitForSwReset) Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
+                if (com.adsemicon.anmg08d.GlobalVariables.waitForSwReset) Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
 
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.Global.regQueue) { qEmpty = com.adsemicon.anmg08d.Global.regQueue.isEmpty() }
+                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.regQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.Global.regQueue) { packet = com.adsemicon.anmg08d.Global.regQueue.remove() }
+                        synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.regQueue.remove() }
 
                         when (packet.kind) {
                             com.adsemicon.anmg08d.PacketKind.RegSwReset ->Log.d("[ADS] ", "SW reset done.")
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
                     }catch (ex: Exception) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -273,17 +273,17 @@ class MonitoringFragment : Fragment() {
         }
 
         private fun monitoring() {
-            if (com.adsemicon.anmg08d.Global.monitoring.hasNewData) {
+            if (com.adsemicon.anmg08d.GlobalVariables.monitoring.hasNewData) {
                 // -------------------------------------------------------------------------//
                 // Display Touch and Percent(임시)
                 // -------------------------------------------------------------------------//
                 activity?.runOnUiThread {
                     updateMonData()
-                    if (com.adsemicon.anmg08d.Global.waitForStopMon) stopMonitoring()
+                    if (com.adsemicon.anmg08d.GlobalVariables.waitForStopMon) stopMonitoring()
                 }
                 // -------------------------------------------------------------------------//
 
-                com.adsemicon.anmg08d.Global.monitoring.hasNewData = false
+                com.adsemicon.anmg08d.GlobalVariables.monitoring.hasNewData = false
             }
         }
     }

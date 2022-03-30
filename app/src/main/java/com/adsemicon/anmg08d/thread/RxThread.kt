@@ -10,17 +10,17 @@ class RxThread : Thread() {
         var rxBuffer: ByteArray = ByteArray(2048)
 
         Log.d("[ADS] ", "Receive thread started. ID : ${this.id}")
-        while (com.adsemicon.anmg08d.Global.rxThreadOn) {
+        while (com.adsemicon.anmg08d.GlobalVariables.rxThreadOn) {
             try {
-                if (com.adsemicon.anmg08d.Global.socket!!.isConnected) {
+                if (com.adsemicon.anmg08d.GlobalVariables.socket!!.isConnected) {
                     // Receive
-                    bytes = com.adsemicon.anmg08d.Global.inStream!!.read(rxBuffer)
+                    bytes = com.adsemicon.anmg08d.GlobalVariables.inStream!!.read(rxBuffer)
 
                     if (bytes > 0) {
                         //synchronized(this) {
-                        synchronized(com.adsemicon.anmg08d.Global.rxRawBytesQueue) {
+                        synchronized(com.adsemicon.anmg08d.GlobalVariables.rxRawBytesQueue) {
                             arrayCopy = rxBuffer.copyOf(bytes)
-                            com.adsemicon.anmg08d.Global.rxRawBytesQueue.add(arrayCopy)
+                            com.adsemicon.anmg08d.GlobalVariables.rxRawBytesQueue.add(arrayCopy)
                         }
                     }
                 }

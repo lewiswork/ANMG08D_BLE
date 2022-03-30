@@ -38,7 +38,7 @@ class SystemLog : LogParent {
                 Log.d("[ADS] ", "Log saved at $file")
             } catch (e: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
-                createFile(com.adsemicon.anmg08d.Global.contextMain, this.folderName, this.fileName)
+                createFile(com.adsemicon.anmg08d.GlobalVariables.contextMain, this.folderName, this.fileName)
             } catch (ex: java.lang.Exception) {
                 Log.d("[ADS] ", ex.toString())
             }
@@ -57,7 +57,7 @@ class SystemLog : LogParent {
             Log.d("[ADS] ", "Log saved at $file")
         } catch (e: FileNotFoundException) {
             Log.d("[ADS] ", "FileNotFound: $file")
-            createFile(com.adsemicon.anmg08d.Global.contextMain, this.folderName, this.fileName)
+            createFile(com.adsemicon.anmg08d.GlobalVariables.contextMain, this.folderName, this.fileName)
         } catch (ex: java.lang.Exception) {
             Log.d("[ADS] ", ex.toString())
         }

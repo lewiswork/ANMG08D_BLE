@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         // External Storage 사용을 위해
         // MainActivity 의 applicationContext 필요 -> late init
         //------------------------------------------------------------------////
-        Global.initLogAndMonitoring(applicationContext)
+        GlobalVariables.initLogAndMonitoring(applicationContext)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,14 +74,14 @@ class MainActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------//
     private fun disconnectBt() {
 
-        if (Global.inStream != null) Global.inStream!!.close()
-        if (Global.outStream != null) Global.outStream!!.close()
-        if (Global.socket != null) Global.socket!!.close()
+        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
-        Global.rxThreadOn = false
-        Global.rxPacketThreadOn = false
+        GlobalVariables.rxThreadOn = false
+        GlobalVariables.rxPacketThreadOn = false
 
-        Global.rxRawBytesQueue.clear()
-        Global.isBtConnected = false
+        GlobalVariables.rxRawBytesQueue.clear()
+        GlobalVariables.isBtConnected = false
     }
 }

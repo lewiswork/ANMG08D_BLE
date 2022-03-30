@@ -46,8 +46,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setControlStatus() {
-        binding.swSysLog.isChecked = com.adsemicon.anmg08d.Global.packetLog.isEnabled
-        binding.swMonLog.isChecked = com.adsemicon.anmg08d.Global.touchLog.isEnabled && com.adsemicon.anmg08d.Global.percentLog.isEnabled
+        binding.swSysLog.isChecked = com.adsemicon.anmg08d.GlobalVariables.packetLog.isEnabled
+        binding.swMonLog.isChecked = com.adsemicon.anmg08d.GlobalVariables.touchLog.isEnabled && com.adsemicon.anmg08d.GlobalVariables.percentLog.isEnabled
     }
 
     private val listenerSwitches = View.OnClickListener {
@@ -55,14 +55,14 @@ class SettingsFragment : Fragment() {
             val str:String
             when (it) {
                 binding.swSysLog -> {
-                    com.adsemicon.anmg08d.Global.packetLog.isEnabled = binding.swSysLog.isChecked
+                    com.adsemicon.anmg08d.GlobalVariables.packetLog.isEnabled = binding.swSysLog.isChecked
                      str = if (binding.swSysLog.isChecked) "enabled" else "disabled"
                     Log.d("[ADS] ", "System log $str")
                     binding.tvStatusSettingsFrag.text ="System log $str." 
                 }
                 binding.swMonLog -> {
-                    com.adsemicon.anmg08d.Global.touchLog.isEnabled = binding.swMonLog.isChecked
-                    com.adsemicon.anmg08d.Global.percentLog.isEnabled = binding.swMonLog.isChecked
+                    com.adsemicon.anmg08d.GlobalVariables.touchLog.isEnabled = binding.swMonLog.isChecked
+                    com.adsemicon.anmg08d.GlobalVariables.percentLog.isEnabled = binding.swMonLog.isChecked
                      str = if (binding.swMonLog.isChecked) "enabled" else "disabled"
                     Log.d("[ADS] ", "Monitoring log $str")
                     binding.tvStatusSettingsFrag.text ="Monitoring log $str."

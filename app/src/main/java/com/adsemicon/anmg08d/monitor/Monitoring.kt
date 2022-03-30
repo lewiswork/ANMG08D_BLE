@@ -34,16 +34,16 @@ class Monitoring {
             channels.add(ChannelData())
 
             if (i == DM_CH_IDX){
-                if (com.adsemicon.anmg08d.Global.percentLog != null) {
-                    com.adsemicon.anmg08d.Global.percentLog.headerText += " CH_DM(%)"
+                if (com.adsemicon.anmg08d.GlobalVariables.percentLog != null) {
+                    com.adsemicon.anmg08d.GlobalVariables.percentLog.headerText += " CH_DM(%)"
                 }
             }else {
                 //if (Global.touchLog != null && i < TCH_CH_CNT) {
-                if (com.adsemicon.anmg08d.Global.touchLog != null) {
-                    com.adsemicon.anmg08d.Global.touchLog.headerText += " CH${i + 1}"
+                if (com.adsemicon.anmg08d.GlobalVariables.touchLog != null) {
+                    com.adsemicon.anmg08d.GlobalVariables.touchLog.headerText += " CH${i + 1}"
                 }
-                if (com.adsemicon.anmg08d.Global.percentLog != null) {
-                    com.adsemicon.anmg08d.Global.percentLog.headerText += " CH${i + 1}(%)"
+                if (com.adsemicon.anmg08d.GlobalVariables.percentLog != null) {
+                    com.adsemicon.anmg08d.GlobalVariables.percentLog.headerText += " CH${i + 1}(%)"
                 }
             }
         }
@@ -58,7 +58,7 @@ class Monitoring {
             com.adsemicon.anmg08d.PacketKind.MonPercent -> setPercent(dataContents)
             else -> { }  // Do nothing
         }
-        com.adsemicon.anmg08d.Global.monitoring.hasNewData = true
+        com.adsemicon.anmg08d.GlobalVariables.monitoring.hasNewData = true
     }
 
     private fun setTouch(touch: Byte) {
@@ -75,18 +75,18 @@ class Monitoring {
         var logStr :String
 
         // Touch Log
-        if (com.adsemicon.anmg08d.Global.touchLog.isEnabled) {
+        if (com.adsemicon.anmg08d.GlobalVariables.touchLog.isEnabled) {
             logStr = ""
             for (i in 0 until TCH_CH_CNT) {
                 synchronized(channels) {
                     logStr += if (channels[i].touch) " 1" else " 0"
                 }
             }
-            com.adsemicon.anmg08d.Global.touchLog.printMonData(logStr)
+            com.adsemicon.anmg08d.GlobalVariables.touchLog.printMonData(logStr)
         }
 
         // Percent Log(Touch Log 와 데이터 저장 시점 일치 목적)
-        if (com.adsemicon.anmg08d.Global.percentLog.isEnabled) {
+        if (com.adsemicon.anmg08d.GlobalVariables.percentLog.isEnabled) {
             logStr = ""
             for (i in 0 until MAX_CH_CNT) {
                 synchronized(channels) {
@@ -95,7 +95,7 @@ class Monitoring {
                     logStr += " ${df.format(percent)}"
                 }
             }
-            com.adsemicon.anmg08d.Global.percentLog.printMonData(logStr)
+            com.adsemicon.anmg08d.GlobalVariables.percentLog.printMonData(logStr)
         }
     }
 

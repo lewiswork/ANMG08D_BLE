@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import com.adsemicon.anmg08d.GlobalVariables
 import com.adsemicon.anmg08d.R
 import com.adsemicon.anmg08d.databinding.ActivityConnectBinding
 
@@ -16,8 +17,8 @@ class ConnectActivity : AppCompatActivity() {
     private  val mmMacs = arrayListOf<String>()
     private  val mmDevices = arrayListOf<BluetoothDevice>()
 
-    private var mmBinding: ActivityConnectBinding? = null
-    private val binding get() = mmBinding!!
+    private var _binding: ActivityConnectBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,8 +49,8 @@ class ConnectActivity : AppCompatActivity() {
     // ListView 의 OnItemClickListener
     //--------------------------------------------------------------------------//
     private val listenerItemClick =  AdapterView.OnItemClickListener { parent, view, position, id ->
-        com.adsemicon.anmg08d.Global.selectedDevice = mmDevices[position]
-        setResult(android.app.Activity.RESULT_OK, intent)
+        GlobalVariables.selectedDevice = mmDevices[position]
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
@@ -58,7 +59,7 @@ class ConnectActivity : AppCompatActivity() {
     //--------------------------------------------------------------------------//
     private fun getPairedDevices() {
         // Get Paired Device Information
-        val pairedDevices = com.adsemicon.anmg08d.Global.adapter.bondedDevices
+        val pairedDevices = GlobalVariables.adapter.bondedDevices
         if (pairedDevices.size > 0) {
             for (device in pairedDevices) {
                 mmNames.add(device.name)        // ListView 표시를 위해 사용

@@ -38,7 +38,7 @@ class MonitoringLog:LogParent {
                 Log.d("[ADS] ", "Log saved at $file")
             } catch (ex: FileNotFoundException) {
                 Log.d("[ADS] ", "FileNotFound: $file")
-                createFile(com.adsemicon.anmg08d.Global.contextMain, this.folderName, this.fileName)
+                createFile(com.adsemicon.anmg08d.GlobalVariables.contextMain, this.folderName, this.fileName)
             } catch (ex: Exception) {
                 Log.d("[ADS] ", ex.toString())
             }

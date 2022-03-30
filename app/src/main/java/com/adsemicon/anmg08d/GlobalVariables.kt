@@ -22,7 +22,7 @@ enum class PacketKind{
     RegSingleRead, RegSingleWrite, RegSwReset
 }
 
-class Global {
+class GlobalVariables {
     // companion object : 타 언어의 Static Class 와 같이 사용하기 위한 목적
     companion object {
 
@@ -95,18 +95,18 @@ class Global {
 
         fun initLogAndMonitoring(context: Context) {
             // Context
-            com.adsemicon.anmg08d.Global.Companion.contextMain = context
+            contextMain = context
 
             // System Logs
-            com.adsemicon.anmg08d.Global.Companion.packetLog = SystemLog(context, "system", "packet.txt")
-            com.adsemicon.anmg08d.Global.Companion.errLog = SystemLog(context, "system", "error.txt", "ERR", true)
+            packetLog = SystemLog(context, "system", "packet.txt")
+            errLog = SystemLog(context, "system", "error.txt", "ERR", true)
 
             // Monitoring Logs
-            com.adsemicon.anmg08d.Global.Companion.touchLog = MonitoringLog(context, "monitoring", "touch.txt")
-            com.adsemicon.anmg08d.Global.Companion.percentLog = MonitoringLog(context, "monitoring", "percent.txt")
+            touchLog = MonitoringLog(context, "monitoring", "touch.txt")
+            percentLog = MonitoringLog(context, "monitoring", "percent.txt")
 
             // Monitoring
-            com.adsemicon.anmg08d.Global.Companion.monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
+            monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
         }
     }
 }

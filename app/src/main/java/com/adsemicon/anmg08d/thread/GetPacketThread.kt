@@ -6,7 +6,7 @@ import android.widget.Toast
 import com.adsemicon.anmg08d.function.log.PacketType
 import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.packet.RPacket
-import com.adsemicon.anmg08d.Global
+import com.adsemicon.anmg08d.GlobalVariables
 import com.adsemicon.anmg08d.PacketCategory
 import com.adsemicon.anmg08d.PacketKind
 import java.io.File
@@ -41,17 +41,17 @@ class GetPacketThread(context: Context):Thread() {
 
         Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
-        while (com.adsemicon.anmg08d.Global.rxPacketThreadOn) {
+        while (com.adsemicon.anmg08d.GlobalVariables.rxPacketThreadOn) {
             try {
                 //------------------------------------------------------------------------------//
                 // rawByteQueue 데이터 -> byteList 로 이동
                 //------------------------------------------------------------------------------//
                 //synchronized(this) { qEmpty = Global.rawRxBytesQueue.isEmpty() }
-                synchronized(Global.rxRawBytesQueue) { qEmpty = Global.rxRawBytesQueue.isEmpty() }
+                synchronized(GlobalVariables.rxRawBytesQueue) { qEmpty = GlobalVariables.rxRawBytesQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(Global.rxRawBytesQueue) { rawByteArray = Global.rxRawBytesQueue.remove() }
+                        synchronized(GlobalVariables.rxRawBytesQueue) { rawByteArray = GlobalVariables.rxRawBytesQueue.remove() }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {
@@ -59,12 +59,12 @@ class GetPacketThread(context: Context):Thread() {
                         }
                         //logRawByteArray(rawByteArray)
                     } catch (ex: NoSuchElementException) {
-                        Global.errLog.printError(ex)
-                        Log.d("[ADS/ERR] ", Global.rxRawBytesQueue.count().toString())
-                        Global.rxRawBytesQueue.clear()
+                        GlobalVariables.errLog.printError(ex)
+                        Log.d("[ADS/ERR] ", GlobalVariables.rxRawBytesQueue.count().toString())
+                        GlobalVariables.rxRawBytesQueue.clear()
                         continue
                     } catch (ex: Exception) {
-                        com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -148,7 +148,7 @@ class GetPacketThread(context: Context):Thread() {
 
                         // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
                         when (category) {
-                            com.adsemicon.anmg08d.PacketCategory.Rom -> com.adsemicon.anmg08d.Global.romQueue.add(pk)
+                            com.adsemicon.anmg08d.PacketCategory.Rom -> com.adsemicon.anmg08d.GlobalVariables.romQueue.add(pk)
 
                             //-------------------------------------------------------------------//
                             // Monitoring 데이터는 Queue 에 저장하지 않음
@@ -156,44 +156,44 @@ class GetPacketThread(context: Context):Thread() {
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
                             //-------------------------------------------------------------------//
                             com.adsemicon.anmg08d.PacketCategory.Monitoring -> {
-                                if (kind == com.adsemicon.anmg08d.PacketKind.MonSet && com.adsemicon.anmg08d.Global.waitForStopMon) {
-                                    com.adsemicon.anmg08d.Global.waitForStopMon = false
+                                if (kind == com.adsemicon.anmg08d.PacketKind.MonSet && com.adsemicon.anmg08d.GlobalVariables.waitForStopMon) {
+                                    com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = false
                                 } else {
-                                    com.adsemicon.anmg08d.Global.monitoring.updateMonData(kind, dataContents)
+                                    com.adsemicon.anmg08d.GlobalVariables.monitoring.updateMonData(kind, dataContents)
                                 }
                             }
                             //-------------------------------------------------------------------//
 
                             com.adsemicon.anmg08d.PacketCategory.Hardware -> {
                                 if (kind == com.adsemicon.anmg08d.PacketKind.HwRead) {
-                                    synchronized(com.adsemicon.anmg08d.Global.hwStat) {
-                                        com.adsemicon.anmg08d.Global.hwStat = dataContents[0]
+                                    synchronized(com.adsemicon.anmg08d.GlobalVariables.hwStat) {
+                                        com.adsemicon.anmg08d.GlobalVariables.hwStat = dataContents[0]
                                     }
                                 }
-                                synchronized(com.adsemicon.anmg08d.Global.hwQueue) {
-                                    com.adsemicon.anmg08d.Global.hwQueue.add(pk)
+                                synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) {
+                                    com.adsemicon.anmg08d.GlobalVariables.hwQueue.add(pk)
                                 }
                             }
                             com.adsemicon.anmg08d.PacketCategory.Register -> {
-                                synchronized(com.adsemicon.anmg08d.Global.regQueue) {
-                                    com.adsemicon.anmg08d.Global.regQueue.add(pk)
+                                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) {
+                                    com.adsemicon.anmg08d.GlobalVariables.regQueue.add(pk)
                                 }
 
-                                if (kind == com.adsemicon.anmg08d.PacketKind.RegSwReset && com.adsemicon.anmg08d.Global.waitForSwReset) {
-                                    com.adsemicon.anmg08d.Global.waitForSwReset = false
+                                if (kind == com.adsemicon.anmg08d.PacketKind.RegSwReset && com.adsemicon.anmg08d.GlobalVariables.waitForSwReset) {
+                                    com.adsemicon.anmg08d.GlobalVariables.waitForSwReset = false
                                     Log.d("[ADS] ", "RI response")
                                 }
                             }
                             com.adsemicon.anmg08d.PacketCategory.Test -> {
-                                synchronized(com.adsemicon.anmg08d.Global.testQueue) {
-                                    com.adsemicon.anmg08d.Global.testQueue.add(pk)
+                                synchronized(com.adsemicon.anmg08d.GlobalVariables.testQueue) {
+                                    com.adsemicon.anmg08d.GlobalVariables.testQueue.add(pk)
                                 }
                             }
                         }
                         prepareLog()
 
                         // 임시, 향 후 Library 적용 예정
-                        com.adsemicon.anmg08d.Global.packetLog.printPacket(PacketType.RX, mmLogStr.toString())
+                        com.adsemicon.anmg08d.GlobalVariables.packetLog.printPacket(PacketType.RX, mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
@@ -201,7 +201,7 @@ class GetPacketThread(context: Context):Thread() {
                 }
 
             } catch (ex: java.io.IOException) {
-                com.adsemicon.anmg08d.Global.errLog.printError(ex)
+                com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
                 Log.d("[ADS/ERR] ", ex.message.toString())
                 ex.printStackTrace()
                 break

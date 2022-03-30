@@ -200,7 +200,7 @@ class Packet {
                 }
             }
 
-            com.adsemicon.anmg08d.Global.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
+            com.adsemicon.anmg08d.GlobalVariables.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
             Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }

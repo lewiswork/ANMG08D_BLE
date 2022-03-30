@@ -1,9 +1,12 @@
 package com.adsemicon.anmg08d.ui.connect
 
+import android.Manifest
+import android.app.Activity
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,13 +14,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.adsemicon.anmg08d.thread.RxThread
+import com.adsemicon.anmg08d.GlobalVariables
+import com.adsemicon.anmg08d.MainActivity
 import com.adsemicon.anmg08d.databinding.FragmentConnectBinding
 import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.thread.GetPacketThread
+import com.adsemicon.anmg08d.thread.RxThread
 import kotlin.experimental.and
 
 class ConnectFragment : Fragment() {
@@ -33,7 +39,7 @@ class ConnectFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
 
         connectViewModel =
@@ -48,7 +54,7 @@ class ConnectFragment : Fragment() {
         })
 
         try {
-            com.adsemicon.anmg08d.Global.adapter = BluetoothAdapter.getDefaultAdapter()
+            GlobalVariables.adapter = BluetoothAdapter.getDefaultAdapter()
         }catch (ex:Exception){
             Toast.makeText(this@ConnectFragment.context, "Error occurred while getting BT adapter", Toast.LENGTH_SHORT)
                 .show()
@@ -57,8 +63,8 @@ class ConnectFragment : Fragment() {
         //------------------------------------------------------------------//
         // 각 구성요소의 Listener 등록
         //------------------------------------------------------------------//
-        mmBinding?.btnConnect?.setOnClickListener(listenerConnect)              // Connect
-        mmBinding?.btnDisconnect?.setOnClickListener(listenerDisconnect)        // Disconnect
+        binding.btnConnect.setOnClickListener(listenerConnect)              // Connect
+        binding.btnDisconnect.setOnClickListener(listenerDisconnect)        // Disconnect
         //------------------------------------------------------------------//
 
         DisplayBtStatus()
@@ -71,40 +77,38 @@ class ConnectFragment : Fragment() {
 
         if (requestCode == CONNECT_ACTIVYTY){
             if (resultCode == RESULT_OK){
-                val device = com.adsemicon.anmg08d.Global.selectedDevice
+                val device = GlobalVariables.selectedDevice
 
-                // Get Socket and Connect using UUID
-                com.adsemicon.anmg08d.Global.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                com.adsemicon.anmg08d.Global.socket!!.connect()
+                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
+                GlobalVariables.socket!!.connect()
 
                 // Get Input/Output Stream using socket
-                com.adsemicon.anmg08d.Global.inStream = com.adsemicon.anmg08d.Global.socket!!.inputStream
-                com.adsemicon.anmg08d.Global.outStream = com.adsemicon.anmg08d.Global.socket!!.outputStream
+                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
+                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
 
-                // Receive Thread 시작
+                // Received Thread 시작
                 try {
-                    com.adsemicon.anmg08d.Global.rxThreadOn =true
-                    com.adsemicon.anmg08d.Global.rxThread = RxThread()
-                    com.adsemicon.anmg08d.Global.rxThread!!.start()
+                    GlobalVariables.rxThreadOn =true
+                    GlobalVariables.rxThread = RxThread()
+                    GlobalVariables.rxThread!!.start()
 
-                    com.adsemicon.anmg08d.Global.rxPacketThreadOn =true
-                    //Global.getPacketThread = GetPacketThread()
-                    com.adsemicon.anmg08d.Global.getPacketThread = GetPacketThread(context!!)
-                    com.adsemicon.anmg08d.Global.getPacketThread!!.start()
-
+                    GlobalVariables.rxPacketThreadOn =true
+                    GlobalVariables.getPacketThread = GetPacketThread(requireContext())
+                    GlobalVariables.getPacketThread!!.start()
                 } catch (ex: Exception) {
-                    Toast.makeText(this@ConnectFragment.context, "Error occurred while starting threads.", Toast.LENGTH_LONG)
-                    .show()
+                    Toast.makeText(this@ConnectFragment.context,
+                        "Error occurred while starting threads.",
+                        Toast.LENGTH_LONG)
+                        .show()
                 }
-
-                com.adsemicon.anmg08d.Global.isBtConnected = true
+                GlobalVariables.isBtConnected = true
                 DisplayBtStatus()
 
                 Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
                     .show()
 
                 Thread.sleep(100)
-                Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
+                Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
             }else if (resultCode == RESULT_CANCELED) {
                 //tvStatus.text = "Connection canceled."
             }
@@ -112,13 +116,13 @@ class ConnectFragment : Fragment() {
     }
 
     private fun DisplayBtStatus() {
-        if (com.adsemicon.anmg08d.Global.isBtConnected) {
+        if (GlobalVariables.isBtConnected) {
             mmBinding?.btnConnect?.isEnabled = false
             mmBinding?.btnDisconnect?.isEnabled = true
             mmBinding?.tvStatus?.text = "Status : Connected"
 
-            mmBinding?.tvDeviceName?.append(com.adsemicon.anmg08d.Global.selectedDevice.name)
-            mmBinding?.tvMac?.append(com.adsemicon.anmg08d.Global.selectedDevice.address)
+            mmBinding?.tvDeviceName?.append(GlobalVariables.selectedDevice.name)
+            mmBinding?.tvMac?.append(GlobalVariables.selectedDevice.address)
         }
         else
         {
@@ -130,49 +134,43 @@ class ConnectFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         mmBinding = null
-        //DisconnectBt()
     }
 
     //---------------------------------------------------------------------------------------//
     // BT Disconnect 함수, Stream, Socket Close 및 Thread 종료
     //---------------------------------------------------------------------------------------//
     private fun disconnectBt() {
-
-        // Clear Relays
-
-        if ((com.adsemicon.anmg08d.Global.hwStat and 0x06) == 0x06.toByte()) {
-            Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
+        if ((GlobalVariables.hwStat and 0x06) == 0x06.toByte()) {
+            Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
             Log.d("[ADS]", "Monitoring stopped.")
             Thread.sleep(10) // ok
         }
-        com.adsemicon.anmg08d.Global.hwStat = 0x00
-        Packet.send(com.adsemicon.anmg08d.Global.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, com.adsemicon.anmg08d.Global.hwStat) // Send packet
+        GlobalVariables.hwStat = 0x00
+        Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
 
-        if (com.adsemicon.anmg08d.Global.inStream != null) com.adsemicon.anmg08d.Global.inStream!!.close()
-        if (com.adsemicon.anmg08d.Global.outStream != null) com.adsemicon.anmg08d.Global.outStream!!.close()
-        if (com.adsemicon.anmg08d.Global.socket != null) com.adsemicon.anmg08d.Global.socket!!.close()
+        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
-        com.adsemicon.anmg08d.Global.rxThreadOn = false
-        com.adsemicon.anmg08d.Global.rxPacketThreadOn = false
+        GlobalVariables.rxThreadOn = false
+        GlobalVariables.rxPacketThreadOn = false
 
         mmBinding?.tvStatus?.text = "Status : Disconnected"
 
-        com.adsemicon.anmg08d.Global.rxRawBytesQueue.clear()
-        com.adsemicon.anmg08d.Global.isBtConnected = false
-
-        com.adsemicon.anmg08d.Global.hwStat = 0
+        GlobalVariables.rxRawBytesQueue.clear()
+        GlobalVariables.isBtConnected = false
+        GlobalVariables.hwStat = 0
     }
 
     //---------------------------------------------------------------------------------------//
     // btnConnect 의 OnClickListener
     //---------------------------------------------------------------------------------------//
     private val listenerConnect = View.OnClickListener {
-        if (com.adsemicon.anmg08d.Global.adapter == null) {
+        if (GlobalVariables.adapter == null) {
             Toast.makeText(this@ConnectFragment.context, "Bluetooth Not Supported", Toast.LENGTH_SHORT)
                 .show()
         } else {
-            if (com.adsemicon.anmg08d.Global.adapter.isEnabled) {
-                //val intent = Intent(this, ConnectActivity::class.java)
+            if (GlobalVariables.adapter.isEnabled) {
                 val intent = Intent(this@ConnectFragment.context, ConnectActivity::class.java)
 
                 try {

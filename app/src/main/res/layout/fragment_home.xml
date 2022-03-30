@@ -8,20 +8,22 @@
     tools:context=".ui.home.HomeFragment">
 
     <TextView
-        android:id="@+id/text_home"
+        android:id="@+id/tvHomeTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:paddingLeft="10dp"
         android:text="Home"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
         android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/btnConnectFrag"
+    <ListView
+        android:id="@+id/lvMenuInfo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BT Connection" />
+        android:layout_height="match_parent"
+        android:paddingLeft="10dp" />
 
 </LinearLayout>

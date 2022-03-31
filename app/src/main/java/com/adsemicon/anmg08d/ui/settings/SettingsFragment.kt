@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.adsemicon.anmg08d.GlobalVariables
 import com.adsemicon.anmg08d.databinding.FragmentSettingsBinding
 import java.lang.Exception
 
@@ -46,8 +47,9 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setControlStatus() {
-        binding.swSysLog.isChecked = com.adsemicon.anmg08d.GlobalVariables.packetLog.isEnabled
-        binding.swMonLog.isChecked = com.adsemicon.anmg08d.GlobalVariables.touchLog.isEnabled && com.adsemicon.anmg08d.GlobalVariables.percentLog.isEnabled
+        binding.swSysLog.isChecked = GlobalVariables.packetLog.isEnabled
+        binding.swMonLog.isChecked = GlobalVariables.touchLog.isEnabled && GlobalVariables.percentLog.isEnabled
+        binding.tvStatusSettingsFrag.text=""
     }
 
     private val listenerSwitches = View.OnClickListener {
@@ -55,14 +57,14 @@ class SettingsFragment : Fragment() {
             val str:String
             when (it) {
                 binding.swSysLog -> {
-                    com.adsemicon.anmg08d.GlobalVariables.packetLog.isEnabled = binding.swSysLog.isChecked
+                    GlobalVariables.packetLog.isEnabled = binding.swSysLog.isChecked
                      str = if (binding.swSysLog.isChecked) "enabled" else "disabled"
                     Log.d("[ADS] ", "System log $str")
                     binding.tvStatusSettingsFrag.text ="System log $str." 
                 }
                 binding.swMonLog -> {
-                    com.adsemicon.anmg08d.GlobalVariables.touchLog.isEnabled = binding.swMonLog.isChecked
-                    com.adsemicon.anmg08d.GlobalVariables.percentLog.isEnabled = binding.swMonLog.isChecked
+                    GlobalVariables.touchLog.isEnabled = binding.swMonLog.isChecked
+                    GlobalVariables.percentLog.isEnabled = binding.swMonLog.isChecked
                      str = if (binding.swMonLog.isChecked) "enabled" else "disabled"
                     Log.d("[ADS] ", "Monitoring log $str")
                     binding.tvStatusSettingsFrag.text ="Monitoring log $str."

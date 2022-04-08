@@ -86,7 +86,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvStatusSettingsFrag"
+            android:id="@+id/tvStatSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"

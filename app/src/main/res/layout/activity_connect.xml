@@ -29,7 +29,9 @@
         android:id="@+id/lvDevices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="100">
+        android:layout_weight="100"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="15dp">
 
     </ListView>
 

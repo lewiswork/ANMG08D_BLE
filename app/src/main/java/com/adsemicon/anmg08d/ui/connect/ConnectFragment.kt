@@ -72,43 +72,60 @@ class ConnectFragment : Fragment() {
         return root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mmBinding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (requireActivity().packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            //Log.d("[ADS] ", "BLE NOT supported.")
+            binding.tvStatus.text = "BLE supported."
+        } else {
+            //Log.d("[ADS] ", "BLE supported.")
+            binding.tvStatus.text = "BLE NOT supported."
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == CONNECT_ACTIVYTY){
             if (resultCode == RESULT_OK){
-                val device = GlobalVariables.selectedDevice
-
-                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-                GlobalVariables.socket!!.connect()
-
-                // Get Input/Output Stream using socket
-                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
-                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
-
-                // Received Thread 시작
-                try {
-                    GlobalVariables.rxThreadOn =true
-                    GlobalVariables.rxThread = RxThread()
-                    GlobalVariables.rxThread!!.start()
-
-                    GlobalVariables.rxPacketThreadOn =true
-                    GlobalVariables.getPacketThread = GetPacketThread(requireContext())
-                    GlobalVariables.getPacketThread!!.start()
-                } catch (ex: Exception) {
-                    Toast.makeText(this@ConnectFragment.context,
-                        "Error occurred while starting threads.",
-                        Toast.LENGTH_LONG)
-                        .show()
-                }
-                GlobalVariables.isBtConnected = true
-                DisplayBtStatus()
-
-                Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
-                    .show()
-
-                Thread.sleep(100)
-                Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
+//                val device = GlobalVariables.selectedDevice
+//
+//                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
+//                GlobalVariables.socket!!.connect()
+//
+//                // Get Input/Output Stream using socket
+//                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
+//                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
+//
+//                // Received Thread 시작
+//                try {
+//                    GlobalVariables.rxThreadOn =true
+//                    GlobalVariables.rxThread = RxThread()
+//                    GlobalVariables.rxThread!!.start()
+//
+//                    GlobalVariables.rxPacketThreadOn =true
+//                    GlobalVariables.getPacketThread = GetPacketThread(requireContext())
+//                    GlobalVariables.getPacketThread!!.start()
+//                } catch (ex: Exception) {
+//                    Toast.makeText(this@ConnectFragment.context,
+//                        "Error occurred while starting threads.",
+//                        Toast.LENGTH_LONG)
+//                        .show()
+//                }
+//                GlobalVariables.isBtConnected = true
+//                DisplayBtStatus()
+//
+//                Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
+//                    .show()
+//
+//                Thread.sleep(100)
+//                Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
             }else if (resultCode == RESULT_CANCELED) {
                 //tvStatus.text = "Connection canceled."
             }
@@ -129,11 +146,6 @@ class ConnectFragment : Fragment() {
             mmBinding?.btnConnect?.isEnabled = true
             mmBinding?.btnDisconnect?.isEnabled = false
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mmBinding = null
     }
 
     //---------------------------------------------------------------------------------------//

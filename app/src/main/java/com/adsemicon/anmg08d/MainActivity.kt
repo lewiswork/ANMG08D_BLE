@@ -1,6 +1,8 @@
 package com.adsemicon.anmg08d
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -51,6 +53,12 @@ class MainActivity : AppCompatActivity() {
         // MainActivity 의 applicationContext 필요 -> late init
         //------------------------------------------------------------------////
         GlobalVariables.initLogAndMonitoring(applicationContext)
+
+//        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+//            Log.d("[ADS] ", "BLE NOT supported.")
+//        } else {
+//            Log.d("[ADS] ", "BLE supported.")
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

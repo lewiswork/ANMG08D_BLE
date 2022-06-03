@@ -18,6 +18,7 @@ import java.lang.Exception
 import java.text.DecimalFormat
 import kotlin.experimental.and
 import kotlin.experimental.or
+import com.adsemicon.anmg08d.GlobalVariables
 
 class MonitoringFragment : Fragment() {
 
@@ -77,7 +78,7 @@ class MonitoringFragment : Fragment() {
             stopMonitoring()
         }
 
-        com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
+        GlobalVariables.waitForStopMon = true
 
         Log.d("[ADS] ", "Monitoring Fragment > onPause")
     }
@@ -91,7 +92,7 @@ class MonitoringFragment : Fragment() {
 
 
     private fun initGridView(view: View) {
-        for (i in 0 until com.adsemicon.anmg08d.GlobalVariables.monitoring.MAX_CH_CNT) {
+        for (i in 0 until GlobalVariables.monitoring.MAX_CH_CNT) {
             val map = HashMap<String, Any>()
             map["chNum"] = chStr[i]
             map["img"] = imgTouchStat[0]    // touch status
@@ -105,33 +106,65 @@ class MonitoringFragment : Fragment() {
         binding.gridMon.adapter = adapter
     }
 
+//    private fun updateMonData() {
+//        dataListMon.clear()
+//        var percent: Double
+//
+//        for (i in 0 until GlobalVariables.monitoring.MAX_CH_CNT) {
+//            val map = HashMap<String, Any>()
+//            map["chNum"] = chStr[i]
+//            synchronized(GlobalVariables.monitoring.channels) {
+//                map["img"] =
+//                    if (GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+//
+//                percent = GlobalVariables.monitoring.channels[i].percent
+//            }
+//            var df = DecimalFormat("0.000")
+//            var perStr = df.format(percent)
+//
+//            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
+//            else map["chVal"] = "$perStr %"
+//
+//            dataListMon.add(map)
+//        }
+//        val keys = arrayOf("img", "chNum", "chVal")
+//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+//        val adapter =
+//            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
+//
+//        binding.gridMon.adapter = adapter
+//    }
+
     private fun updateMonData() {
-        dataListMon.clear()
-        var percent: Double
+        // Graphical Display 시 반응 속도 저하 관련 테스트를 위해 임시 주석 처리
+//        dataListMon.clear()
+//        var percent: Double
+//
+//        for (i in 0 until GlobalVariables.monitoring.MAX_CH_CNT) {
+//            val map = HashMap<String, Any>()
+//            map["chNum"] = chStr[i]
+//            synchronized(GlobalVariables.monitoring.channels) {
+//                map["img"] =
+//                    if (GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+//
+//                percent = GlobalVariables.monitoring.channels[i].percent
+//            }
+//            var df = DecimalFormat("0.000")
+//            var perStr = df.format(percent)
+//
+//            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
+//            else map["chVal"] = "$perStr %"
+//
+//            dataListMon.add(map)
+//        }
+//        val keys = arrayOf("img", "chNum", "chVal")
+//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+//        val adapter =
+//            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
+//
+//        binding.gridMon.adapter = adapter
 
-        for (i in 0 until com.adsemicon.anmg08d.GlobalVariables.monitoring.MAX_CH_CNT) {
-            val map = HashMap<String, Any>()
-            map["chNum"] = chStr[i]
-            synchronized(com.adsemicon.anmg08d.GlobalVariables.monitoring.channels) {
-                map["img"] =
-                    if (com.adsemicon.anmg08d.GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
-
-                percent = com.adsemicon.anmg08d.GlobalVariables.monitoring.channels[i].percent
-            }
-            var df = DecimalFormat("0.000")
-            var perStr = df.format(percent)
-
-            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
-            else map["chVal"] = "$perStr %"
-
-            dataListMon.add(map)
-        }
-        val keys = arrayOf("img", "chNum", "chVal")
-        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-        val adapter =
-            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
-
-        binding.gridMon.adapter = adapter
+        binding.tvStatusMonFrag.text = GlobalVariables.monitoring.channels[6].touch.toString()
     }
 
     private fun checkConnections() {
@@ -178,12 +211,12 @@ class MonitoringFragment : Fragment() {
 
                     if (mask == 0x00.toByte()) {
                         stopMonitoring()
-                        com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
+                        GlobalVariables.waitForStopMon = true
                     } else Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, mask) // Send packet
                 }
                 binding.btnClearMon -> {
                     stopMonitoring()
-                    com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = true
+                    GlobalVariables.waitForStopMon = true
                 }
             }
         } catch (ex: Exception) {
@@ -243,22 +276,22 @@ class MonitoringFragment : Fragment() {
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.regQueue.isEmpty() }
+                synchronized(GlobalVariables.regQueue) { qEmpty = GlobalVariables.regQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.regQueue.remove() }
+                        synchronized(GlobalVariables.regQueue) { packet = GlobalVariables.regQueue.remove() }
 
                         when (packet.kind) {
                             com.adsemicon.anmg08d.PacketKind.RegSwReset ->Log.d("[ADS] ", "SW reset done.")
                             else -> {}    // Do nothing
                         }
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                        GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
                     }catch (ex: Exception) {
-                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                        GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -273,17 +306,17 @@ class MonitoringFragment : Fragment() {
         }
 
         private fun monitoring() {
-            if (com.adsemicon.anmg08d.GlobalVariables.monitoring.hasNewData) {
+            if (GlobalVariables.monitoring.hasNewData) {
                 // -------------------------------------------------------------------------//
                 // Display Touch and Percent(임시)
                 // -------------------------------------------------------------------------//
                 activity?.runOnUiThread {
                     updateMonData()
-                    if (com.adsemicon.anmg08d.GlobalVariables.waitForStopMon) stopMonitoring()
+                    if (GlobalVariables.waitForStopMon) stopMonitoring()
                 }
                 // -------------------------------------------------------------------------//
 
-                com.adsemicon.anmg08d.GlobalVariables.monitoring.hasNewData = false
+                GlobalVariables.monitoring.hasNewData = false
             }
         }
     }

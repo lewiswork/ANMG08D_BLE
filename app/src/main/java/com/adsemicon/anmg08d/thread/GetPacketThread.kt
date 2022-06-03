@@ -64,7 +64,7 @@ class GetPacketThread(context: Context):Thread() {
                         GlobalVariables.rxRawBytesQueue.clear()
                         continue
                     } catch (ex: Exception) {
-                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                        GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break
@@ -148,52 +148,52 @@ class GetPacketThread(context: Context):Thread() {
 
                         // Packet 별 Queue 에 Packet 저장(Raw Byte List Clear)
                         when (category) {
-                            com.adsemicon.anmg08d.PacketCategory.Rom -> com.adsemicon.anmg08d.GlobalVariables.romQueue.add(pk)
+                            PacketCategory.Rom -> GlobalVariables.romQueue.add(pk)
 
                             //-------------------------------------------------------------------//
                             // Monitoring 데이터는 Queue 에 저장하지 않음
                             // Monitoring Class Data 갱신 처리
                             // 이후 Data Display Thread 에서 Monitoring Class Data Display
                             //-------------------------------------------------------------------//
-                            com.adsemicon.anmg08d.PacketCategory.Monitoring -> {
-                                if (kind == com.adsemicon.anmg08d.PacketKind.MonSet && com.adsemicon.anmg08d.GlobalVariables.waitForStopMon) {
-                                    com.adsemicon.anmg08d.GlobalVariables.waitForStopMon = false
+                            PacketCategory.Monitoring -> {
+                                if (kind == PacketKind.MonSet && GlobalVariables.waitForStopMon) {
+                                    GlobalVariables.waitForStopMon = false
                                 } else {
-                                    com.adsemicon.anmg08d.GlobalVariables.monitoring.updateMonData(kind, dataContents)
+                                    GlobalVariables.monitoring.updateMonData(kind, dataContents)
                                 }
                             }
                             //-------------------------------------------------------------------//
 
-                            com.adsemicon.anmg08d.PacketCategory.Hardware -> {
-                                if (kind == com.adsemicon.anmg08d.PacketKind.HwRead) {
-                                    synchronized(com.adsemicon.anmg08d.GlobalVariables.hwStat) {
-                                        com.adsemicon.anmg08d.GlobalVariables.hwStat = dataContents[0]
+                            PacketCategory.Hardware -> {
+                                if (kind == PacketKind.HwRead) {
+                                    synchronized(GlobalVariables.hwStat) {
+                                        GlobalVariables.hwStat = dataContents[0]
                                     }
                                 }
-                                synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) {
-                                    com.adsemicon.anmg08d.GlobalVariables.hwQueue.add(pk)
+                                synchronized(GlobalVariables.hwQueue) {
+                                    GlobalVariables.hwQueue.add(pk)
                                 }
                             }
-                            com.adsemicon.anmg08d.PacketCategory.Register -> {
-                                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) {
-                                    com.adsemicon.anmg08d.GlobalVariables.regQueue.add(pk)
+                            PacketCategory.Register -> {
+                                synchronized(GlobalVariables.regQueue) {
+                                    GlobalVariables.regQueue.add(pk)
                                 }
 
-                                if (kind == com.adsemicon.anmg08d.PacketKind.RegSwReset && com.adsemicon.anmg08d.GlobalVariables.waitForSwReset) {
-                                    com.adsemicon.anmg08d.GlobalVariables.waitForSwReset = false
+                                if (kind == PacketKind.RegSwReset && GlobalVariables.waitForSwReset) {
+                                    GlobalVariables.waitForSwReset = false
                                     Log.d("[ADS] ", "RI response")
                                 }
                             }
-                            com.adsemicon.anmg08d.PacketCategory.Test -> {
-                                synchronized(com.adsemicon.anmg08d.GlobalVariables.testQueue) {
-                                    com.adsemicon.anmg08d.GlobalVariables.testQueue.add(pk)
+                            PacketCategory.Test -> {
+                                synchronized(GlobalVariables.testQueue) {
+                                    GlobalVariables.testQueue.add(pk)
                                 }
                             }
                         }
                         prepareLog()
 
                         // 임시, 향 후 Library 적용 예정
-                        com.adsemicon.anmg08d.GlobalVariables.packetLog.printPacket(PacketType.RX, mmLogStr.toString())
+                        GlobalVariables.packetLog.printPacket(PacketType.RX, mmLogStr.toString())
 
                         clearRawByteList()  // Packet 처리 완료된 Raw Data 제거
                     }
@@ -201,7 +201,7 @@ class GetPacketThread(context: Context):Thread() {
                 }
 
             } catch (ex: java.io.IOException) {
-                com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                GlobalVariables.errLog.printError(ex)
                 Log.d("[ADS/ERR] ", ex.message.toString())
                 ex.printStackTrace()
                 break
@@ -257,7 +257,7 @@ class GetPacketThread(context: Context):Thread() {
             }
         }
         //Log.d("[ADS] ", "[RX PK ELE] $mmLogStr")
-        Log.d("[ADS] ", "[PK RX] $mmLogStr")
+        //Log.d("[ADS] ", "[PK RX] $mmLogStr")
         //------------------------------------------------------------------------------//
     }
 

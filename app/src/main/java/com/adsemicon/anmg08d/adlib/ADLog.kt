@@ -1,7 +1,6 @@
 package com.adsemicon.anmg08d.adlib
 
 import android.util.Log
-//import kr.co.blue.adlib.Thread.ADThread
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

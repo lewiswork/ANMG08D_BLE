@@ -32,6 +32,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.adsemicon.anmg08d'
 }
 
 dependencies {

@@ -1,6 +1,7 @@
 package com.adsemicon.anmg08d.thread
 
 import android.util.Log
+import com.adsemicon.anmg08d.GlobalVariables
 
 class RxThread : Thread() {
 
@@ -10,17 +11,17 @@ class RxThread : Thread() {
         var rxBuffer: ByteArray = ByteArray(2048)
 
         Log.d("[ADS] ", "Receive thread started. ID : ${this.id}")
-        while (com.adsemicon.anmg08d.GlobalVariables.rxThreadOn) {
+        while (GlobalVariables.rxThreadOn) {
             try {
-                if (com.adsemicon.anmg08d.GlobalVariables.socket!!.isConnected) {
+                if (GlobalVariables.socket!!.isConnected) {
                     // Receive
-                    bytes = com.adsemicon.anmg08d.GlobalVariables.inStream!!.read(rxBuffer)
+                    bytes = GlobalVariables.inStream!!.read(rxBuffer)
 
                     if (bytes > 0) {
                         //synchronized(this) {
-                        synchronized(com.adsemicon.anmg08d.GlobalVariables.rxRawBytesQueue) {
+                        synchronized(GlobalVariables.rxRawBytesQueue) {
                             arrayCopy = rxBuffer.copyOf(bytes)
-                            com.adsemicon.anmg08d.GlobalVariables.rxRawBytesQueue.add(arrayCopy)
+                            GlobalVariables.rxRawBytesQueue.add(arrayCopy)
                         }
                     }
                 }

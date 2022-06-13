@@ -170,39 +170,33 @@ class ConnectFragment : Fragment() {
         binding.tvDeviceName.text = GlobalVariables.selectedDevice.name
         binding.tvMac.text = GlobalVariables.selectedDevice.address
 
-//        GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-//        GlobalVariables.socket!!.connect()
-
-
-        //binding.tvStatus.text = "Real connected."
-
 //        // Get Input/Output Stream using socket
 //        GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
 //        GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
 
         // Received Thread 시작
-//        try {
+        try {
 //            GlobalVariables.rxThreadOn = true
 //            GlobalVariables.rxThread = RxThread()
 //            GlobalVariables.rxThread!!.start()
-//
+
 //            GlobalVariables.rxPacketThreadOn = true
 //            GlobalVariables.getPacketThread = GetPacketThread(requireContext())
 //            GlobalVariables.getPacketThread!!.start()
-//        } catch (ex: Exception) {
-//            Toast.makeText(this@ConnectFragment.context,
-//                "Error occurred while starting threads.",
-//                Toast.LENGTH_LONG)
-//                .show()
-//        }
-//        GlobalVariables.isBtConnected = true
-//        displayBtStatus()
-//
-//        Toast.makeText(this@ConnectFragment.context,
-//            "Bluetooth device connected.",
-//            Toast.LENGTH_LONG)
-//            .show()
-//
+        } catch (ex: Exception) {
+            Toast.makeText(this@ConnectFragment.context,
+                "Error occurred while starting threads.",
+                Toast.LENGTH_LONG)
+                .show()
+        }
+        GlobalVariables.isBtConnected = true
+        displayBtStatus()
+
+        Toast.makeText(this@ConnectFragment.context,
+            "Bluetooth device connected.",
+            Toast.LENGTH_LONG)
+            .show()
+
 //        Thread.sleep(100)
 //        Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
     }
@@ -387,13 +381,13 @@ class ConnectFragment : Fragment() {
     // BT Disconnect 함수, Stream, Socket Close 및 Thread 종료
     //---------------------------------------------------------------------------------------//
     private fun disconnectBt() {
-        if ((GlobalVariables.hwStat and 0x06) == 0x06.toByte()) {
-            Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
-            Log.d("[ADS]", "Monitoring stopped.")
-            Thread.sleep(10) // ok
-        }
+//        if ((GlobalVariables.hwStat and 0x06) == 0x06.toByte()) {
+//            Packet.send(GlobalVariables.outStream, PacketKind.MonSet, 0x00)  // Stop All Monitoring
+//            Log.d("[ADS]", "Monitoring stopped.")
+//            Thread.sleep(10) // ok
+//        }
         GlobalVariables.hwStat = 0x00
-        Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
+        //Packet.send(GlobalVariables.outStream, PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
 
         if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
         if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
@@ -439,13 +433,9 @@ class ConnectFragment : Fragment() {
     // btnDisconnect 의 OnClickListener
     //---------------------------------------------------------------------------------------//
     private val listenerDisconnect = View.OnClickListener {
+        //disconnectBt()
+        disconnectGattServer()
         disconnectBt()
-
-//        mmBinding?.tvDeviceName?.text = "Device : "
-//        mmBinding?.tvMac?.text = "MAC : "
-//
-//        mmBinding?.btnConnect?.isEnabled = true
-//        mmBinding?.btnDisconnect?.isEnabled = false
 
         binding.tvDeviceName.text = "Device : "
         binding.tvMac.text = "MAC : "

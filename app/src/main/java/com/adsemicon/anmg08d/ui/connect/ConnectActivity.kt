@@ -34,7 +34,6 @@ class ConnectActivity : AppCompatActivity() {
     private var _binding: ActivityConnectBinding? = null
     private val binding get() = _binding!!
 
-
     private val bleScanner = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             //Log.d("DeviceListActivity", "onScanResult()")
@@ -50,56 +49,6 @@ class ConnectActivity : AppCompatActivity() {
             Log.e("[ADS]", "BLE scan failed with code $_error")
         }
     }
-
-    /**
-     * Add scan result
-     */
-    private fun addScanResult(result: ScanResult) {
-        // get scanned device
-        val device = result.device
-        // get scanned device MAC address
-        val deviceAddress = device.address
-        val deviceName = device.name
-
-        if (device.name == null) return
-
-        // 중복 체크
-        if (scanResults!!.isNotEmpty()) {
-            for (dev in scanResults!!) {
-                //if (dev.name == null || dev.address == deviceAddress) return
-                if (dev.address == deviceAddress) return
-            }
-        }
-        // add arrayList
-        scanResults?.add(result.device)
-        mmNames.add(device.name)        // ListView 표시를 위해 사용
-        mmMacs.add(device.address)      // ListView 표시를 위해 사용
-        mmDevices.add(device)           // 최종 Device 선택 시 사용
-
-        // ListView 에 Device List Display
-        val dataList = ArrayList<HashMap<String, Any>>()
-
-        for (i in mmNames.indices) {
-            val map = HashMap<String, Any>()
-            map["name"] = mmNames[i]
-            map["mac"] = mmMacs[i]
-            dataList.add(map)
-        }
-
-        var keys = arrayOf("name", "mac")
-        val ids = intArrayOf(R.id.tvDeviceName, R.id.tvDeviceMac)
-        val adapter1 = SimpleAdapter(this, dataList, R.layout.bt_devices_row, keys, ids)
-
-        val lvDevices = findViewById<ListView>(R.id.lvDevices)
-        lvDevices.adapter = adapter1
-
-        // status text UI update
-        //statusTxt.set("add scanned device: $deviceAddress")
-        Log.d("[ADS] ", "add scanned device: $deviceName / $deviceAddress")
-        // scanlist update 이벤트
-        //_listUpdate.value = Event(true)
-    }
-
 
     private val bluetoothLeScanner: BluetoothLeScanner
         get()  {
@@ -126,32 +75,82 @@ class ConnectActivity : AppCompatActivity() {
         //getPairedDevices()
     }
 
+
+    /**
+     * Add scan result
+     */
+    private fun addScanResult(result: ScanResult) {
+        // get scanned device
+        val device = result.device
+        // get scanned device MAC address
+        val deviceAddress = device.address
+        val deviceName = device.name
+
+        if (device.name == null) return
+
+        // 중복 체크
+        if (scanResults!!.isNotEmpty()) {
+            for (dev in scanResults!!) {
+                //if (dev.name == null || dev.address == deviceAddress) return
+                if (dev.address == deviceAddress) return
+            }
+        }
+        // add arrayList
+        scanResults?.add(device)
+        mmNames.add(device.name)        // ListView 표시를 위해 사용
+        mmMacs.add(device.address)      // ListView 표시를 위해 사용
+        mmDevices.add(device)           // 최종 Device 선택 시 사용
+
+        // ListView 에 Device List Display
+        val dataList = ArrayList<HashMap<String, Any>>()
+
+        for (i in mmNames.indices) {
+            val map = HashMap<String, Any>()
+            map["name"] = mmNames[i]
+            map["mac"] = mmMacs[i]
+            dataList.add(map)
+        }
+
+        var keys = arrayOf("name", "mac")
+        val ids = intArrayOf(R.id.tvDeviceName, R.id.tvDeviceMac)
+        val adapter1 = SimpleAdapter(this, dataList, R.layout.row_bt_devices, keys, ids)
+
+        val lvDevices = findViewById<ListView>(R.id.lvDevices)
+        lvDevices.adapter = adapter1
+
+        // status text UI update
+        //statusTxt.set("add scanned device: $deviceAddress")
+        Log.d("[ADS] ", "add scanned device: $deviceName / $deviceAddress")
+        // scanlist update 이벤트
+        //_listUpdate.value = Event(true)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
-            REQ_CODE_ACCESS_FINE_LOCATION -> {  // 1
-                if (grantResults.isEmpty()) {  // 2
+            REQ_CODE_ACCESS_FINE_LOCATION -> {
+                if (grantResults.isEmpty()) {
                     throw RuntimeException("Empty permission result")
                 }
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {  // 3
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d( "[ADS] ", "ACCESS_FINE_LOCATION granted.")
                     Log.d("[ADS] ", "Proceed next sequence.2")
 
-                    if (ActivityCompat.checkSelfPermission(this,
-                            Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        Log.d( "[ADS] ", "BLUETOOTH_SCAN is not permitted.")
-                        return
-                    }
+//                    if (ActivityCompat.checkSelfPermission(this,
+//                            Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+//                    ) {
+//                        // TODO: Consider calling
+//                        //    ActivityCompat#requestPermissions
+//                        // here to request the missing permissions, and then overriding
+//                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                        //                                          int[] grantResults)
+//                        // to handle the case where the user grants the permission. See the documentation
+//                        // for ActivityCompat#requestPermissions for more details.
+//                        Log.d( "[ADS] ", "BLUETOOTH_SCAN is not permitted.")
+//                        return
+//                    }
                     bluetoothLeScanner.startScan(bleScanner)
 
                 } else {
@@ -196,48 +195,28 @@ class ConnectActivity : AppCompatActivity() {
             // 권한 활성 시 이후 Sequence 진행
             Log.d("[ADS] ", "ACCESS_FINE_LOCATION enabled.")
             Log.d("[ADS] ", "Proceed next sequence")
+
             bluetoothLeScanner.startScan(bleScanner)
         }
-
-//        if (m_locationPermitted)
-//            Log.d( "[ADS] ", "ACCESS_FINE_LOCATION OK")
-//        else
-//            Log.d( "[ADS] ", "ACCESS_FINE_LOCATION No")
-
-//        if(enableLocation())
-//            Log.d("[ADS] ", "ACCESS_FINE_LOCATION enabled.")
-//        else
-//            Log.d("[ADS] ", "ACCESS_FINE_LOCATION disabled.")
-
-//        if (ContextCompat.checkSelfPermission(this,
-//                Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(Manifest.permission.BLUETOOTH_SCAN),
-//                0
-//            )
-//        }
-//
-//        bluetoothLeScanner.startScan(bleScanner)
     }
 
     override fun onStop() {
         Log.d("[ADS] ", "Connect Fragment > Connect Activity > onStop()")
-//        if (ActivityCompat.checkSelfPermission(this,
-//                Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            Log.d("[ADS] ", "returned2")
-//            return
-//        }
-        //bluetoothLeScanner.stopScan(bleScanner)
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.d("[ADS] ", "ACCESS_FINE_LOCATION is not permitted.")
+            return
+        }
+        bluetoothLeScanner.stopScan(bleScanner)
+        Log.d("[ADS] ", "BLUETOOTH SCAN stopped.")
         super.onStop()
     }
 
@@ -261,6 +240,7 @@ class ConnectActivity : AppCompatActivity() {
     //--------------------------------------------------------------------------//
     private val listenerItemClick =  AdapterView.OnItemClickListener { parent, view, position, id ->
         GlobalVariables.selectedDevice = mmDevices[position]
+        //GlobalVariables.selectedDevice= scanResults[position]
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
@@ -291,7 +271,7 @@ class ConnectActivity : AppCompatActivity() {
 
         var keys = arrayOf("name", "mac")
         val ids = intArrayOf(R.id.tvDeviceName, R.id.tvDeviceMac)
-        val adapter1 = SimpleAdapter(this, dataList, R.layout.bt_devices_row, keys, ids)
+        val adapter1 = SimpleAdapter(this, dataList, R.layout.row_bt_devices, keys, ids)
 
         val lvDevices = findViewById<ListView>(R.id.lvDevices)
         lvDevices.adapter = adapter1

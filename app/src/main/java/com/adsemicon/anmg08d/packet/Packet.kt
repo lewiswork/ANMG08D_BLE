@@ -13,8 +13,6 @@ class Packet {
         const val ETX: Byte = 0x03
         const val IDX_DATA_START : Int = 6
 
-
-
         val packetCategory = mapOf(
             "E" to com.adsemicon.anmg08d.PacketCategory.Rom,
             "M" to com.adsemicon.anmg08d.PacketCategory.Monitoring,

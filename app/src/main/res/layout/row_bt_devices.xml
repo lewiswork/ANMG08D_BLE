@@ -2,14 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingVertical="5dp"
+    android:paddingLeft="10dp">
 
     <TextView
         android:id="@+id/tvDeviceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Name : "
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#000000" />
 
     <TextView
         android:id="@+id/tvDeviceMac"

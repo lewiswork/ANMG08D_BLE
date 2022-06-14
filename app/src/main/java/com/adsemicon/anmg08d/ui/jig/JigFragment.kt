@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.adsemicon.anmg08d.GlobalVariables
+import com.adsemicon.anmg08d.PacketKind
 import com.adsemicon.anmg08d.databinding.FragmentJigBinding
 import com.adsemicon.anmg08d.packet.RPacket
 import com.adsemicon.anmg08d.packet.Packet
@@ -102,23 +104,23 @@ class JigFragment : Fragment() {
                 binding.swVdd, binding.swI2c -> {
                     if (binding.swVdd.isChecked) mask = mask or 0x02
                     if (binding.swI2c.isChecked) mask = mask or 0x04
-                    com.adsemicon.anmg08d.GlobalVariables.hwStat = mask
+                    GlobalVariables.hwStat = mask
                 }
                 binding.btnClearRelays -> {
-                    com.adsemicon.anmg08d.GlobalVariables.hwStat = 0x00
+                    GlobalVariables.hwStat = 0x00
                     binding.swVdd.isChecked = false
                     binding.swI2c.isChecked = false
                 }
             }
 
-            if (com.adsemicon.anmg08d.GlobalVariables.hwStatPrev == 0x06.toByte() && com.adsemicon.anmg08d.GlobalVariables.hwStat != 0x06.toByte()) {
-                Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)  // Stop All Monitoring
+            if (GlobalVariables.hwStatPrev == 0x06.toByte() && GlobalVariables.hwStat != 0x06.toByte()) {
+                Packet.send(GlobalVariables.outStream, PacketKind.MonSet, 0x00)  // Stop All Monitoring
                 Log.d("[ADS]", "Monitoring stopped.")
                 //Thread.sleep(100) // ok
                 Thread.sleep(10) // ok
             }
-            Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwWrite, com.adsemicon.anmg08d.GlobalVariables.hwStat) // Send packet
-            com.adsemicon.anmg08d.GlobalVariables.hwStatPrev = com.adsemicon.anmg08d.GlobalVariables.hwStat
+            Packet.send(GlobalVariables.outStream, PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
+            GlobalVariables.hwStatPrev = GlobalVariables.hwStat
 
             //binding.textView3.text = Global.hwStat.toString()    // for debugging
         } catch (ex: Exception) {
@@ -142,32 +144,32 @@ class JigFragment : Fragment() {
                 // Timer 처리
                 //------------------------------------------------------------------------------//
                 if (tick){
-                    Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
+                    Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
                     tick = false
                 }
 
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.hwQueue.isEmpty() }
+                synchronized(GlobalVariables.hwQueue) { qEmpty = GlobalVariables.hwQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.GlobalVariables.hwQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.hwQueue.remove() }
+                        synchronized(GlobalVariables.hwQueue) { packet = GlobalVariables.hwQueue.remove() }
 
                         when (packet.kind) {
-                            com.adsemicon.anmg08d.PacketKind.HwRead -> {
+                            PacketKind.HwRead -> {
                                 activity?.runOnUiThread {
                                     displayRelayStatus()
                                 }
                             }
                         }
                     } catch (ex: NoSuchElementException) {
-                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                        GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.toString())
                         continue
                     } catch (ex: Exception) {
-                        com.adsemicon.anmg08d.GlobalVariables.errLog.printError(ex)
+                        GlobalVariables.errLog.printError(ex)
                         Log.d("[ADS/ERR] ", ex.message.toString())
                         Log.d("[ADS/ERR] ", ex.printStackTrace().toString())
                         break

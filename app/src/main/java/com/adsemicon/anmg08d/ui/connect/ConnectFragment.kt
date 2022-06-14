@@ -85,6 +85,8 @@ class ConnectFragment : Fragment() {
             //------------------------------------------------------------------//
             binding.btnConnect.setOnClickListener(listenerConnect)              // Connect
             binding.btnDisconnect.setOnClickListener(listenerDisconnect)        // Disconnect
+
+            binding.button.setOnClickListener (listenerSend)
             //------------------------------------------------------------------//
 
             displayBtStatus()
@@ -295,12 +297,13 @@ class ConnectFragment : Fragment() {
             val uuidNotification = UUID.fromString(UUID_CHAR_NOTIFICATION)
             val uuidRw = UUID.fromString(UUID_CHAR_RW)
 
-            val ch = gatt.getService(uuidService).getCharacteristic(uuidRw)
-            val descriptor:BluetoothGattDescriptor = ch.getDescriptor(
-                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
-            )
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            gatt!!.writeDescriptor(descriptor);
+            //val ch = gatt.getService(uuidService).getCharacteristic(uuidRw)
+            val ch = bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)
+//            val descriptor:BluetoothGattDescriptor = ch.getDescriptor(
+//                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
+//            )
+//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//            gatt!!.writeDescriptor(descriptor);
 
             //ch.setValue("LMN");
 //            gatt!!.writeCharacteristic(ch)
@@ -322,30 +325,29 @@ class ConnectFragment : Fragment() {
             Log.d("[ADS] ", "Services discovery is successfully.")
             //bleConnectionProc()
 
-            var ba  =  ByteArray(9)
-            var ba2  =  ByteArray(1)
+//            var ba  =  ByteArray(9)
+//            var ba2  =  ByteArray(1)
+//
+//            ba[0] = 0x02
+//            ba[1] = 'H'.code.toByte()
+//            ba[2] = 'W'.code.toByte()
+//            ba[3] = '0'.code.toByte()
+//            ba[4] = '0'.code.toByte()
+//            ba[5] = '1'.code.toByte()
+//            ba[6] = 0x02
+//            ba[7] = 0xfe.toByte()
+//            ba[8] = 0x03
+//            //ch.setValue("OPQ");
+//
+//            ch?.setValue(ba)
+//            //gatt!!.writeCharacteristic(ch)
+//           bleGatt?.writeCharacteristic(ch)
 
-            ba[0] = 0x02
-            ba[1] = 'H'.code.toByte()
-            ba[2] = 'W'.code.toByte()
-            ba[3] = '0'.code.toByte()
-            ba[4] = '0'.code.toByte()
-            ba[5] = '1'.code.toByte()
-            ba[6] = 0x02
-            ba[7] = 0xfe.toByte()
-            ba[8] = 0x03
-            //ch.setValue("OPQ");
-
-            ch.setValue(ba)
-            gatt!!.writeCharacteristic(ch)
-
-            //connected = true
-
-//            val descriptor:BluetoothGattDescriptor = ch.getDescriptor(
-//                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
-//            )
-//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//            gatt!!.writeDescriptor(descriptor);
+            val descriptor:BluetoothGattDescriptor? = ch?.getDescriptor(
+                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
+            )
+            descriptor?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+            gatt!!.writeDescriptor(descriptor);
         }
 
         override fun onCharacteristicChanged(
@@ -353,12 +355,12 @@ class ConnectFragment : Fragment() {
             characteristic: BluetoothGattCharacteristic,
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            Log.d("[ADS] ", "characteristic changed: " + characteristic.uuid.toString())
+            //Log.d("[ADS] ", "characteristic changed: " + characteristic.uuid.toString())
 
             //readCharacteristic(characteristic)
 
             activity?.runOnUiThread(Runnable {
-                Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
+                //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
                 Log.d("[ADS] ", "onCharacteristicChanged: " + characteristic.getStringValue(0))
 
                 //readCharacteristic(characteristic)
@@ -563,5 +565,29 @@ class ConnectFragment : Fragment() {
 
         binding.btnConnect.isEnabled = true
         binding.btnDisconnect.isEnabled = false
+    }
+
+    private val listenerSend = View.OnClickListener {
+
+        val uuidService = UUID.fromString(UUID_SERVICE)
+        val uuidRw = UUID.fromString(UUID_CHAR_RW)
+
+        val ch = bleGatt!!.getService(uuidService).getCharacteristic(uuidRw)
+
+        var ba = ByteArray(9)
+
+        ba[0] = 0x02
+        ba[1] = 'H'.code.toByte()
+        ba[2] = 'W'.code.toByte()
+        ba[3] = '0'.code.toByte()
+        ba[4] = '0'.code.toByte()
+        ba[5] = '1'.code.toByte()
+        ba[6] = 0x02
+        ba[7] = 0xfe.toByte()
+        ba[8] = 0x03
+        //ch.setValue("OPQ");
+
+        ch.setValue(ba)
+        bleGatt?.writeCharacteristic(ch)
     }
 }

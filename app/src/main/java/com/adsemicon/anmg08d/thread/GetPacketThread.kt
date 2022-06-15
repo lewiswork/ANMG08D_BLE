@@ -41,7 +41,7 @@ class GetPacketThread(context: Context):Thread() {
 
         Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
-        while (GlobalVariables.rxPacketThreadOn) {
+        while (GlobalVariables.getPacketThreadOn) {
             try {
                 //------------------------------------------------------------------------------//
                 // rawByteQueue 데이터 -> byteList 로 이동

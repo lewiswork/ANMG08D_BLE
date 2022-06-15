@@ -39,7 +39,7 @@ class GlobalVariables {
         var socket: BluetoothSocket? = null
 
         var rxThreadOn = false
-        var rxPacketThreadOn = false
+        var getPacketThreadOn = false
 
         //var rxThread: RxThread? = null
         var getPacketThread: GetPacketThread? = null

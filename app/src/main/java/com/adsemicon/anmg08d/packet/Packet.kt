@@ -199,7 +199,7 @@ class Packet {
             GlobalVariables.btCh.setValue(ba)
             GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
-            logTxPacket(ba)
+            //logTxPacket(ba)
         }
 
         //--------------------------------------------------------------------------------------//
@@ -290,7 +290,7 @@ class Packet {
             }
 
             GlobalVariables.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
-            Log.d("[ADS] ", "[PK TX] $logStr")
+            //Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }
 }

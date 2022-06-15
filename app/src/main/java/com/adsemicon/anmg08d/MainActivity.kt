@@ -1,8 +1,6 @@
 package com.adsemicon.anmg08d
 
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -87,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 //        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
-        GlobalVariables.rxPacketThreadOn = false
+        GlobalVariables.getPacketThreadOn = false
 
         GlobalVariables.rxRawBytesQueue.clear()
         GlobalVariables.isBtConnected = false

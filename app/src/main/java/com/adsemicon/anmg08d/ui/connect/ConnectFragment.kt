@@ -3,7 +3,6 @@ package com.adsemicon.anmg08d.ui.connect
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.bluetooth.*
-import android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,13 +18,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 import com.adsemicon.anmg08d.GlobalVariables
+import com.adsemicon.anmg08d.PacketKind
 import com.adsemicon.anmg08d.databinding.FragmentConnectBinding
+import com.adsemicon.anmg08d.packet.Packet
 import com.adsemicon.anmg08d.thread.GetPacketThread
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.CLIENT_CHARACTERISTIC_CONFIG
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_RW_NOTIFY
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_SERVICE
-import org.apache.commons.io.Charsets
-import java.nio.charset.Charset
 import java.util.*
 
 
@@ -76,7 +75,7 @@ class ConnectFragment : Fragment() {
             binding.btnConnect.setOnClickListener(listenerConnect)              // Connect
             binding.btnDisconnect.setOnClickListener(listenerDisconnect)        // Disconnect
 
-            binding.button.setOnClickListener (listenerSend)
+            //binding.button.setOnClickListener (listenerSend)
             //------------------------------------------------------------------//
 
             displayBtStatus()
@@ -110,7 +109,6 @@ class ConnectFragment : Fragment() {
     }
 
     fun bleConnectionProc() {
-
         activity?.runOnUiThread {
 //            binding.tvDeviceName.text = GlobalVariables.selectedDevice.name
 //            binding.tvMac.text = GlobalVariables.selectedDevice.address
@@ -120,21 +118,21 @@ class ConnectFragment : Fragment() {
 //        GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
 //        GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
 
-//            // Received Thread 시작
-//            try {
-//  //          GlobalVariables.rxThreadOn = true
-////            GlobalVariables.rxThread = RxThread()
-////            GlobalVariables.rxThread!!.start()
-//
-//            GlobalVariables.rxPacketThreadOn = true
-//            GlobalVariables.getPacketThread = GetPacketThread(requireContext())
-//            GlobalVariables.getPacketThread!!.start()
-//            } catch (ex: Exception) {
-//                Toast.makeText(this@ConnectFragment.context,
-//                    "Error occurred while starting threads.",
-//                    Toast.LENGTH_LONG)
-//                    .show()
-//            }
+//            // Packet 추출 Thread 시작(RxThread 미사용, 2차 버전)
+            try {
+                //          GlobalVariables.rxThreadOn = true
+//            GlobalVariables.rxThread = RxThread()
+//            GlobalVariables.rxThread!!.start()
+
+                GlobalVariables.getPacketThreadOn = true
+                GlobalVariables.getPacketThread = GetPacketThread(requireContext())
+                GlobalVariables.getPacketThread!!.start()
+            } catch (ex: Exception) {
+                Toast.makeText(this@ConnectFragment.context,
+                    "Error occurred while starting threads.",
+                    Toast.LENGTH_LONG)
+                    .show()
+            }
             GlobalVariables.isBtConnected = true
             displayBtStatus()
 
@@ -143,9 +141,8 @@ class ConnectFragment : Fragment() {
                 Toast.LENGTH_LONG)
                 .show()
 
-//        Thread.sleep(100)
-        //Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
-
+            //Thread.sleep(100)
+            //Packet.send(PacketKind.HwRead) // Send packet
         }
     }
 
@@ -225,28 +222,13 @@ class ConnectFragment : Fragment() {
             super.onCharacteristicChanged(gatt, characteristic)
 
             //activity?.runOnUiThread(Runnable {
-            //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
-            //Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
+                //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
+                //Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
 //            GlobalVariables.rxRawBytesQueue.add(characteristic.getStringValue(0).toByteArray())
-            //var str = characteristic.getStringValue(0)
-            var ba = characteristic.value
+                //var str = characteristic.getStringValue(0)    // String Type 으로 추출(toByteArray 시, Encoding 관련 문제
+                var ba = characteristic.value   // byte[] type 으로 return
 
-//            var str = characteristic.getIntValue(0)
-
-            //var str = characteristic.get
-            //Log.d("[ADS] ", "RX : " + str)
-
-            //var uba = ba.to
-            //var ba = str.toByteArray(Charsets.US_ASCII)
-
-            for (b in ba) {
-                Log.d("[ADS] ", "RX[n] : " + String.format("%02X", b))
-         //       Log.d("[ADS] ", "RX[n] : " +  b.toString())
-            }
-
-
-            //GlobalVariables.rxRawBytesQueue.add(str.toByteArray())
-
+                GlobalVariables.rxRawBytesQueue.add(ba)
             //})
         }
 
@@ -257,9 +239,9 @@ class ConnectFragment : Fragment() {
         ) {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("[ADS] ", "Characteristic written successfully")
+                //Log.d("[ADS] ", "Characteristic written successfully")
             } else {
-                Log.e("[ADS] ", "Characteristic write successfully, status: $status")
+                //Log.e("[ADS] ", "Characteristic write successfully, status: $status")
                 disconnectGattServer()
             }
         }
@@ -361,7 +343,7 @@ class ConnectFragment : Fragment() {
 //        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
-        GlobalVariables.rxPacketThreadOn = false
+        GlobalVariables.getPacketThreadOn = false
 
         //mmBinding?.tvStatus?.text = "Status : Disconnected"
         binding.tvStatus.text = "Status : Disconnected"
@@ -411,24 +393,24 @@ class ConnectFragment : Fragment() {
         binding.btnDisconnect.isEnabled = false
     }
 
-    private val listenerSend = View.OnClickListener {
-
-        val uuidService = UUID.fromString(UUID_SERVICE)
-        val uuidRw = UUID.fromString(UUID_CHAR_RW_NOTIFY)
-        val ch = GlobalVariables.bleGatt.getService(uuidService).getCharacteristic(uuidRw)
-        var ba = ByteArray(8)
-
-        ba[0] = 0x02
-        ba[1] = 'H'.code.toByte()
-        ba[2] = 'R'.code.toByte()
-        ba[3] = '0'.code.toByte()
-        ba[4] = '0'.code.toByte()
-        ba[5] = '0'.code.toByte()
-        //ba[6] = 0x02
-        ba[6] = 0x00
-        ba[7] = 0x03
-
-        ch.setValue(ba)
-        GlobalVariables.bleGatt.writeCharacteristic(ch)
-    }
+//    private val listenerSend = View.OnClickListener {
+//
+//        val uuidService = UUID.fromString(UUID_SERVICE)
+//        val uuidRw = UUID.fromString(UUID_CHAR_RW_NOTIFY)
+//        val ch = GlobalVariables.bleGatt.getService(uuidService).getCharacteristic(uuidRw)
+//        var ba = ByteArray(8)
+//
+//        ba[0] = 0x02
+//        ba[1] = 'H'.code.toByte()
+//        ba[2] = 'R'.code.toByte()
+//        ba[3] = '0'.code.toByte()
+//        ba[4] = '0'.code.toByte()
+//        ba[5] = '0'.code.toByte()
+//        //ba[6] = 0x02
+//        ba[6] = 0x00
+//        ba[7] = 0x03
+//
+//        ch.setValue(ba)
+//        GlobalVariables.bleGatt.writeCharacteristic(ch)
+//    }
 }

@@ -138,34 +138,34 @@ class MonitoringFragment : Fragment() {
 
     private fun updateMonData() {
         // Graphical Display 시 반응 속도 저하 관련 테스트를 위해 임시 주석 처리
-//        dataListMon.clear()
-//        var percent: Double
-//
-//        for (i in 0 until GlobalVariables.monitoring.MAX_CH_CNT) {
-//            val map = HashMap<String, Any>()
-//            map["chNum"] = chStr[i]
-//            synchronized(GlobalVariables.monitoring.channels) {
-//                map["img"] =
-//                    if (GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
-//
-//                percent = GlobalVariables.monitoring.channels[i].percent
-//            }
-//            var df = DecimalFormat("0.000")
-//            var perStr = df.format(percent)
-//
-//            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
-//            else map["chVal"] = "$perStr %"
-//
-//            dataListMon.add(map)
-//        }
-//        val keys = arrayOf("img", "chNum", "chVal")
-//        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
-//        val adapter =
-//            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
-//
-//        binding.gridMon.adapter = adapter
+        dataListMon.clear()
+        var percent: Double
 
-        binding.tvStatusMonFrag.text = GlobalVariables.monitoring.channels[6].touch.toString()
+        for (i in 0 until GlobalVariables.monitoring.MAX_CH_CNT) {
+            val map = HashMap<String, Any>()
+            map["chNum"] = chStr[i]
+            synchronized(GlobalVariables.monitoring.channels) {
+                map["img"] =
+                    if (GlobalVariables.monitoring.channels[i].touch) imgTouchStat[1] else imgTouchStat[0]     // touch status
+
+                percent = GlobalVariables.monitoring.channels[i].percent
+            }
+            var df = DecimalFormat("0.000")
+            var perStr = df.format(percent)
+
+            if (percent >= 0) map["chVal"] = " $perStr %"   // (-) 표시 부분만큼 앞에 공백 추가
+            else map["chVal"] = "$perStr %"
+
+            dataListMon.add(map)
+        }
+        val keys = arrayOf("img", "chNum", "chVal")
+        val ids = intArrayOf(R.id.ivDot, R.id.tvChNum, R.id.tvPercent)
+        val adapter =
+            SimpleAdapter(view?.context, dataListMon, R.layout.row_monitoring, keys, ids)
+
+        binding.gridMon.adapter = adapter
+
+        //binding.tvStatusMonFrag.text = GlobalVariables.monitoring.channels[6].touch.toString()
     }
 
     private fun checkConnections() {

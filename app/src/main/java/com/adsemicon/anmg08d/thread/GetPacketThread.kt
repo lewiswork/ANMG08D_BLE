@@ -52,7 +52,8 @@ class GetPacketThread(context: Context):Thread() {
                 if (!qEmpty) {
                     try {
                         synchronized(GlobalVariables.rxRawBytesQueue) {
-                            rawByteArray = GlobalVariables.rxRawBytesQueue.remove() }
+                            rawByteArray = GlobalVariables.rxRawBytesQueue.remove()
+                        }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {

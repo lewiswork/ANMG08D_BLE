@@ -314,11 +314,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun checkConnections() {
-        if (com.adsemicon.anmg08d.GlobalVariables.isBtConnected) {
-            if ((com.adsemicon.anmg08d.GlobalVariables.hwStat and 0x06) != 0x06.toByte()) {
+        if (GlobalVariables.isBtConnected) {
+            if ((GlobalVariables.hwStat and 0x06) != 0x06.toByte()) {
                 tvStatus.text = "Relays are off."
                 setControlEnabled(false)
-                //setControlEnabled(true) // for debugging, 임시
             } else {
                 tvStatus.text = "BT connected and relays are on."
 
@@ -361,27 +360,19 @@ class RegisterActivity : AppCompatActivity() {
             Log.d("[ADS] ", "Register thread started. ID : ${this.id}")
             while (regThreadOn) {
 
-//                if (tick){
-//                    hideKeyboard(linearRegisterActivity)
-////                    Log.d("[ADS] ", "Timer tick")
-//                    timer?.cancel()
-//                    tick=false
-//                }
-
                 //------------------------------------------------------------------------------//
                 // Packet 처리
                 //------------------------------------------------------------------------------//
-                synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { qEmpty = com.adsemicon.anmg08d.GlobalVariables.regQueue.isEmpty() }
+                synchronized(GlobalVariables.regQueue) { qEmpty = GlobalVariables.regQueue.isEmpty() }
 
                 if (!qEmpty) {
                     try {
-                        synchronized(com.adsemicon.anmg08d.GlobalVariables.regQueue) { packet = com.adsemicon.anmg08d.GlobalVariables.regQueue.remove() }
+                        synchronized(GlobalVariables.regQueue) { packet = GlobalVariables.regQueue.remove() }
 
                         when (packet.kind) {
-                            com.adsemicon.anmg08d.PacketKind.RegSingleRead -> packetProcRegRead(packet)
-                            com.adsemicon.anmg08d.PacketKind.RegSingleWrite -> {
+                            PacketKind.RegSingleRead -> packetProcRegRead(packet)
+                            PacketKind.RegSingleWrite -> {
                                 packetProcRegWrite()
-                                //Thread.sleep(1)
                             }
                             else -> {}    // Do nothing
                         }
@@ -396,7 +387,7 @@ class RegisterActivity : AppCompatActivity() {
                         break
                     }
                 } else {
-                    Thread.sleep(10)
+                    //Thread.sleep(10)
                 }
                 //------------------------------------------------------------------------------//
             }
@@ -404,12 +395,12 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         private fun packetProcRegRead(packet: RPacket) {
-            val regSize = com.adsemicon.anmg08d.GlobalVariables.regCon.registers.size
+            val regSize = GlobalVariables.regCon.registers.size
             val uAddr = packet.dataList[0].toUByte()
             val uVal = packet.dataList[1].toUByte()
 
-            if (com.adsemicon.anmg08d.GlobalVariables.regCon.hasRegister(uAddr)) {
-                com.adsemicon.anmg08d.GlobalVariables.regCon.setRegister(uAddr, uVal)
+            if (GlobalVariables.regCon.hasRegister(uAddr)) {
+                GlobalVariables.regCon.setRegister(uAddr, uVal)
             }
 
             if (rwAll) {

@@ -196,13 +196,13 @@ class ConnectFragment : Fragment() {
 
             val uuidService = UUID.fromString(UUID_SERVICE)
             val uuidRw = UUID.fromString(UUID_CHAR_RW_NOTIFY)
-            //val ch = bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)
+
             GlobalVariables.btCh =
-                // bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)!!
                 GlobalVariables.bleGatt.getService(uuidService)?.getCharacteristic(uuidRw)!!
 
             //var result = gatt.setCharacteristicNotification(ch, true)
-            gatt.setCharacteristicNotification(GlobalVariables.btCh, true)
+            //gatt.setCharacteristicNotification(GlobalVariables.btCh, true)
+            GlobalVariables.bleGatt.setCharacteristicNotification(GlobalVariables.btCh, true)
 
             // log for successful discovery
             //Log.d("[ADS] ", result.toString())
@@ -226,10 +226,12 @@ class ConnectFragment : Fragment() {
                 //Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
 //            GlobalVariables.rxRawBytesQueue.add(characteristic.getStringValue(0).toByteArray())
                 //var str = characteristic.getStringValue(0)    // String Type 으로 추출(toByteArray 시, Encoding 관련 문제
-                var ba = characteristic.value   // byte[] type 으로 return
 
-                GlobalVariables.rxRawBytesQueue.add(ba)
-            //})
+//            var ba = characteristic.value   // byte[] type 으로 return
+//            GlobalVariables.rxRawBytesQueue.add(ba)
+            synchronized(GlobalVariables.rxRawBytesQueue) {
+                GlobalVariables.rxRawBytesQueue.add(characteristic.value)
+            }
         }
 
         override fun onCharacteristicWrite(
@@ -246,31 +248,31 @@ class ConnectFragment : Fragment() {
             }
         }
 
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic,
-            status: Int,
-        ) {
-            super.onCharacteristicRead(gatt, characteristic, status)
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("[ADS] ", "Characteristic read successfully")
-                readCharacteristic(characteristic)
-            } else {
-                Log.e("[ADS] ", "Characteristic read unsuccessful, status: $status")
-                // Trying to read from the Time Characteristic? It doesnt have the property or permissions
-                // set to allow this. Normally this would be an error and you would want to:
-                // disconnectGattServer();
-            }
-        }
-
-        /**
-         * Log the value of the characteristic
-         * @param characteristic
-         */
-        private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
-            val msg = characteristic.getStringValue(0)
-            Log.d("[ADS] ", "read: $msg")
-        }
+//        override fun onCharacteristicRead(
+//            gatt: BluetoothGatt?,
+//            characteristic: BluetoothGattCharacteristic,
+//            status: Int,
+//        ) {
+//            super.onCharacteristicRead(gatt, characteristic, status)
+//            if (status == BluetoothGatt.GATT_SUCCESS) {
+//                Log.d("[ADS] ", "Characteristic read successfully")
+//                readCharacteristic(characteristic)
+//            } else {
+//                Log.e("[ADS] ", "Characteristic read unsuccessful, status: $status")
+//                // Trying to read from the Time Characteristic? It doesnt have the property or permissions
+//                // set to allow this. Normally this would be an error and you would want to:
+//                // disconnectGattServer();
+//            }
+//        }
+//
+//        /**
+//         * Log the value of the characteristic
+//         * @param characteristic
+//         */
+//        private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
+//            val msg = characteristic.getStringValue(0)
+//            Log.d("[ADS] ", "read: $msg")
+//        }
     }
 
     /**

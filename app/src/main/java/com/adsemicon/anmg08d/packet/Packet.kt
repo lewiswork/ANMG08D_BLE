@@ -196,7 +196,7 @@ class Packet {
             val ba: ByteArray = listTxPacket.toByteArray()
 //            os!!.write(ba)
 
-            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.btCh.value = ba
             GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
             //logTxPacket(ba)
@@ -219,10 +219,10 @@ class Packet {
             // send packet
             val ba: ByteArray = listTxPacket.toByteArray()
             //os!!.write(ba)
-            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.btCh.value = ba
             GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
-            logTxPacket(ba)
+            //logTxPacket(ba)
         }
 
         //--------------------------------------------------------------------------------------//
@@ -240,10 +240,10 @@ class Packet {
 
             val ba: ByteArray = listTxPacket.toByteArray()
             //os!!.write(ba)
-            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.btCh.value = ba
             GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
-            logTxPacket(ba)
+            //logTxPacket(ba)
         }
 
         //--------------------------------------------------------------------------------------//
@@ -262,10 +262,10 @@ class Packet {
 
             val ba: ByteArray = listTxPacket.toByteArray()
             //os!!.write(ba)
-            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.btCh.value = ba
             GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
-            logTxPacket(ba)
+            //logTxPacket(ba)
         }
 
         private fun logTxPacket(ba: ByteArray) {

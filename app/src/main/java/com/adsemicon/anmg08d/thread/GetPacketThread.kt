@@ -41,7 +41,7 @@ class GetPacketThread(context: Context):Thread() {
 
         Log.d("[ADS] ", "Get packet thread started. ID : ${this.id}")
 
-        while (com.adsemicon.anmg08d.GlobalVariables.rxPacketThreadOn) {
+        while (GlobalVariables.rxPacketThreadOn) {
             try {
                 //------------------------------------------------------------------------------//
                 // rawByteQueue 데이터 -> byteList 로 이동
@@ -51,7 +51,8 @@ class GetPacketThread(context: Context):Thread() {
 
                 if (!qEmpty) {
                     try {
-                        synchronized(GlobalVariables.rxRawBytesQueue) { rawByteArray = GlobalVariables.rxRawBytesQueue.remove() }
+                        synchronized(GlobalVariables.rxRawBytesQueue) {
+                            rawByteArray = GlobalVariables.rxRawBytesQueue.remove() }
 
                         var len = rawByteArray.count()
                         for (i in 0 until len) {
@@ -260,35 +261,6 @@ class GetPacketThread(context: Context):Thread() {
         //Log.d("[ADS] ", "[PK RX] $mmLogStr")
         //------------------------------------------------------------------------------//
     }
-
-//    private fun logToFile(str:String) {
-//        //------------------------------------------------------------------------------//
-//        // 발췌 Packet Log 파일 저장
-//        // (테스트 완료, 저장된 파일 확인함 > Android Studio 의 Device File Explorer 사용)
-//        //------------------------------------------------------------------------------//
-//        // 시스템의 임시 디렉토리명을 획득, 운영체제마다 다름
-////        var pathname = System.getProperty("java.io.tmpdir")
-////        var someFile = File("$pathname/rx_packet.txt")
-////
-//        // 문자열을 앞서 지정한 경로에 파일로 저장, 저장시 캐릭터셋은 기본값인 UTF-8으로 저장
-//        // 이미 파일이 존재할 경우 덮어쓰기로 저장
-//        // 파일이 아닌 디렉토리이거나 기타의 이유로 저장이 불가능할 경우 FileNotFoundException 발생
-//        try {
-//            //someFile.appendText("가나다라마바사")
-//            fileName.appendText("$str\n")
-//            Log.d("[ADS] ", "File saved at : $fileName")
-//        } catch (e: FileNotFoundException) {
-//            Log.d("[ADS] ", "FileNotFound: $fileName")
-//        }
-//        //------------------------------------------------------------------------------//
-//
-////        //------------------------------------------------------------------------------//
-////        // Lib test (향 후 적용 예정)
-////        //------------------------------------------------------------------------------//
-////        ADLog.print(LogKind.Log, str)
-////        Log.d("[ADS] ", "File saved at : $fileName")
-////        //------------------------------------------------------------------------------//
-//    }
 
     // writeTextData() method save the data into the file in byte format
     // It also toast a message "Done/filepath_where_the_file_is_saved"

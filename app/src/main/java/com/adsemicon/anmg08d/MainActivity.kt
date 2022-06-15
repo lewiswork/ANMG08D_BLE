@@ -82,9 +82,9 @@ class MainActivity : AppCompatActivity() {
     //---------------------------------------------------------------------------------------//
     private fun disconnectBt() {
 
-        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
-        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
-        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
+//        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+//        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+//        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
         GlobalVariables.rxPacketThreadOn = false

@@ -114,12 +114,12 @@ class JigFragment : Fragment() {
             }
 
             if (GlobalVariables.hwStatPrev == 0x06.toByte() && GlobalVariables.hwStat != 0x06.toByte()) {
-                Packet.send(GlobalVariables.outStream, PacketKind.MonSet, 0x00)  // Stop All Monitoring
+                Packet.send( PacketKind.MonSet, 0x00)  // Stop All Monitoring
                 Log.d("[ADS]", "Monitoring stopped.")
                 //Thread.sleep(100) // ok
                 Thread.sleep(10) // ok
             }
-            Packet.send(GlobalVariables.outStream, PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
+            Packet.send( PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
             GlobalVariables.hwStatPrev = GlobalVariables.hwStat
 
             //binding.textView3.text = Global.hwStat.toString()    // for debugging
@@ -144,7 +144,8 @@ class JigFragment : Fragment() {
                 // Timer 처리
                 //------------------------------------------------------------------------------//
                 if (tick){
-                    Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
+                    //Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
+                    Packet.send( PacketKind.HwRead) // Send packet
                     tick = false
                 }
 

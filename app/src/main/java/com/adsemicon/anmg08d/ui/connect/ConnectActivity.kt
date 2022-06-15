@@ -40,7 +40,6 @@ class ConnectActivity : AppCompatActivity() {
             super.onScanResult(callbackType, result)
             val device = result.device
             Log.d("[ADS] ", "Device found: ${device.address} - ${device.name ?: "Unknown"}")
-            //Log.d("DeviceListActivity","onScanResult: ${result.device?.address} - ${result.device?.name}")
 
             addScanResult(result)
         }
@@ -136,21 +135,8 @@ class ConnectActivity : AppCompatActivity() {
                 }
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d( "[ADS] ", "ACCESS_FINE_LOCATION granted.")
-                    Log.d("[ADS] ", "Proceed next sequence.2")
+//                    Log.d("[ADS] ", "Proceed next sequence.2")
 
-//                    if (ActivityCompat.checkSelfPermission(this,
-//                            Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
-//                    ) {
-//                        // TODO: Consider calling
-//                        //    ActivityCompat#requestPermissions
-//                        // here to request the missing permissions, and then overriding
-//                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                        //                                          int[] grantResults)
-//                        // to handle the case where the user grants the permission. See the documentation
-//                        // for ActivityCompat#requestPermissions for more details.
-//                        Log.d( "[ADS] ", "BLUETOOTH_SCAN is not permitted.")
-//                        return
-//                    }
                     bluetoothLeScanner.startScan(bleScanner)
 
                 } else {
@@ -158,17 +144,6 @@ class ConnectActivity : AppCompatActivity() {
                     //Log.d("[ADS] ", "exit activity.")
                     Toast.makeText(applicationContext, "위치정보 사용 수락 후 App 사용이 가능합니다.", Toast.LENGTH_LONG)
                         .show()
-                    // 권한 요청 거부 시 처리
-//                    if (shouldShowRequestPermissionRationale(
-//                            Manifest.permission.ACCESS_FINE_LOCATION)) { // 4
-//                        Log.d( "[ADS] ", "User declined, but i can still ask for more")
-//                        requestPermissions(
-//                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-//                            0)
-//                    } else {
-//                        Log.d("[ADS] ", "User declined and i can't ask")
-//                        //showDialogToGetPermission()   // 5
-//                    }
                 }
             }
         }
@@ -194,7 +169,7 @@ class ConnectActivity : AppCompatActivity() {
         }else   {
             // 권한 활성 시 이후 Sequence 진행
             Log.d("[ADS] ", "ACCESS_FINE_LOCATION enabled.")
-            Log.d("[ADS] ", "Proceed next sequence")
+            //Log.d("[ADS] ", "Proceed next sequence")
 
             bluetoothLeScanner.startScan(bleScanner)
         }
@@ -218,13 +193,6 @@ class ConnectActivity : AppCompatActivity() {
         bluetoothLeScanner.stopScan(bleScanner)
         Log.d("[ADS] ", "BLUETOOTH SCAN stopped.")
         super.onStop()
-    }
-
-
-    private fun enableLocation(): Boolean {
-        val service =
-            this.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return service.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     //--------------------------------------------------------------------------//

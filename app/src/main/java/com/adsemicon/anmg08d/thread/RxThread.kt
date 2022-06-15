@@ -18,7 +18,6 @@ class RxThread : Thread() {
                     bytes = GlobalVariables.inStream!!.read(rxBuffer)
 
                     if (bytes > 0) {
-                        //synchronized(this) {
                         synchronized(GlobalVariables.rxRawBytesQueue) {
                             arrayCopy = rxBuffer.copyOf(bytes)
                             GlobalVariables.rxRawBytesQueue.add(arrayCopy)

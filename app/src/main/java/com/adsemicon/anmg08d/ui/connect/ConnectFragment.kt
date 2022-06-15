@@ -3,6 +3,7 @@ package com.adsemicon.anmg08d.ui.connect
 import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.bluetooth.*
+import android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8
 import android.content.Context.BLUETOOTH_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,10 +20,12 @@ import androidx.lifecycle.ViewModelProvider
 
 import com.adsemicon.anmg08d.GlobalVariables
 import com.adsemicon.anmg08d.databinding.FragmentConnectBinding
+import com.adsemicon.anmg08d.thread.GetPacketThread
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.CLIENT_CHARACTERISTIC_CONFIG
-//import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_NOTIFICATION
-import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_RW
+import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_RW_NOTIFY
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_SERVICE
+import org.apache.commons.io.Charsets
+import java.nio.charset.Charset
 import java.util.*
 
 
@@ -38,13 +41,7 @@ class ConnectFragment : Fragment() {
     private val REQ_CODE_CONNECT_ACTIVITY = 0
     private val REQ_CODE_BT_EN = 1
 
-    //ble adapter
-    //private var bleAdapter: BluetoothAdapter? = null
-
-
-    private var bleGatt: BluetoothGatt? = null      // BLE Gatt
-
-
+    //private var bleGatt: BluetoothGatt? = null      // BLE Gatt
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,10 +63,10 @@ class ConnectFragment : Fragment() {
         })
 
         try {
-            //GlobalVariables.btAdapter = BluetoothAdapter.getDefaultAdapter()
 
             // ble manager
             val bleManager: BluetoothManager = requireContext().getSystemService( BLUETOOTH_SERVICE ) as BluetoothManager
+
             // set ble adapter
             GlobalVariables.btAdapter= bleManager.adapter
 
@@ -107,10 +104,8 @@ class ConnectFragment : Fragment() {
 
         if (requireActivity().packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Log.d("[ADS] ", "BLE supported.")
-            //binding.tvStatus.text = "BLE supported."  // 미지원 시 처리 Code 구현 예정
         } else {
             Log.d("[ADS] ", "BLE NOT supported.")
-            //binding.tvStatus.text = "BLE NOT supported."
         }
     }
 
@@ -125,21 +120,21 @@ class ConnectFragment : Fragment() {
 //        GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
 //        GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
 
-            // Received Thread 시작
-            try {
-//            GlobalVariables.rxThreadOn = true
-//            GlobalVariables.rxThread = RxThread()
-//            GlobalVariables.rxThread!!.start()
-
+//            // Received Thread 시작
+//            try {
+//  //          GlobalVariables.rxThreadOn = true
+////            GlobalVariables.rxThread = RxThread()
+////            GlobalVariables.rxThread!!.start()
+//
 //            GlobalVariables.rxPacketThreadOn = true
 //            GlobalVariables.getPacketThread = GetPacketThread(requireContext())
 //            GlobalVariables.getPacketThread!!.start()
-            } catch (ex: Exception) {
-                Toast.makeText(this@ConnectFragment.context,
-                    "Error occurred while starting threads.",
-                    Toast.LENGTH_LONG)
-                    .show()
-            }
+//            } catch (ex: Exception) {
+//                Toast.makeText(this@ConnectFragment.context,
+//                    "Error occurred while starting threads.",
+//                    Toast.LENGTH_LONG)
+//                    .show()
+//            }
             GlobalVariables.isBtConnected = true
             displayBtStatus()
 
@@ -149,7 +144,7 @@ class ConnectFragment : Fragment() {
                 .show()
 
 //        Thread.sleep(100)
-//        Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
+        //Packet.send(GlobalVariables.outStream, PacketKind.HwRead) // Send packet
 
         }
     }
@@ -191,34 +186,36 @@ class ConnectFragment : Fragment() {
 
             // find discovered characteristics
             for (service in gatt!!.services) {
-                Log.d("[ADS] ", "[SVC] "+ service.uuid.toString())
+                Log.d("[ADS] ", "[SVC] " + service.uuid.toString())
 
                 for (char in service.characteristics) {
                     Log.d("[ADS] ", "  [CHAR]" + char.uuid.toString())
 
-                    for (desc in char.descriptors){
+                    for (desc in char.descriptors) {
                         Log.d("[ADS] ", "    [DESC]" + desc.uuid.toString())
                     }
                 }
             }
 
             val uuidService = UUID.fromString(UUID_SERVICE)
-            val uuidRw = UUID.fromString(UUID_CHAR_RW)
-            val ch = bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)
+            val uuidRw = UUID.fromString(UUID_CHAR_RW_NOTIFY)
+            //val ch = bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)
+            GlobalVariables.btCh =
+                // bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)!!
+                GlobalVariables.bleGatt.getService(uuidService)?.getCharacteristic(uuidRw)!!
 
             //var result = gatt.setCharacteristicNotification(ch, true)
-            gatt.setCharacteristicNotification(ch, true)
-
+            gatt.setCharacteristicNotification(GlobalVariables.btCh, true)
 
             // log for successful discovery
             //Log.d("[ADS] ", result.toString())
             Log.d("[ADS] ", "Services discovery is successfully.")
 
-            val descriptor:BluetoothGattDescriptor? = ch?.getDescriptor(
+            val descriptor: BluetoothGattDescriptor? = GlobalVariables.btCh?.getDescriptor(
                 UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
             )
             descriptor?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-            gatt!!.writeDescriptor(descriptor);
+            gatt!!.writeDescriptor(descriptor)
         }
 
         override fun onCharacteristicChanged(
@@ -229,7 +226,27 @@ class ConnectFragment : Fragment() {
 
             //activity?.runOnUiThread(Runnable {
             //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
-            Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
+            //Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
+//            GlobalVariables.rxRawBytesQueue.add(characteristic.getStringValue(0).toByteArray())
+            //var str = characteristic.getStringValue(0)
+            var ba = characteristic.value
+
+//            var str = characteristic.getIntValue(0)
+
+            //var str = characteristic.get
+            //Log.d("[ADS] ", "RX : " + str)
+
+            //var uba = ba.to
+            //var ba = str.toByteArray(Charsets.US_ASCII)
+
+            for (b in ba) {
+                Log.d("[ADS] ", "RX[n] : " + String.format("%02X", b))
+         //       Log.d("[ADS] ", "RX[n] : " +  b.toString())
+            }
+
+
+            //GlobalVariables.rxRawBytesQueue.add(str.toByteArray())
+
             //})
         }
 
@@ -280,30 +297,11 @@ class ConnectFragment : Fragment() {
     fun disconnectGattServer() {
         Log.d("[ADS] ", "Closing Gatt connection")
         // disconnect and close the gatt
-        if (bleGatt != null) {
-            bleGatt!!.disconnect()
-            bleGatt!!.close()
+        if (GlobalVariables.bleGatt != null) {
+            GlobalVariables.bleGatt?.disconnect()
+            GlobalVariables.bleGatt?.close()
         }
     }
-//
-//    fun write(){
-//        val cmdCharacteristic = BluetoothUtils.findCommandCharacteristic(bleGatt!!)
-//        // disconnect if the characteristic is not found
-//        if (cmdCharacteristic == null) {
-//            Log.e("[ADS] ", "Unable to find cmd characteristic")
-//            disconnectGattServer()
-//            return
-//        }
-//        val cmdBytes = ByteArray(2)
-//        cmdBytes[0] = 1
-//        cmdBytes[1] = 2
-//        cmdCharacteristic.value = cmdBytes
-//        val success: Boolean = bleGatt!!.writeCharacteristic(cmdCharacteristic)
-//        // check the result
-//        if( !success ) {
-//            Log.e("[ADS] ", "Failed to write command")
-//        }
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -311,7 +309,9 @@ class ConnectFragment : Fragment() {
         if (requestCode == REQ_CODE_CONNECT_ACTIVITY){
             if (resultCode == RESULT_OK){
                 val device = GlobalVariables.selectedDevice
-                bleGatt = device?.connectGatt(context, false, gattClientCallback)
+                //bleGatt = device?.connectGatt(context, false, gattClientCallback)
+                GlobalVariables.bleGatt = device?.connectGatt(context, false, gattClientCallback)
+
             }else if (resultCode == RESULT_CANCELED) {
                 //binding.tvStatus.text = "Connection canceled."
             }
@@ -328,22 +328,6 @@ class ConnectFragment : Fragment() {
             }
         }
     }
-
-//    private fun displayBtStatus() {
-//        if (GlobalVariables.isBtConnected) {
-//            mmBinding?.btnConnect?.isEnabled = false
-//            mmBinding?.btnDisconnect?.isEnabled = true
-//            mmBinding?.tvStatus?.text = "Status : Connected"
-//
-//            mmBinding?.tvDeviceName?.append(GlobalVariables.selectedDevice.name)
-//            mmBinding?.tvMac?.append(GlobalVariables.selectedDevice.address)
-//        }
-//        else
-//        {
-//            mmBinding?.btnConnect?.isEnabled = true
-//            mmBinding?.btnDisconnect?.isEnabled = false
-//        }
-//    }
 
     private fun displayBtStatus() {
         if (GlobalVariables.isBtConnected) {
@@ -368,17 +352,19 @@ class ConnectFragment : Fragment() {
 //            Log.d("[ADS]", "Monitoring stopped.")
 //            Thread.sleep(10) // ok
 //        }
+
         GlobalVariables.hwStat = 0x00
         //Packet.send(GlobalVariables.outStream, PacketKind.HwWrite, GlobalVariables.hwStat) // Send packet
 
-        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
-        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
-        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
+//        if (GlobalVariables.inStream != null) GlobalVariables.inStream!!.close()
+//        if (GlobalVariables.outStream != null) GlobalVariables.outStream!!.close()
+//        if (GlobalVariables.socket != null) GlobalVariables.socket!!.close()
 
         GlobalVariables.rxThreadOn = false
         GlobalVariables.rxPacketThreadOn = false
 
-        mmBinding?.tvStatus?.text = "Status : Disconnected"
+        //mmBinding?.tvStatus?.text = "Status : Disconnected"
+        binding.tvStatus.text = "Status : Disconnected"
 
         GlobalVariables.rxRawBytesQueue.clear()
         GlobalVariables.isBtConnected = false
@@ -415,7 +401,6 @@ class ConnectFragment : Fragment() {
     // btnDisconnect 의 OnClickListener
     //---------------------------------------------------------------------------------------//
     private val listenerDisconnect = View.OnClickListener {
-        //disconnectBt()
         disconnectGattServer()
         disconnectBt()
 
@@ -429,24 +414,21 @@ class ConnectFragment : Fragment() {
     private val listenerSend = View.OnClickListener {
 
         val uuidService = UUID.fromString(UUID_SERVICE)
-        val uuidRw = UUID.fromString(UUID_CHAR_RW)
-
-        val ch = bleGatt!!.getService(uuidService).getCharacteristic(uuidRw)
-
-        var ba = ByteArray(9)
+        val uuidRw = UUID.fromString(UUID_CHAR_RW_NOTIFY)
+        val ch = GlobalVariables.bleGatt.getService(uuidService).getCharacteristic(uuidRw)
+        var ba = ByteArray(8)
 
         ba[0] = 0x02
         ba[1] = 'H'.code.toByte()
-        ba[2] = 'W'.code.toByte()
+        ba[2] = 'R'.code.toByte()
         ba[3] = '0'.code.toByte()
         ba[4] = '0'.code.toByte()
-        ba[5] = '1'.code.toByte()
-        ba[6] = 0x02
-        ba[7] = 0xfe.toByte()
-        ba[8] = 0x03
-        //ch.setValue("OPQ");
+        ba[5] = '0'.code.toByte()
+        //ba[6] = 0x02
+        ba[6] = 0x00
+        ba[7] = 0x03
 
         ch.setValue(ba)
-        bleGatt?.writeCharacteristic(ch)
+        GlobalVariables.bleGatt.writeCharacteristic(ch)
     }
 }

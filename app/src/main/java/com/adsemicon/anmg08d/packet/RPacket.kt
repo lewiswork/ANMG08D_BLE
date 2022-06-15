@@ -1,8 +1,11 @@
 package com.adsemicon.anmg08d.packet
 
+import com.adsemicon.anmg08d.PacketCategory
+import com.adsemicon.anmg08d.PacketKind
+
 data class RPacket (
-    val category: com.adsemicon.anmg08d.PacketCategory? = null,
-    val kind: com.adsemicon.anmg08d.PacketKind? = null,
+    val category: PacketCategory? = null,
+    val kind: PacketKind? = null,
     val dataLength: Int,
     val dataList: ByteArray
 ) {

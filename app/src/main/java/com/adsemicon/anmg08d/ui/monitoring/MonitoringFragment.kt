@@ -19,6 +19,7 @@ import java.text.DecimalFormat
 import kotlin.experimental.and
 import kotlin.experimental.or
 import com.adsemicon.anmg08d.GlobalVariables
+import com.adsemicon.anmg08d.PacketKind
 
 class MonitoringFragment : Fragment() {
 
@@ -212,7 +213,7 @@ class MonitoringFragment : Fragment() {
                     if (mask == 0x00.toByte()) {
                         stopMonitoring()
                         GlobalVariables.waitForStopMon = true
-                    } else Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, mask) // Send packet
+                    } else Packet.send(PacketKind.MonSet, mask) // Send packet
                 }
                 binding.btnClearMon -> {
                     stopMonitoring()
@@ -235,8 +236,8 @@ class MonitoringFragment : Fragment() {
     }
 
     private val listenerSwReset = View.OnClickListener {
-        Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
-        com.adsemicon.anmg08d.GlobalVariables.waitForSwReset=true
+        Packet.send(PacketKind.RegSwReset) // Send packet
+        GlobalVariables.waitForSwReset=true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -253,7 +254,7 @@ class MonitoringFragment : Fragment() {
         binding.swTouch.isChecked = false
         binding.swPercent.isChecked = false
 
-        Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.MonSet, 0x00)
+        Packet.send(PacketKind.MonSet, 0x00)
     }
 
     //---------------------------------------------------------------------------------------//
@@ -271,7 +272,7 @@ class MonitoringFragment : Fragment() {
                 monitoring()
 
                 // SW Reset Packet 미응답 시, 재 전송
-                if (com.adsemicon.anmg08d.GlobalVariables.waitForSwReset) Packet.send(com.adsemicon.anmg08d.GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.RegSwReset) // Send packet
+                if (GlobalVariables.waitForSwReset) Packet.send(PacketKind.RegSwReset) // Send packet
 
                 //------------------------------------------------------------------------------//
                 // Packet 처리

@@ -1,6 +1,9 @@
 package com.adsemicon.anmg08d.packet
 
 import android.util.Log
+import com.adsemicon.anmg08d.GlobalVariables
+import com.adsemicon.anmg08d.PacketCategory
+import com.adsemicon.anmg08d.PacketKind
 import com.adsemicon.anmg08d.function.log.PacketType
 import java.io.OutputStream
 import java.lang.Exception
@@ -14,29 +17,29 @@ class Packet {
         const val IDX_DATA_START : Int = 6
 
         val packetCategory = mapOf(
-            "E" to com.adsemicon.anmg08d.PacketCategory.Rom,
-            "M" to com.adsemicon.anmg08d.PacketCategory.Monitoring,
-            "R" to com.adsemicon.anmg08d.PacketCategory.Register,
-            "H" to com.adsemicon.anmg08d.PacketCategory.Hardware,
-            "T" to com.adsemicon.anmg08d.PacketCategory.Test
+            "E" to PacketCategory.Rom,
+            "M" to PacketCategory.Monitoring,
+            "R" to PacketCategory.Register,
+            "H" to PacketCategory.Hardware,
+            "T" to PacketCategory.Test
         )
 
         val packetKind = mapOf(
-            "HW" to com.adsemicon.anmg08d.PacketKind.HwWrite,
-            "HR" to com.adsemicon.anmg08d.PacketKind.HwRead,
+            "HW" to PacketKind.HwWrite,
+            "HR" to PacketKind.HwRead,
 
-            "MS" to com.adsemicon.anmg08d.PacketKind.MonSet,
-            "MT" to com.adsemicon.anmg08d.PacketKind.MonTouch,
-            "MP" to com.adsemicon.anmg08d.PacketKind.MonPercent,
+            "MS" to PacketKind.MonSet,
+            "MT" to PacketKind.MonTouch,
+            "MP" to PacketKind.MonPercent,
 
-            "RX" to com.adsemicon.anmg08d.PacketKind.RegSingleRead,
-            "RY" to com.adsemicon.anmg08d.PacketKind.RegSingleWrite,
-            "RI" to com.adsemicon.anmg08d.PacketKind.RegSwReset
+            "RX" to PacketKind.RegSingleRead,
+            "RY" to PacketKind.RegSingleWrite,
+            "RI" to PacketKind.RegSwReset
         )
 
         private val listTxPacket: ArrayList<Byte> = ArrayList()
 
-        private fun setHeader(kind: com.adsemicon.anmg08d.PacketKind) {
+        private fun setHeader(kind: PacketKind) {
             val str: String = packetKind.entries.find { it.value == kind }!!.key
             val ba = str.toByteArray()
             if (str.length == 2) {
@@ -98,11 +101,90 @@ class Packet {
             return calcVal.toByte()
         }
 
+//        //--------------------------------------------------------------------------------------//
+//        // Make packet without data
+//        // 데이터 없는 Packet 생성/전송
+//        //--------------------------------------------------------------------------------------//
+//        fun send(os: OutputStream?, kind: PacketKind) {
+//            listTxPacket.clear()
+//
+//            listTxPacket.add(STX)   // Set Start of Packet(STX)
+//            setHeader(kind) // Set Header
+//            setSize(0)  // Set Size as 0
+//            listTxPacket.add(0) // Set checksum as 0
+//            listTxPacket.add(ETX)   // Set End of Packet(ETX)
+//
+//            val ba: ByteArray = listTxPacket.toByteArray()
+//            os!!.write(ba)
+//
+//            logTxPacket(ba)
+//        }
+//
+//        //--------------------------------------------------------------------------------------//
+//        // 1-byte 데이터 Packet 생성/전송
+//        //--------------------------------------------------------------------------------------//
+//        fun send(os: OutputStream?, kind: PacketKind, b: Byte) {
+//            listTxPacket.clear()
+//
+//            // make packet
+//            listTxPacket.add(STX)           // Set Start of Packet(STX)
+//            setHeader(kind)                 // Set Header
+//            setSize(1)                      // Set Size
+//            listTxPacket.add(b)             // Set Data
+//            setChecksum(makeChecksum(b))    // Set checksum
+//            listTxPacket.add(ETX)           // Set End of Packet(ETX)
+//
+//            // send packet
+//            val ba: ByteArray = listTxPacket.toByteArray()
+//            os!!.write(ba)
+//
+//            logTxPacket(ba)
+//        }
+//
+//        //--------------------------------------------------------------------------------------//
+//        // 2-byte 이상 데이터 Packet 생성/전송, Data Length 미지정(Byte Array Size = Data Length 인 경우)
+//        //--------------------------------------------------------------------------------------//
+//        fun send(os: OutputStream?, kind: PacketKind, ba: ByteArray) {
+//            listTxPacket.clear()
+//
+//            listTxPacket.add(STX)               // Set Start of Packet(STX)
+//            setHeader(kind)                 // Set Header
+//            setSize(ba.size)    // Set Size
+//            for (b in ba) listTxPacket.add(b)    // Set Data
+//            setChecksum(makeChecksum(ba))   // Set checksum
+//            listTxPacket.add(ETX)   // Set End of Packet(ETX)
+//
+//            val ba: ByteArray = listTxPacket.toByteArray()
+//            os!!.write(ba)
+//
+//            logTxPacket(ba)
+//        }
+//
+//        //--------------------------------------------------------------------------------------//
+//        // 2-byte 이상 데이터 Packet 생성/전송, Data Length 지정(Byte Array Size != Data Length 인 경우)
+//        //--------------------------------------------------------------------------------------//
+//        fun send(os: OutputStream?, kind: PacketKind, ba: ByteArray, dataLength:Int) {
+//            var i: Int
+//            listTxPacket.clear()
+//
+//            listTxPacket.add(STX)   // Set Start of Packet(STX)
+//            setHeader(kind) // Set Header
+//            setSize(dataLength) // Set Size
+//            for (i in 0 until dataLength) listTxPacket.add(ba[i])    // Set Data
+//            setChecksum(makeChecksum(ba, dataLength))   // Set checksum
+//            listTxPacket.add(ETX)   // Set End of Packet(ETX)
+//
+//            val ba: ByteArray = listTxPacket.toByteArray()
+//            os!!.write(ba)
+//
+//            logTxPacket(ba)
+//        }
+
         //--------------------------------------------------------------------------------------//
         // Make packet without data
         // 데이터 없는 Packet 생성/전송
         //--------------------------------------------------------------------------------------//
-        fun send(os: OutputStream?, kind: com.adsemicon.anmg08d.PacketKind) {
+        fun send( kind: PacketKind) {
             listTxPacket.clear()
 
             listTxPacket.add(STX)   // Set Start of Packet(STX)
@@ -112,7 +194,10 @@ class Packet {
             listTxPacket.add(ETX)   // Set End of Packet(ETX)
 
             val ba: ByteArray = listTxPacket.toByteArray()
-            os!!.write(ba)
+//            os!!.write(ba)
+
+            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
             logTxPacket(ba)
         }
@@ -120,7 +205,7 @@ class Packet {
         //--------------------------------------------------------------------------------------//
         // 1-byte 데이터 Packet 생성/전송
         //--------------------------------------------------------------------------------------//
-        fun send(os: OutputStream?, kind: com.adsemicon.anmg08d.PacketKind, b: Byte) {
+        fun send( kind: PacketKind, b: Byte) {
             listTxPacket.clear()
 
             // make packet
@@ -133,7 +218,9 @@ class Packet {
 
             // send packet
             val ba: ByteArray = listTxPacket.toByteArray()
-            os!!.write(ba)
+            //os!!.write(ba)
+            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
             logTxPacket(ba)
         }
@@ -141,7 +228,7 @@ class Packet {
         //--------------------------------------------------------------------------------------//
         // 2-byte 이상 데이터 Packet 생성/전송, Data Length 미지정(Byte Array Size = Data Length 인 경우)
         //--------------------------------------------------------------------------------------//
-        fun send(os: OutputStream?, kind: com.adsemicon.anmg08d.PacketKind, ba: ByteArray) {
+        fun send(kind: PacketKind, ba: ByteArray) {
             listTxPacket.clear()
 
             listTxPacket.add(STX)               // Set Start of Packet(STX)
@@ -152,7 +239,9 @@ class Packet {
             listTxPacket.add(ETX)   // Set End of Packet(ETX)
 
             val ba: ByteArray = listTxPacket.toByteArray()
-            os!!.write(ba)
+            //os!!.write(ba)
+            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
             logTxPacket(ba)
         }
@@ -160,7 +249,7 @@ class Packet {
         //--------------------------------------------------------------------------------------//
         // 2-byte 이상 데이터 Packet 생성/전송, Data Length 지정(Byte Array Size != Data Length 인 경우)
         //--------------------------------------------------------------------------------------//
-        fun send(os: OutputStream?, kind: com.adsemicon.anmg08d.PacketKind, ba: ByteArray, dataLength:Int) {
+        fun send(kind: PacketKind, ba: ByteArray, dataLength:Int) {
             var i: Int
             listTxPacket.clear()
 
@@ -172,7 +261,9 @@ class Packet {
             listTxPacket.add(ETX)   // Set End of Packet(ETX)
 
             val ba: ByteArray = listTxPacket.toByteArray()
-            os!!.write(ba)
+            //os!!.write(ba)
+            GlobalVariables.btCh.setValue(ba)
+            GlobalVariables.bleGatt.writeCharacteristic(GlobalVariables.btCh)
 
             logTxPacket(ba)
         }
@@ -198,7 +289,7 @@ class Packet {
                 }
             }
 
-            com.adsemicon.anmg08d.GlobalVariables.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
+            GlobalVariables.packetLog.printPacket(PacketType.TX, logStr.toString())  // 임시, 향 후 Library 적용 예정
             Log.d("[ADS] ", "[PK TX] $logStr")
         }
     }

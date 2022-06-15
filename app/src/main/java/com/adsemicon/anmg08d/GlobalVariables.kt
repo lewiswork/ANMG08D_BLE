@@ -1,8 +1,6 @@
 package com.adsemicon.anmg08d
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothSocket
+import android.bluetooth.*
 import android.content.Context
 import com.adsemicon.anmg08d.function.log.MonitoringLog
 import com.adsemicon.anmg08d.function.log.SystemLog
@@ -29,6 +27,10 @@ class GlobalVariables {
         // Bluetooth 관련
         lateinit var btAdapter: BluetoothAdapter       // Late Initialize : 변수 초기화를 나중으로 미룸
         lateinit var selectedDevice: BluetoothDevice
+
+        lateinit var btCh: BluetoothGattCharacteristic
+        lateinit var bleGatt: BluetoothGatt      // BLE Gatt
+
         var rxRawBytesQueue: Queue<ByteArray> = LinkedList()
         var isBtConnected: Boolean = false           // BT 연결 상태
 
@@ -39,7 +41,7 @@ class GlobalVariables {
         var rxThreadOn = false
         var rxPacketThreadOn = false
 
-        var rxThread: RxThread? = null
+        //var rxThread: RxThread? = null
         var getPacketThread: GetPacketThread? = null
 
         var romQueue: Queue<RPacket> = LinkedList()
@@ -55,25 +57,6 @@ class GlobalVariables {
         var waitForSwReset: Boolean = false // Jig 로부터 응답이 없을 시 Packet 재전송 목적
 
         var regCon: RegisterController = RegisterController()
-
-//        var instance: MainActivity? =MainActivity()
-//        fun applicationContext() : Context {
-//            return instance!!.applicationContext
-//        }
-//        var path = instance!!.applicationContext
-
-        //lateinit var basePath: File
-
-        // System Logs
-//        var packetLog = SystemLog("system", "packet.txt")
-//        //var packetLog = SystemLog("system", "packet.txt")
-//        var errLog = SystemLog("system", "error.txt", "ERR", true)
-//
-//        // Monitoring Logs
-//        var touchLog = MonitoringLog("monitoring", "touch.txt")
-//        var percentLog = MonitoringLog("monitoring", "percent.txt")
-//
-//        val monitoring = Monitoring()   // Touch/Percent Log 객체 생성 이후에 생성
 
         //------------------------------------------------------------------//
         // External Storage 사용을 위해

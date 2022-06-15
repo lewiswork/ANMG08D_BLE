@@ -25,7 +25,7 @@ class Constants {
         const val CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb"
 
         const val UUID_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb"
-        const val UUID_CHAR_RW = "0000ffe1-0000-1000-8000-00805f9b34fb"
+        const val UUID_CHAR_RW_NOTIFY = "0000ffe1-0000-1000-8000-00805f9b34fb"
         //const val UUID_CHAR_NOTIFICATION = "0000ffe3-0000-1000-8000-00805f9b34fb"
         //const val UUID_CHAR_NOTIFICATION = "0000ffe1-0000-1000-8000-00805f9b34fb"
     }

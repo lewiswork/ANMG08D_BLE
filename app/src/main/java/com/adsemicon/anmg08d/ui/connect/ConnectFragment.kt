@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.adsemicon.anmg08d.GlobalVariables
 import com.adsemicon.anmg08d.databinding.FragmentConnectBinding
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.CLIENT_CHARACTERISTIC_CONFIG
-import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_NOTIFICATION
+//import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_NOTIFICATION
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_CHAR_RW
 import com.adsemicon.anmg08d.ui.connect.Constants.Companion.UUID_SERVICE
 import java.util.*
@@ -39,18 +39,11 @@ class ConnectFragment : Fragment() {
     private val REQ_CODE_BT_EN = 1
 
     //ble adapter
-    private var bleAdapter: BluetoothAdapter? = null
-
-    // BLE Gatt
-    private var bleGatt: BluetoothGatt? = null
-
-    private val writeGattCharacteristic: BluetoothGattCharacteristic? = null
-
-    var tick=false
-    var timer : Timer? = null
+    //private var bleAdapter: BluetoothAdapter? = null
 
 
-    var connected=false
+    private var bleGatt: BluetoothGatt? = null      // BLE Gatt
+
 
 
     override fun onCreateView(
@@ -97,20 +90,6 @@ class ConnectFragment : Fragment() {
             binding.btnConnect.isEnabled=false
         }
 
-//        timer = kotlin.concurrent.timer(period = 10) {
-//            tick = true
-//
-//            if (connected) {
-//                val uuidService = UUID.fromString(UUID_SERVICE)
-//                val uuidRw = UUID.fromString(UUID_CHAR_RW)
-//
-//                val ch = bleGatt!!.getService(uuidService).getCharacteristic(uuidRw)
-//
-//
-//                bleGatt!!.readCharacteristic(ch)
-//            }
-//        }
-
         return root
     }
 
@@ -134,60 +113,6 @@ class ConnectFragment : Fragment() {
             //binding.tvStatus.text = "BLE NOT supported."
         }
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == REQ_CODE_CONNECT_ACTIVITY){
-//            if (resultCode == RESULT_OK){
-//                val device = GlobalVariables.selectedDevice
-//
-//                GlobalVariables.socket = device.createRfcommSocketToServiceRecord(device.uuids[0].uuid)
-//                GlobalVariables.socket!!.connect()
-//
-//                // Get Input/Output Stream using socket
-//                GlobalVariables.inStream = GlobalVariables.socket!!.inputStream
-//                GlobalVariables.outStream = GlobalVariables.socket!!.outputStream
-//
-//                // Received Thread 시작
-//                try {
-//                    GlobalVariables.rxThreadOn =true
-//                    GlobalVariables.rxThread = RxThread()
-//                    GlobalVariables.rxThread!!.start()
-//
-//                    GlobalVariables.rxPacketThreadOn =true
-//                    GlobalVariables.getPacketThread = GetPacketThread(requireContext())
-//                    GlobalVariables.getPacketThread!!.start()
-//                } catch (ex: Exception) {
-//                    Toast.makeText(this@ConnectFragment.context,
-//                        "Error occurred while starting threads.",
-//                        Toast.LENGTH_LONG)
-//                        .show()
-//                }
-//                GlobalVariables.isBtConnected = true
-//                displayBtStatus()
-//
-//                Toast.makeText(this@ConnectFragment.context, "Bluetooth device connected.", Toast.LENGTH_LONG)
-//                    .show()
-//
-//                Thread.sleep(100)
-//                Packet.send(GlobalVariables.outStream, com.adsemicon.anmg08d.PacketKind.HwRead) // Send packet
-//            }else if (resultCode == RESULT_CANCELED) {
-//                //tvStatus.text = "Connection canceled."
-//            }
-//        }else if (requestCode == REQ_CODE_BT_EN) {
-//            if (resultCode == RESULT_OK){
-//                Toast.makeText(this@ConnectFragment.context, "Bluetooth 기능이 활성화되었습니다.", Toast.LENGTH_LONG)
-//                    .show()
-//                showConnectActivity()
-//            }
-//            else{
-//                var msg = "Bluetooth Enable 후 App 사용이 가능합니다."
-//                Toast.makeText(this@ConnectFragment.context, msg, Toast.LENGTH_LONG)
-//                    .show()
-//            }
-//        }
-//    }
 
     fun bleConnectionProc() {
 
@@ -237,25 +162,20 @@ class ConnectFragment : Fragment() {
             super.onConnectionStateChange(gatt, status, newState)
             if( status == BluetoothGatt.GATT_FAILURE ) {
                 disconnectGattServer()
-                //binding.tvStatus.text = "Connection failed 1."
                 return
             } else if( status != BluetoothGatt.GATT_SUCCESS ) {
                 disconnectGattServer()
-                //binding.tvStatus.text = "Connection failed 2."
                 return
             }
 
             if( newState == BluetoothProfile.STATE_CONNECTED ) {
                 // update the connection status message
-
-                //binding.tvStatus.text = "Connected."
                 Log.d("[ADS] ", "Connected to the GATT server")
                 gatt.discoverServices()
 
                 bleConnectionProc()
             } else if ( newState == BluetoothProfile.STATE_DISCONNECTED ) {
                 disconnectGattServer()
-                //binding.tvStatus.text = "Connection failed 3."
             }
         }
 
@@ -269,19 +189,8 @@ class ConnectFragment : Fragment() {
                 return
             }
 
-//            // find discovered characteristics
-//            // find discovered characteristics
-//            val  matching_characteristics : List<BluetoothGattCharacteristic> = BluetoothUtils.findBLECharacteristics(gatt!!)
-//            //val  matching_characteristics : List<BluetoothGattCharacteristic> = BluetoothUtils.findBLECharacteristics(bleGatt!!)
-//            if (matching_characteristics.isEmpty()) {
-//                Log.e("[ADS] ", "Unable to find characteristics")
-//                return
-//            }
-
-            //val gatt = BleManager.getInstance().getBluetoothGatt(GlobalVariables.selectedDevice)
-
+            // find discovered characteristics
             for (service in gatt!!.services) {
-                //mResultAdapter!!.addResult(service)
                 Log.d("[ADS] ", "[SVC] "+ service.uuid.toString())
 
                 for (char in service.characteristics) {
@@ -294,54 +203,16 @@ class ConnectFragment : Fragment() {
             }
 
             val uuidService = UUID.fromString(UUID_SERVICE)
-            val uuidNotification = UUID.fromString(UUID_CHAR_NOTIFICATION)
             val uuidRw = UUID.fromString(UUID_CHAR_RW)
-
-            //val ch = gatt.getService(uuidService).getCharacteristic(uuidRw)
             val ch = bleGatt?.getService(uuidService)?.getCharacteristic(uuidRw)
-//            val descriptor:BluetoothGattDescriptor = ch.getDescriptor(
-//                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
-//            )
-//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-//            gatt!!.writeDescriptor(descriptor);
 
-            //ch.setValue("LMN");
-//            gatt!!.writeCharacteristic(ch)
-
-//            gatt!!.setCharacteristicNotification(ch, true)
-//            // UUID for notification
-//            val descriptor:BluetoothGattDescriptor = ch.getDescriptor(
-//                UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
-//            )
-//            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-//            gatt.writeDescriptor(descriptor)
-
-
-            var result = gatt.setCharacteristicNotification(ch, true)
+            //var result = gatt.setCharacteristicNotification(ch, true)
+            gatt.setCharacteristicNotification(ch, true)
 
 
             // log for successful discovery
-            Log.d("[ADS] ", result.toString())
+            //Log.d("[ADS] ", result.toString())
             Log.d("[ADS] ", "Services discovery is successfully.")
-            //bleConnectionProc()
-
-//            var ba  =  ByteArray(9)
-//            var ba2  =  ByteArray(1)
-//
-//            ba[0] = 0x02
-//            ba[1] = 'H'.code.toByte()
-//            ba[2] = 'W'.code.toByte()
-//            ba[3] = '0'.code.toByte()
-//            ba[4] = '0'.code.toByte()
-//            ba[5] = '1'.code.toByte()
-//            ba[6] = 0x02
-//            ba[7] = 0xfe.toByte()
-//            ba[8] = 0x03
-//            //ch.setValue("OPQ");
-//
-//            ch?.setValue(ba)
-//            //gatt!!.writeCharacteristic(ch)
-//           bleGatt?.writeCharacteristic(ch)
 
             val descriptor:BluetoothGattDescriptor? = ch?.getDescriptor(
                 UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG)
@@ -355,16 +226,11 @@ class ConnectFragment : Fragment() {
             characteristic: BluetoothGattCharacteristic,
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            //Log.d("[ADS] ", "characteristic changed: " + characteristic.uuid.toString())
 
-            //readCharacteristic(characteristic)
-
-            activity?.runOnUiThread(Runnable {
-                //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
-                Log.d("[ADS] ", "onCharacteristicChanged: " + characteristic.getStringValue(0))
-
-                //readCharacteristic(characteristic)
-            })
+            //activity?.runOnUiThread(Runnable {
+            //Log.d("[ADS] ", "onCharacteristicChanged: 변화 감지 했습니다")
+            Log.d("[ADS] ", "RX : " + characteristic.getStringValue(0))
+            //})
         }
 
         override fun onCharacteristicWrite(
@@ -375,9 +241,6 @@ class ConnectFragment : Fragment() {
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d("[ADS] ", "Characteristic written successfully")
-
-                //gatt!!.readCharacteristic(characteristic)
-
             } else {
                 Log.e("[ADS] ", "Characteristic write successfully, status: $status")
                 disconnectGattServer()
@@ -406,13 +269,9 @@ class ConnectFragment : Fragment() {
          * @param characteristic
          */
         private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
-
             val msg = characteristic.getStringValue(0)
-            //binding.tvStatus.text = msg
             Log.d("[ADS] ", "read: $msg")
         }
-
-
     }
 
     /**
@@ -426,25 +285,25 @@ class ConnectFragment : Fragment() {
             bleGatt!!.close()
         }
     }
-
-    fun write(){
-        val cmdCharacteristic = BluetoothUtils.findCommandCharacteristic(bleGatt!!)
-        // disconnect if the characteristic is not found
-        if (cmdCharacteristic == null) {
-            Log.e("[ADS] ", "Unable to find cmd characteristic")
-            disconnectGattServer()
-            return
-        }
-        val cmdBytes = ByteArray(2)
-        cmdBytes[0] = 1
-        cmdBytes[1] = 2
-        cmdCharacteristic.value = cmdBytes
-        val success: Boolean = bleGatt!!.writeCharacteristic(cmdCharacteristic)
-        // check the result
-        if( !success ) {
-            Log.e("[ADS] ", "Failed to write command")
-        }
-    }
+//
+//    fun write(){
+//        val cmdCharacteristic = BluetoothUtils.findCommandCharacteristic(bleGatt!!)
+//        // disconnect if the characteristic is not found
+//        if (cmdCharacteristic == null) {
+//            Log.e("[ADS] ", "Unable to find cmd characteristic")
+//            disconnectGattServer()
+//            return
+//        }
+//        val cmdBytes = ByteArray(2)
+//        cmdBytes[0] = 1
+//        cmdBytes[1] = 2
+//        cmdCharacteristic.value = cmdBytes
+//        val success: Boolean = bleGatt!!.writeCharacteristic(cmdCharacteristic)
+//        // check the result
+//        if( !success ) {
+//            Log.e("[ADS] ", "Failed to write command")
+//        }
+//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
